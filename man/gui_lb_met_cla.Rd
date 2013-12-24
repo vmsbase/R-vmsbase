@@ -1,0 +1,32 @@
+\name{gui_lb_met_cla}
+\alias{gui_lb_met_cla}
+\title{LogBook Metier Classification GUI}
+\usage{
+gui_lb_met_cla(lb_db_name = "")
+}
+\arguments{
+  \item{lb_db_name}{The path of a LogBook DataBase}
+}
+\value{
+This function does not return a value.  After the execution
+the computed result will be added to the logbook database
+in the 'lb_cla' table.
+}
+\description{
+The \code{gui_lb_met_cla} function implements the graphical
+user interface for the LogBook metier classification
+}
+\details{
+This function, with a LogBook DB and a Metier Discovery
+object (see \code{\link{gui_lb_met_dis}}), computes a fuzzy
+classification of the logbooks in the seleted db according
+to the data provided from the Metier Discovery object.
+}
+\references{
+free text reference Pointers to the literature related to
+this object.
+}
+\seealso{
+\code{\link{gui_lb_met_dis}}
+}
+

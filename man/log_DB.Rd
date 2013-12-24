@@ -1,0 +1,20 @@
+\docType{class}
+\name{log_DB}
+\alias{log_DB}
+\alias{log_DB-class}
+\title{LogBook DataBase class}
+\description{
+LogBook DataBase reference Class
+
+\itemize{ \item{\code{dir} character path of the LogBook
+DataBase} \item{\code{db} character name of the LogBook
+DataBase} \item{\code{tab} character tables in the LogBook
+DataBase}
+
+}
+}
+\details{
+\code{log_DB} class is a reference class for the Logbook
+DataBase.
+}
+

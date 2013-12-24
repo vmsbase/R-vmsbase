@@ -1,0 +1,31 @@
+\name{Assign_Area}
+\alias{Assign_Area}
+\title{Assign Area - Internal Function}
+\usage{
+Assign_Area(evnt, box)
+}
+\arguments{
+  \item{evnt}{The VMS Track Data}
+
+  \item{box}{The Sea Areas Shape File Box}
+}
+\value{
+This function does not return a value.
+}
+\description{
+The \code{Assign_Area} is the internal function that
+implements the Assign Area routine.
+}
+\details{
+This function, with a VMS DB Track and a Sea Areas Shape
+File, (see \code{\link{gui_vms_db_are}}), finds the Sea
+Area that contain the VMS DB Track.
+}
+\references{
+free text reference Pointers to the literature related to
+this object.
+}
+\seealso{
+\code{\link{gui_vms_db_are}}
+}
+

@@ -1,0 +1,34 @@
+\name{Join2shp}
+\alias{Join2shp}
+\title{Shape File Data Joining - Internal Function}
+\usage{
+Join2shp(shpfile, datavector, dirdest)
+}
+\arguments{
+  \item{shpfile}{The Original Grid Shape File}
+
+  \item{datavector}{The Effort Count Vector}
+
+  \item{dirdest}{The File Destination Directory}
+}
+\value{
+This function does not return a value.
+}
+\description{
+The \code{Join2shp} is the internal function that
+implements the Shape File Data Joining routine.
+}
+\details{
+This function, with a Grid Shape File, an Effort Count
+Vector and a File Destination Directory, (see
+\code{\link{gui_out_grid}}), creates a new Grid Shape File
+annotated with the Effort Count Vector.
+}
+\references{
+free text reference Pointers to the literature related to
+this object.
+}
+\seealso{
+\code{\link{gui_out_grid}}
+}
+

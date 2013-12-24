@@ -1,0 +1,25 @@
+\name{gui_lb_db_stat}
+\alias{gui_lb_db_stat}
+\title{LogBook DB Status GUI}
+\usage{
+gui_lb_db_stat(lb_db_name = "")
+}
+\arguments{
+  \item{lb_db_name}{The path of a LogBook DataBase}
+}
+\value{
+This function does not return a value.
+}
+\description{
+The \code{gui_lb_db_stat} function implements the graphical
+user interface for the LogBook DB Status viewer.
+}
+\details{
+This function, with a LogBook database, shows the current
+LogBook DB status.
+}
+\references{
+free text reference Pointers to the literature related to
+this object.
+}
+

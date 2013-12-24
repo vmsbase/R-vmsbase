@@ -1,0 +1,20 @@
+\docType{class}
+\name{vms_DB}
+\alias{vms_DB}
+\alias{vms_DB-class}
+\title{VMS DataBase class}
+\description{
+VMS DataBase reference Class
+
+\itemize{ \item{\code{dir} character path of the VMS
+DataBase} \item{\code{db} character name of the VMS
+DataBase} \item{\code{tab} character tables in the VMS
+DataBase}
+
+}
+}
+\details{
+\code{vms_DB} class is a reference class for the VMS
+DataBase.
+}
+

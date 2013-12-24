@@ -1,0 +1,16 @@
+\name{kno2kmh}
+\alias{kno2kmh}
+\title{Knots to Km/h speed conversion function}
+\usage{
+kno2kmh(speed)
+}
+\arguments{
+  \item{speed}{The value in knots of the speed.}
+}
+\value{
+The function returns the speed value converted in km/h
+}
+\description{
+\code{kno2kmh} converts speed in knots to km/h values.
+}
+

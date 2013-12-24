@@ -1,0 +1,24 @@
+\name{gui_lb_editraw}
+\alias{gui_lb_editraw}
+\title{Raw LogBook Editing GUI}
+\usage{
+gui_lb_editraw()
+}
+\value{
+This function does not return a value.  After the execution
+the user is asked where to put the edited file.
+}
+\description{
+The \code{gui_lb_editraw} function implements the graphical
+user interface for the editing of a raw logbook dataset
+}
+\details{
+This function, with a raw logbook dataset, produces an
+edited version of it. The user must select, for each
+mandatory field, the column name where the data is stored.
+}
+\references{
+free text reference Pointers to the literature related to
+this object.
+}
+

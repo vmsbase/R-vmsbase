@@ -1,0 +1,34 @@
+\name{gui_out_grid}
+\alias{gui_out_grid}
+\title{VMS Effort Gridding GUI}
+\usage{
+gui_out_grid(vms_db_name = "")
+}
+\arguments{
+  \item{vms_db_name}{The path of a VMS DataBase}
+}
+\value{
+This function does not return a value.  The result count
+will be plotted on the submitted grid. The user can both
+save the result count vector as an r object (necessary for
+\code{\link{gui_dcf_ind}}), or the annotated grid shape
+file.
+}
+\description{
+The \code{gui_out_grid} function implements the graphical
+user interface for the VMS Effort Gridding
+}
+\details{
+This function, with a VMS DB and a Grid Sea Area Map shape
+file, computes the total fishing effort (in hours) over
+each cell of the submitted grid, relative to the selected
+metier
+}
+\references{
+free text reference Pointers to the literature related to
+this object.
+}
+\seealso{
+\code{\link{gui_dcf_ind}}
+}
+

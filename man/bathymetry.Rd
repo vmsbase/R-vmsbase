@@ -1,0 +1,19 @@
+\docType{class}
+\name{bathymetry}
+\alias{bathymetry}
+\alias{bathymetry-class}
+\title{Bathymetry rData File class}
+\description{
+Bathymetry rData File reference Class
+
+\itemize{ \item{\code{path} character The Path to the
+Bathymetry rData file} \item{\code{data} XYZ-matrix The
+loaded Bathymetry data}
+
+}
+}
+\details{
+\code{bathymetry} class is a reference class for the
+Bathymetry rData file.
+}
+

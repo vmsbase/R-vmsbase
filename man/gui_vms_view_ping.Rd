@@ -1,0 +1,32 @@
+\name{gui_vms_view_ping}
+\alias{gui_vms_view_ping}
+\title{VMS DB View Raw Ping Data GUI}
+\usage{
+gui_vms_view_ping(vms_db_name = "", bathy_file_name = "")
+}
+\arguments{
+  \item{vms_db_name}{The path of a VMS DataBase}
+
+  \item{bathy_file_name}{The path of a Bathymetry file}
+}
+\value{
+This function does not return a value.
+}
+\description{
+The \code{gui_vms_view_ping} function implements the
+graphical user interface for the VMS DB routine to view raw
+ping data.
+}
+\details{
+This function, with a VMS database, plots vessel data.
+}
+\references{
+free text reference Pointers to the literature related to
+this object.
+}
+\seealso{
+\code{\link{gui_vms_save_bat}}
+\code{\link{gui_vms_view_track}}
+\code{\link{gui_vms_view_intrp}}
+}
+

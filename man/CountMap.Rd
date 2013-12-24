@@ -1,0 +1,31 @@
+\name{CountMap}
+\alias{CountMap}
+\title{Effort Count - Internal Function}
+\usage{
+CountMap(xy, GridPS)
+}
+\arguments{
+  \item{xy}{The VMS Fishing Point Data}
+
+  \item{GridPS}{The Sea Area Grid File}
+}
+\value{
+This function does not return a value.
+}
+\description{
+The \code{CountMap} is the internal function that
+implements the Effort Count routine.
+}
+\details{
+This function, with a VMS DB Track and a Sea Areas Shape
+File, (see \code{\link{gui_out_grid}}), computes the Effort
+Count Vector.
+}
+\references{
+free text reference Pointers to the literature related to
+this object.
+}
+\seealso{
+\code{\link{gui_out_grid}}
+}
+

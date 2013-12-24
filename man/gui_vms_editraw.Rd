@@ -1,0 +1,25 @@
+\name{gui_vms_editraw}
+\alias{gui_vms_editraw}
+\title{Raw VMS Editing GUI}
+\usage{
+gui_vms_editraw()
+}
+\value{
+This function does not return a value.  After the execution
+the user is asked where to put the edited file.
+}
+\description{
+The \code{gui_vms_editraw} function implements the
+graphical user interface for the editing of a raw vms
+dataset
+}
+\details{
+This function, with a raw vms dataset, produces an edited
+version of it. The user must select, for each mandatory
+field, the column name where the data is stored.
+}
+\references{
+free text reference Pointers to the literature related to
+this object.
+}
+
