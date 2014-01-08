@@ -86,7 +86,7 @@ saveRawLogBook <- function (rawfile,
     if(length(tole_eutc) > 0)
     {
       rawfile$data <- rawfile$data[-tole_eutc,]
-      end_utc <- sta_utc[-tole_eutc]
+      end_utc <- end_utc[-tole_eutc]
       logbook <- logbook[-tole_eutc,]
     }
     
