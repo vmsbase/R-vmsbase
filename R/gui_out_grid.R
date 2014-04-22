@@ -68,7 +68,7 @@ gui_out_grid <- function(vms_db_name = "")
            svalue(sel_vms_f) <- ifelse(.Platform$OS.type == "windows", strsplit(vms_DB$db, "\\\\")[[1]][length(strsplit(vms_DB$db, "\\\\")[[1]])],strsplit(vms_DB$db, "/")[[1]][length(strsplit(vms_DB$db, "/")[[1]])])
            if(vms_DB$db != "")
            {
-             met_sel_d[] <- sqldf("select distinct(met_des) from vms_lb", dbname = vms_DB$db)[,1]
+#              met_sel_d[] <- sqldf("select distinct(met_des) from vms_lb", dbname = vms_DB$db)[,1]
              svalue(met_sel_d, index = TRUE) <- 1
              enabled(gri_g3f3) <- TRUE
              enabled(gri_g3f4) <- TRUE
@@ -145,7 +145,18 @@ gui_out_grid <- function(vms_db_name = "")
   gri_g3f4 <- ggroup(horizontal = TRUE, container = gri_g3)
   addSpring(gri_g3f4)
   dat_sel_f <- gframe(text = "Metier Data Source", horizontal=TRUE, container = gri_g3f4) 
-  dat_sel_d <- gdroplist(c("VMS-LB Match", "NN Prediction"), selected = 1, container = dat_sel_f) 
+  dat_sel_d <- gdroplist(c("VMS-LB Match", "NN Prediction"), selected = 1, container = dat_sel_f, function(h,...)
+    {
+    if(vms_DB$db != "")
+    {
+    if(svalue(dat_sel_d) == "VMS-LB Match")
+    {
+      met_sel_d[] <- sqldf("select distinct(met_des) from vms_lb", dbname = vms_DB$db)[,1]
+    }else{
+      met_sel_d[] <- sqldf("select distinct(met_des) from nn_clas", dbname = vms_DB$db)[,1]
+    }
+    }
+  }) 
   addSpring(gri_g3f4)
   enabled(gri_g3f4) <- FALSE
   
