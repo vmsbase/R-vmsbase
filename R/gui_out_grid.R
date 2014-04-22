@@ -145,8 +145,8 @@ gui_out_grid <- function(vms_db_name = "")
   gri_g3f4 <- ggroup(horizontal = TRUE, container = gri_g3)
   addSpring(gri_g3f4)
   dat_sel_f <- gframe(text = "Metier Data Source", horizontal=TRUE, container = gri_g3f4) 
-  dat_sel_d <- gdroplist(c("VMS-LB Match", "NN Prediction"), selected = 1, container = dat_sel_f, function(h,...)
-    {
+  dat_sel_d <- gdroplist(c("VMS-LB Match", "NN Prediction"), selected = 1, container = dat_sel_f, 
+      handler = function(h,...){
     if(vms_DB$db != "")
     {
     if(svalue(dat_sel_d) == "VMS-LB Match")
