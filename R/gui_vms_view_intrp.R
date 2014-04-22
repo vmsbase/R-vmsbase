@@ -41,6 +41,8 @@ gui_vms_view_intrp <- function (vms_db_name = "", bathy_file_name = "")
   big_g <- ggroup(horizontal = T, container = intrp_view_win)
   left_g <- ggroup(horizontal = F, container = big_g)
   chk_g3 <- ggroup(horizontal = TRUE, container = left_g)
+  expo_gr <- ggroup(horizontal = TRUE, container = left_g)
+  
   #################
   addSpring(chk_g3)
   vms_db_f <- gframe(text = "VMS DB file", horizontal = TRUE, container = chk_g3)
@@ -52,7 +54,8 @@ gui_vms_view_intrp <- function (vms_db_name = "", bathy_file_name = "")
            vms_DB$db <- gfile(text = "Select VMS DataBase file",
                               type = "open",
                               filter = list("VMS DB file" = list(patterns = c("*.vms.sqlite"))))
-           svalue(sel_vms_f) <- strsplit(vms_DB$db, "/")[[1]][length(strsplit(vms_DB$db, "/")[[1]])]
+           #            svalue(sel_vms_f) <- strsplit(vms_DB$db, "/")[[1]][length(strsplit(vms_DB$db, "/")[[1]])]
+           svalue(sel_vms_f) <- ifelse(.Platform$OS.type == "windows", strsplit(vms_DB$db, "\\\\")[[1]][length(strsplit(vms_DB$db, "\\\\")[[1]])],strsplit(vms_DB$db, "/")[[1]][length(strsplit(vms_DB$db, "/")[[1]])])
            
            incee <- sqldf("select distinct I_NCEE from intrp order by I_NCEE", dbname = vms_DB$db)
            selves[] <- incee
@@ -65,15 +68,18 @@ gui_vms_view_intrp <- function (vms_db_name = "", bathy_file_name = "")
   gimage(system.file("ico/application-exit-5.png", package="vmsbase"), container = vms_db_f,
          handler = function(h,...){
            vms_DB$db <- ""
-           turn_wdgt_off(c(selves, vestra, save_ves_jpeg, cus_dep_g, vms_db_f))
+           turn_wdgt_off(c(selves, vestra, save_ves_jpeg, cus_dep_g, vms_db_f, expo_gr))
            #            enabled(selves) <- FALSE
            #            enabled(vestra) <- FALSE
            svalue(sel_vms_f) <- "Select VMS DB file"
          })
   addSpring(chk_g3)
   #################
+  ################
   
-  save_ves_jpeg <- gbutton(text = "save jpeg", container = left_g, handler = function(h,...)
+  addSpring(expo_gr)
+  
+  save_ves_jpeg <- gbutton(text = "save jpeg", container = expo_gr, handler = function(h,...)
   {
     enabled(intrp_view_win) <- FALSE
     #turn_wdgt_off(c(left_g1, selves, vestra, cus_dep_g, vms_db_f))
@@ -82,7 +88,7 @@ gui_vms_view_intrp <- function (vms_db_name = "", bathy_file_name = "")
       enabled(save_ves_jpeg) <- FALSE
       xle <- par()$pin[1]
       yle <- par()$pin[2]
-      turn_wdgt_off(c(left_g1, selves, vestra, save_ves_jpeg, cus_dep_g, vms_db_f, bbox_exp))
+      turn_wdgt_off(c(left_g1, selves, vestra, save_ves_jpeg, cus_dep_g, vms_db_f, bbox_exp, expo_gr))
       
       jpeg(filename = gfile(text = "Jpeg file path and name",
                             initialfilename = "*.jpeg",
@@ -121,17 +127,97 @@ gui_vms_view_intrp <- function (vms_db_name = "", bathy_file_name = "")
       }
       dev.off()
       enabled(save_ves_jpeg) <- TRUE
-      turn_wdgt_on(c(left_g1, selves, vestra, save_ves_jpeg, cus_dep_g, vms_db_f, bbox_exp))
+      turn_wdgt_on(c(left_g1, selves, vestra, save_ves_jpeg, cus_dep_g, vms_db_f, bbox_exp, expo_gr))
     }
     enabled(intrp_view_win) <- TRUE
   })
-  enabled(save_ves_jpeg) <- FALSE
+  #   enabled(save_ves_jpeg) <- FALSE
   
   #################
   
+  addSpring(expo_gr)
+  export_csv <- gbutton(text = "export csv", container = expo_gr, handler = function(h,...)
+  {
+    turn_wdgt_off(c(left_g1, selves, vestra, save_ves_jpeg, cus_dep_g, vms_db_f, bbox_exp, expo_gr))
+    
+    if(vnum != 0)
+    {
+      
+      if(trackn == 0)
+      {
+        vessel <- fn$sqldf("select * from intrp where I_NCEE = `vnum` order by DATE", dbname = vms_DB$db)
+        if(nrow(vessel) != 0)
+        {
+          csv_fil_na <- gfile(text = "Saving vessel route as CSV file", type = "save", initialfilename = "*.csv", 
+                              filter = list("All files" = list(patterns = c("*")), "CSV files" =
+                                              list(patterns = "*.csv")))
+          
+          if(length(unlist(strsplit(csv_fil_na, "[.]"))) == 1){csv_fil_na <- paste(csv_fil_na, ".csv", sep = "")}
+          
+          write.table(vessel,
+                      file = csv_fil_na,
+                      append = FALSE,
+                      sep = ";",
+                      dec = ".",
+                      row.names = FALSE,
+                      col.names = TRUE)
+        }
+      }else{
+        fishi <- sqldf("select count(*) from p_fish", dbname = vms_DB$db)
+        if(fishi == 0)
+        {
+          track  <- fn$sqldf("select * from intrp where I_NCEE = `vnum` and T_NUM = `trackn` order by DATE", dbname = vms_DB$db)      
+          
+          csv_fil_na <- gfile(text = "Saving single vessel track as CSV file", type = "save", initialfilename = "*.csv", 
+                              filter = list("All files" = list(patterns = c("*")), "CSV files" =
+                                              list(patterns = "*.csv")))
+          
+          if(length(unlist(strsplit(csv_fil_na, "[.]"))) == 1){csv_fil_na <- paste(csv_fil_na, ".csv", sep = "")}
+          
+          write.table(track,
+                      file = csv_fil_na,
+                      append = FALSE,
+                      sep = ";",
+                      dec = ".",
+                      row.names = FALSE,
+                      col.names = TRUE)
+          
+          
+        }else{
+          track  <- fn$sqldf("select * from intrp, p_fish where I_NCEE = `vnum` and T_NUM = `trackn` and intrp.rowid = i_id order by DATE", dbname = vms_DB$db)
+          if(nrow(track) == 0)
+          {
+            track <- fn$sqldf("select * from intrp where I_NCEE = `vnum` and T_NUM = `trackn` order by DATE", dbname = vms_DB$db)
+          }
+          
+          csv_fil_na <- gfile(text = "Saving single vessel track as CSV file", type = "save", initialfilename = "*.csv", 
+                              filter = list("All files" = list(patterns = c("*")), "CSV files" =
+                                              list(patterns = "*.csv")))
+          
+          if(length(unlist(strsplit(csv_fil_na, "[.]"))) == 1){csv_fil_na <- paste(csv_fil_na, ".csv", sep = "")}
+          
+          write.table(track,
+                      file = csv_fil_na,
+                      append = FALSE,
+                      sep = ";",
+                      dec = ".",
+                      row.names = FALSE,
+                      col.names = TRUE)
+        }
+        
+      }
+      
+      turn_wdgt_on(c(left_g1, selves, vestra, save_ves_jpeg, cus_dep_g, vms_db_f, bbox_exp, expo_gr))
+    }
+  })
   
   
-  bbox_exp <- gexpandgroup(text = "Custom B-Box", container = left_g, horizontal = FALSE)
+  addSpring(expo_gr)
+  enabled(expo_gr) <- FALSE
+  
+  bbox_exp <- gexpandgroup(text = "Custom B-Box", container = left_g, horizontal = TRUE)
+  addSpring(bbox_exp)
+  
   bbox_lay <- glayout(container = bbox_exp)
   
   bbox_lay[1,2] <- ggroup(horizontal = FALSE)
@@ -147,7 +233,7 @@ gui_vms_view_intrp <- function (vms_db_name = "", bathy_file_name = "")
   glabel("Min Lat", container = bbox_lay[3,2])
   mi_la <- gspinbutton(from = -90, to = 90, by = 0.5, value = 0, container = bbox_lay[3,2])
   re_plot <- gbutton(text = "Custom Plot", container = bbox_exp, handler = function(h,...){
-    turn_wdgt_off(c(left_g1, selves, vestra, save_ves_jpeg, cus_dep_g, vms_db_f, bbox_exp))
+    turn_wdgt_off(c(left_g1, selves, vestra, save_ves_jpeg, cus_dep_g, vms_db_f, bbox_exp, expo_gr))
     
     vnum <- svalue(selves)
     
@@ -182,7 +268,7 @@ gui_vms_view_intrp <- function (vms_db_name = "", bathy_file_name = "")
         intrpview2(track, trackn, bathy, fishi = ifelse((svalue(sho_fis) == "Yes" & fishi != 0), TRUE, FALSE), xrange, yrange)
       }
     }
-    turn_wdgt_on(c(left_g1, selves, vestra, save_ves_jpeg, cus_dep_g, vms_db_f, bbox_exp))
+    turn_wdgt_on(c(left_g1, selves, vestra, save_ves_jpeg, cus_dep_g, vms_db_f, bbox_exp, expo_gr))
     
   })
   enabled(bbox_exp) <- FALSE
@@ -198,7 +284,7 @@ gui_vms_view_intrp <- function (vms_db_name = "", bathy_file_name = "")
   left_g2 <- gframe(horizontal = T, container = left_g, expand = T)  
   selves <- gtable(data.frame("Vessel" = numeric(0)), chosencol = 1, container = left_g2, expand = T, handler = function(h,...)
   {
-    turn_wdgt_off(c(left_g1, selves, vestra, save_ves_jpeg, cus_dep_g, vms_db_f, bbox_exp))
+    turn_wdgt_off(c(left_g1, selves, vestra, save_ves_jpeg, cus_dep_g, vms_db_f, bbox_exp, expo_gr))
     #     enabled(save_ves_jpeg) <- FALSE
     #     enabled(vestra) <- FALSE
     #     enabled(selves) <- FALSE
@@ -217,7 +303,7 @@ gui_vms_view_intrp <- function (vms_db_name = "", bathy_file_name = "")
       svalue(mi_la) <- yrange[1]
       intrpview(vessel, bathy, xrange, yrange)
     }
-    turn_wdgt_on(c(left_g1, selves, vestra, save_ves_jpeg, cus_dep_g, vms_db_f, bbox_exp))
+    turn_wdgt_on(c(left_g1, selves, vestra, save_ves_jpeg, cus_dep_g, vms_db_f, bbox_exp, expo_gr))
     #     enabled(vestra) <- TRUE
     #     enabled(selves) <- TRUE
     #     enabled(save_ves_jpeg) <- TRUE
@@ -226,7 +312,7 @@ gui_vms_view_intrp <- function (vms_db_name = "", bathy_file_name = "")
   
   vestra <- gtable(data.frame("Track" = numeric(0)), chosencol = 1, container = left_g2, expand = T, handler = function(h,...)
   {
-    turn_wdgt_off(c(left_g1, selves, vestra, save_ves_jpeg, cus_dep_g, vms_db_f, bbox_exp))
+    turn_wdgt_off(c(left_g1, selves, vestra, save_ves_jpeg, cus_dep_g, vms_db_f, bbox_exp, expo_gr))
     
     #     enabled(vestra) <- FALSE
     #     enabled(selves) <- FALSE
@@ -259,7 +345,7 @@ gui_vms_view_intrp <- function (vms_db_name = "", bathy_file_name = "")
     #     enabled(vestra) <- TRUE
     #     enabled(selves) <- TRUE
     #     enabled(save_ves_jpeg) <- TRUE
-    turn_wdgt_on(c(left_g1, selves, vestra, save_ves_jpeg, cus_dep_g, vms_db_f, bbox_exp))
+    turn_wdgt_on(c(left_g1, selves, vestra, save_ves_jpeg, cus_dep_g, vms_db_f, bbox_exp, expo_gr))
     
   })
   enabled(vestra) <- FALSE
@@ -294,15 +380,18 @@ gui_vms_view_intrp <- function (vms_db_name = "", bathy_file_name = "")
   if(vms_DB$db != "")
   {
     enabled(intrp_view_win) <- FALSE
-    svalue(sel_vms_f) <- strsplit(vms_DB$db, "/")[[1]][length(strsplit(vms_DB$db, "/")[[1]])]
+    #     svalue(sel_vms_f) <- strsplit(vms_DB$db, "/")[[1]][length(strsplit(vms_DB$db, "/")[[1]])]
+    svalue(sel_vms_f) <- ifelse(.Platform$OS.type == "windows", strsplit(vms_DB$db, "\\\\")[[1]][length(strsplit(vms_DB$db, "\\\\")[[1]])],strsplit(vms_DB$db, "/")[[1]][length(strsplit(vms_DB$db, "/")[[1]])])
+    
     incee <- sqldf("select distinct I_NCEE from intrp order by I_NCEE", dbname = vms_DB$db)
     selves[] <- incee
     enabled(intrp_view_win) <- TRUE
-    turn_wdgt_on(c(left_g1, selves, vestra, save_ves_jpeg, cus_dep_g, vms_db_f))
+    turn_wdgt_on(c(left_g1, selves, vestra, save_ves_jpeg, cus_dep_g, vms_db_f, expo_gr))
   }
   if(bathy$path != "")
   {
-    svalue(cus_dep_lab) <- paste("File: ", strsplit(bathy$path, "/")[[1]][length(strsplit(bathy$path, "/")[[1]])], sep = "")
+    #     svalue(cus_dep_lab) <- paste("File: ", strsplit(bathy$path, "/")[[1]][length(strsplit(bathy$path, "/")[[1]])], sep = "")
+    svalue(cus_dep_lab) <- paste("File: ", ifelse(.Platform$OS.type == "windows", strsplit(bathy$path, "\\\\")[[1]][length(strsplit(bathy$path, "\\\\")[[1]])],strsplit(bathy$path, "/")[[1]][length(strsplit(bathy$path, "/")[[1]])]), sep = "")
     bathy$data <- readRDS(bathy$path)
   }
 }

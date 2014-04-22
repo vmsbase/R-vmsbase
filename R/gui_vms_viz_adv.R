@@ -47,8 +47,8 @@ gui_vms_viz_adv <- function (vms_db_name = "")
            vms_DB$db <- gfile(text = "Select VMS DataBase file",
                               type = "open",
                               filter = list("VMS DB file" = list(patterns = c("*.vms.sqlite"))))
-           svalue(sel_vms_f) <- strsplit(vms_DB$db, "/")[[1]][length(strsplit(vms_DB$db, "/")[[1]])]
-           
+           #            svalue(sel_vms_f) <- strsplit(vms_DB$db, "/")[[1]][length(strsplit(vms_DB$db, "/")[[1]])]
+           svalue(sel_vms_f) <- ifelse(.Platform$OS.type == "windows", strsplit(vms_DB$db, "\\\\")[[1]][length(strsplit(vms_DB$db, "\\\\")[[1]])],strsplit(vms_DB$db, "/")[[1]][length(strsplit(vms_DB$db, "/")[[1]])])
            svalue(s_bar) <- "Loading DataSet"
            incee <- sqldf("select distinct I_NCEE from intrp order by I_NCEE", dbname = vms_DB$db)
            #colnames(incee) <- "Vessel ID"
@@ -78,7 +78,7 @@ gui_vms_viz_adv <- function (vms_db_name = "")
   ################à
   
   d_zoom <- gdroplist(2:20, selected = 8, container = g_lef, handler = function(h,...)
-    {
+  {
     svalue(s_bar) <- "Press `Draw Map` button to update view"
   })
   
@@ -88,7 +88,7 @@ gui_vms_viz_adv <- function (vms_db_name = "")
   })
   
   b_draw <- gbutton("Draw\nMap", container = g_lef, handler = function(h,...)
-    {
+  {
     enabled(selves) <- FALSE
     enabled(vestra) <- FALSE
     enabled(b_draw) <- FALSE
@@ -110,15 +110,15 @@ gui_vms_viz_adv <- function (vms_db_name = "")
       if(nrow(data) > 2)
       {
         b_box <- make_bbox(s_track[,"LON"], s_track[,"LAT"], f = 0.3)
-                
+        
         svalue(s_bar) <- paste("Loading map...", sep = "")
         
         map <- suppressWarnings(get_map(location = b_box,
-                       zoom = svalue(d_zoom), 
-                       scale = "auto",
-                       maptype = "hybrid",
-                       filename = "ggmapTemp",
-                       source = "google"))
+                                        zoom = svalue(d_zoom), 
+                                        scale = "auto",
+                                        maptype = "hybrid",
+                                        filename = "ggmapTemp",
+                                        source = "google"))
         
         if("Path" %in% svalue(c_opt) & "Points" %in% svalue(c_opt))
         {
@@ -158,7 +158,7 @@ gui_vms_viz_adv <- function (vms_db_name = "")
       vestra[] <- unique(vessel["T_NUM"])
       
       svalue(s_bar) <- paste("Loading Vessel Tracks complete!", sep = "")
-          
+      
       if(nrow(vessel) != 0)
       {
         
@@ -169,11 +169,11 @@ gui_vms_viz_adv <- function (vms_db_name = "")
         svalue(s_bar) <- paste("Loading map...", sep = "")
         
         map <- suppressWarnings(get_map(location = b_box,
-                       zoom = svalue(d_zoom), 
-                       scale = "auto",
-                       maptype = "hybrid",
-                       filename = "ggmapTemp",
-                       source = "google"))
+                                        zoom = svalue(d_zoom), 
+                                        scale = "auto",
+                                        maptype = "hybrid",
+                                        filename = "ggmapTemp",
+                                        source = "google"))
         
         if("Path" %in% svalue(c_opt) & "Points" %in% svalue(c_opt))
         {
@@ -215,7 +215,7 @@ gui_vms_viz_adv <- function (vms_db_name = "")
   {
     jpeg(filename = gfile(text = "Jpeg file path and name",
                           initialfilename = "*.jpeg",
-                         type = "save"),
+                          type = "save"),
          width = 800, height = 800)
     
     enabled(selves) <- FALSE
@@ -381,11 +381,11 @@ gui_vms_viz_adv <- function (vms_db_name = "")
       svalue(s_bar) <- paste("Loading map...", sep = "")
       
       map <- suppressWarnings(get_map(location = b_box,
-                     zoom = svalue(d_zoom), 
-                     scale = "auto",
-                     maptype = "hybrid",
-                     filename = "ggmapTemp",
-                     source = "google"))
+                                      zoom = svalue(d_zoom), 
+                                      scale = "auto",
+                                      maptype = "hybrid",
+                                      filename = "ggmapTemp",
+                                      source = "google"))
       
       if("Path" %in% svalue(c_opt) & "Points" %in% svalue(c_opt))
       {
@@ -453,15 +453,15 @@ gui_vms_viz_adv <- function (vms_db_name = "")
       zoom <- max(zoomlon, zoomlat)
       
       svalue(d_zoom) <- zoom
-            
+      
       svalue(s_bar) <- paste("Loading map...", sep = "")
       
       map <- suppressWarnings(get_map(location = b_box,
-                     zoom = svalue(d_zoom), 
-                     scale = "auto",
-                     maptype = "hybrid",
-                     filename = "ggmapTemp",
-                     source = "google"))
+                                      zoom = svalue(d_zoom), 
+                                      scale = "auto",
+                                      maptype = "hybrid",
+                                      filename = "ggmapTemp",
+                                      source = "google"))
       
       if("Path" %in% svalue(c_opt) & "Points" %in% svalue(c_opt))
       {
@@ -515,13 +515,13 @@ gui_vms_viz_adv <- function (vms_db_name = "")
   enabled(vestra) <- FALSE
   
   visible(adv_view_win) <- TRUE
-
+  
   svalue(s_bar) <- "Loading Map"
   
   map <- suppressWarnings(get_googlemap(center = c(lon = 12.482778, lat = 41.893056),
-                       zoom = 3,
-                       scale = 1,
-                       maptype = "hybrid"))
+                                        zoom = 3,
+                                        scale = 1,
+                                        maptype = "hybrid"))
   
   print(ggmap(map))
   
@@ -529,7 +529,8 @@ gui_vms_viz_adv <- function (vms_db_name = "")
   
   if(vms_DB$db != "")
   {
-    svalue(sel_vms_f) <- strsplit(vms_DB$db, "/")[[1]][length(strsplit(vms_DB$db, "/")[[1]])]
+    #     svalue(sel_vms_f) <- strsplit(vms_DB$db, "/")[[1]][length(strsplit(vms_DB$db, "/")[[1]])]
+    svalue(sel_vms_f) <- ifelse(.Platform$OS.type == "windows", strsplit(vms_DB$db, "\\\\")[[1]][length(strsplit(vms_DB$db, "\\\\")[[1]])],strsplit(vms_DB$db, "/")[[1]][length(strsplit(vms_DB$db, "/")[[1]])])
     svalue(s_bar) <- "Loading DataSet"
     incee <- sqldf("select distinct I_NCEE from intrp order by I_NCEE", dbname = vms_DB$db)
     #colnames(incee) <- "Vessel ID"

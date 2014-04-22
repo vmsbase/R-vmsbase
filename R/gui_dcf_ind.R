@@ -41,7 +41,8 @@ gui_dcf_ind <- function()
            grid_vec_file <<- gfile(text = "Select Grid Count vector file",
                               type = "open",
                               filter = list("Grid Count file" = list(patterns = c("*.grivec.rData"))))
-           svalue(sel_vec_f) <- strsplit(grid_vec_file, "/")[[1]][length(strsplit(grid_vec_file, "/")[[1]])]
+#            svalue(sel_vec_f) <- strsplit(grid_vec_file, "/")[[1]][length(strsplit(grid_vec_file, "/")[[1]])]
+           svalue(sel_vec_f) <- ifelse(.Platform$OS.type == "windows", strsplit(grid_vec_file, "\\\\")[[1]][length(strsplit(grid_vec_file,  "\\\\")[[1]])], strsplit(grid_vec_file, "/")[[1]][length(strsplit(grid_vec_file, "/")[[1]])])
            if(grid_vec_file != "")
            {
              enabled(start_b) <- TRUE

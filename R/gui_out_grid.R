@@ -64,8 +64,8 @@ gui_out_grid <- function(vms_db_name = "")
            vms_DB$db <- gfile(text = "Select VMS DataBase file",
                               type = "open",
                               filter = list("VMS DB file" = list(patterns = c("*.vms.sqlite"))))
-           svalue(sel_vms_f) <- strsplit(vms_DB$db, "/")[[1]][length(strsplit(vms_DB$db, "/")[[1]])]
-           
+#            svalue(sel_vms_f) <- strsplit(vms_DB$db, "/")[[1]][length(strsplit(vms_DB$db, "/")[[1]])]
+           svalue(sel_vms_f) <- ifelse(.Platform$OS.type == "windows", strsplit(vms_DB$db, "\\\\")[[1]][length(strsplit(vms_DB$db, "\\\\")[[1]])],strsplit(vms_DB$db, "/")[[1]][length(strsplit(vms_DB$db, "/")[[1]])])
            if(vms_DB$db != "")
            {
              met_sel_d[] <- sqldf("select distinct(met_des) from vms_lb", dbname = vms_DB$db)[,1]
@@ -105,7 +105,9 @@ gui_out_grid <- function(vms_db_name = "")
            themap$path <- gfile(text = "Select ShapePoly map",
                                 type = "open",
                                 filter = list("shp data" = list(patterns = c("*.shp"))))
-           svalue(cus_map_lab) <- paste("Grid map: ", strsplit(themap$path, "/")[[1]][length(strsplit(themap$path, "/")[[1]])], sep = "")
+#            svalue(cus_map_lab) <- paste("Grid map: ", strsplit(themap$path, "/")[[1]][length(strsplit(themap$path, "/")[[1]])], sep = "")
+           svalue(cus_map_lab) <- paste("Grid map: ", ifelse(.Platform$OS.type == "windows", strsplit(themap$path, "\\\\")[[1]][length(strsplit(themap$path, "\\\\")[[1]])],strsplit(themap$path, "/")[[1]][length(strsplit(themap$path, "/")[[1]])]), sep = "")
+           
            if(themap$path != "" & vms_DB$db != "")
            {
              met_sel_d[] <- sqldf("select distinct(met_des) from vms_lb", dbname = vms_DB$db)[,1]
@@ -424,13 +426,15 @@ gui_out_grid <- function(vms_db_name = "")
   addSpring(save_vesh_g)
   if(vms_DB$db != "")
   {
-    svalue(sel_vms_f) <- strsplit(vms_DB$db, "/")[[1]][length(strsplit(vms_DB$db, "/")[[1]])]
+#     svalue(sel_vms_f) <- strsplit(vms_DB$db, "/")[[1]][length(strsplit(vms_DB$db, "/")[[1]])]
+    svalue(sel_vms_f) <- ifelse(.Platform$OS.type == "windows", strsplit(vms_DB$db, "\\\\")[[1]][length(strsplit(vms_DB$db, "\\\\")[[1]])],strsplit(vms_DB$db, "/")[[1]][length(strsplit(vms_DB$db, "/")[[1]])])
     met_sel_d[] <- sqldf("select distinct(met_des) from vms_lb", dbname = vms_DB$db)[,1]
     svalue(met_sel_d, index = TRUE) <- 1
     enabled(gri_g3f3) <- TRUE
     enabled(gri_g3f4) <- TRUE
     if(themap$path != "")
     {
+      svalue(cus_map_lab) <- paste("Grid map: ", ifelse(.Platform$OS.type == "windows", strsplit(themap$path, "\\\\")[[1]][length(strsplit(themap$path, "\\\\")[[1]])],strsplit(themap$path, "/")[[1]][length(strsplit(themap$path, "/")[[1]])]), sep = "")
       enabled(start_b) <- TRUE
     }
   }  

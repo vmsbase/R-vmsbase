@@ -35,9 +35,10 @@ gui_vms_view_ping <- function (vms_db_name = "", bathy_file_name = "")
   
   ping_view_win <- gwindow("Ping View Device", visible = FALSE)
   
-  big_g <- ggroup(horizontal = T, container = ping_view_win)
-  left_g <- ggroup(horizontal = F, container = big_g)
+  big_g <- ggroup(horizontal = TRUE, container = ping_view_win)
+  left_g <- ggroup(horizontal = FALSE, container = big_g)
   chk_g3 <- ggroup(horizontal = TRUE, container = left_g)
+  expo_gr <- ggroup(horizontal = TRUE, container = left_g)
   
   #################
   addSpring(chk_g3)
@@ -50,36 +51,41 @@ gui_vms_view_ping <- function (vms_db_name = "", bathy_file_name = "")
            vms_DB$db <- gfile(text = "Select VMS DataBase file",
                               type = "open",
                               filter = list("VMS DB file" = list(patterns = c("*.vms.sqlite"))))
-           svalue(sel_vms_f) <- strsplit(vms_DB$db, "/")[[1]][length(strsplit(vms_DB$db, "/")[[1]])]
+           #            svalue(sel_vms_f) <- strsplit(vms_DB$db, "/")[[1]][length(strsplit(vms_DB$db, "/")[[1]])]
+           svalue(sel_vms_f) <- ifelse(.Platform$OS.type == "windows", strsplit(vms_DB$db, "\\\\")[[1]][length(strsplit(vms_DB$db, "\\\\")[[1]])],strsplit(vms_DB$db, "/")[[1]][length(strsplit(vms_DB$db, "/")[[1]])])
            
            incee <- sqldf("select distinct I_NCEE from ping order by I_NCEE", dbname = vms_DB$db)
            selves[] <- incee
            
            enabled(selves) <- TRUE
-           enabled(save_jpeg) <- TRUE
+           enabled(expo_gr) <- TRUE
            enabled(bbox_exp) <- TRUE
          })
   gimage(system.file("ico/application-exit-5.png", package="vmsbase"), container = vms_db_f,
          handler = function(h,...){
            vms_DB$db <- ""
            enabled(selves) <- FALSE
-           enabled(save_jpeg) <- FALSE
+           enabled(expo_gr) <- FALSE
            enabled(bbox_exp) <- FALSE
            svalue(sel_vms_f) <- "Select VMS DB file"
          })
   addSpring(chk_g3)
   ################
-  
-  save_jpeg <- gbutton(text = "save jpeg", container = left_g, handler = function(h,...)
+  addSpring(expo_gr)
+  save_jpeg <- gbutton(text = "save jpeg", container = expo_gr, handler = function(h,...)
   {
     enabled(ping_view_win) <- FALSE
     
     xle <- par()$pin[1]
     yle <- par()$pin[2]
     
-    jpeg(filename = gfile(text = "Jpeg file path and name",
-                          initialfilename = "*.jpeg",
-                          type = "save"),
+    j_fil_na <- gfile(text = "Jpeg file path and name",
+                      initialfilename = "*.jpeg",
+                      type = "save")
+    if(length(unlist(strsplit(j_fil_na, "[.]"))) == 1){j_fil_na <- paste(j_fil_na, ".jpeg", sep = "")}
+    
+    
+    jpeg(filename = j_fil_na,
          width = round(1000*xle), height = round(1000*yle),
          quality = 100, bg = "aliceblue", pointsize = 80)
     par(lwd = 10)
@@ -94,10 +100,36 @@ gui_vms_view_ping <- function (vms_db_name = "", bathy_file_name = "")
     dev.off()
     enabled(ping_view_win) <- TRUE
   })
+  addSpring(expo_gr)
+  export_csv <- gbutton(text = "export csv", container = expo_gr, handler = function(h,...)
+  {
+    enabled(ping_view_win) <- FALSE
+    vnum <- svalue(selves)
+    vessel <- fn$sqldf("select * from ping where I_NCEE = `vnum` order by DATE", dbname = vms_DB$db)
+    if(nrow(vessel) != 0)
+    {
+      csv_fil_na <- gfile(text = "Save vessel route as CSV file", type = "save", initialfilename = "*.csv", 
+                          filter = list("All files" = list(patterns = c("*")), "CSV files" =
+                                          list(patterns = "*.csv")))
+      
+      if(length(unlist(strsplit(csv_fil_na, "[.]"))) == 1){csv_fil_na <- paste(csv_fil_na, ".csv", sep = "")}
+      
+      write.table(vessel,
+                  file = csv_fil_na,
+                  append = FALSE,
+                  sep = ";",
+                  dec = ".",
+                  row.names = FALSE,
+                  col.names = TRUE)
+    }
+    enabled(ping_view_win) <- TRUE
+  })
+  addSpring(expo_gr)
   
-  bbox_exp <- gexpandgroup(text = "Custom B-Box", container = left_g, horizontal = FALSE)
+  
+  bbox_exp <- gexpandgroup(text = "Custom B-Box", container = left_g, horizontal = TRUE)
+  addSpring(bbox_exp)
   bbox_lay <- glayout(container = bbox_exp)
-  
   bbox_lay[1,2] <- ggroup(horizontal = FALSE)
   glabel("Max Lat", container = bbox_lay[1,2])
   ma_la <- gspinbutton(from = -90, to = 90, by = 0.5, value = 0, container = bbox_lay[1,2])
@@ -110,7 +142,7 @@ gui_vms_view_ping <- function (vms_db_name = "", bathy_file_name = "")
   bbox_lay[3,2] <- ggroup(horizontal = FALSE)
   glabel("Min Lat", container = bbox_lay[3,2])
   mi_la <- gspinbutton(from = -90, to = 90, by = 0.5, value = 0, container = bbox_lay[3,2])
-
+  addSpring(bbox_exp)
   re_plot <- gbutton(text = "Custom Plot", container = bbox_exp, handler = function(h,...){
     
     vnum <- svalue(selves)
@@ -121,13 +153,14 @@ gui_vms_view_ping <- function (vms_db_name = "", bathy_file_name = "")
     
     pingview(vessel, bathy, xrange, yrange)
   })
+  addSpring(bbox_exp)
   enabled(bbox_exp) <- FALSE
   
   chk_g4 <- ggroup(horizontal = TRUE, expand = TRUE, container = left_g)
   selves <- gtable(items = data.frame("Vessel" = numeric(0)), chosencol = 1, container = chk_g4, expand = TRUE, handler = function(h,...)
   {
     enabled(ping_view_win) <- FALSE
-    enabled(save_jpeg) <- FALSE
+    enabled(expo_gr) <- FALSE
     
     vnum <- svalue(selves)
     vessel <- fn$sqldf("select * from ping where I_NCEE = `vnum` order by DATE", dbname = vms_DB$db)
@@ -143,10 +176,10 @@ gui_vms_view_ping <- function (vms_db_name = "", bathy_file_name = "")
       pingview(vessel, bathy, xrange, yrange)
     }
     enabled(ping_view_win) <- TRUE
-    enabled(save_jpeg) <- TRUE
+    enabled(expo_gr) <- TRUE
   })
   enabled(selves) <- FALSE
-  enabled(save_jpeg) <- FALSE
+  enabled(expo_gr) <- FALSE
   ###################
   cus_dep_g <- gframe(text = "Bathymetry File", horizontal = TRUE, container = left_g)
   addSpring(cus_dep_g)
@@ -155,9 +188,13 @@ gui_vms_view_ping <- function (vms_db_name = "", bathy_file_name = "")
   gimage(system.file("ico/folder-download.png", package="vmsbase"), container = cus_dep_g,
          handler = function(h,...){
            bathy$path <- gfile(text = "Select Bathymetry File",
-                                type = "open",
-                                filter = list("bathy data" = list(patterns = c("*sqlitebathy.rData"))))
-           svalue(cus_dep_lab) <- paste("File: ", strsplit(bathy$path, "/")[[1]][length(strsplit(bathy$path, "/")[[1]])], sep = "")
+                               type = "open",
+                               filter = list("bathy data" = list(patterns = c("*sqlitebathy.rData"))))
+           #            svalue(cus_dep_lab) <- paste("File: ", strsplit(bathy$path, "/")[[1]][length(strsplit(bathy$path, "/")[[1]])], sep = "")
+           
+           svalue(cus_dep_lab) <- paste("File: ", ifelse(.Platform$OS.type == "windows", strsplit(bathy$path, "\\\\")[[1]][length(strsplit(bathy$path, "\\\\")[[1]])],strsplit(bathy$path, "/")[[1]][length(strsplit(bathy$path, "/")[[1]])]), sep = "")
+           
+           
            bathy$data <- readRDS(bathy$path)
          })
   gimage(system.file("ico/application-exit-5.png", package="vmsbase"), container = cus_dep_g,
@@ -176,7 +213,10 @@ gui_vms_view_ping <- function (vms_db_name = "", bathy_file_name = "")
   if(vms_DB$db != "")
   {
     enabled(ping_view_win) <- FALSE
-    svalue(sel_vms_f) <- strsplit(vms_DB$db, "/")[[1]][length(strsplit(vms_DB$db, "/")[[1]])]
+    
+    #     svalue(sel_vms_f) <- strsplit(vms_DB$db, "/")[[1]][length(strsplit(vms_DB$db, "/")[[1]])]
+    svalue(sel_vms_f) <- ifelse(.Platform$OS.type == "windows", strsplit(vms_DB$db, "\\\\")[[1]][length(strsplit(vms_DB$db, "\\\\")[[1]])],strsplit(vms_DB$db, "/")[[1]][length(strsplit(vms_DB$db, "/")[[1]])])
+    
     incee <- sqldf("select distinct I_NCEE from ping order by I_NCEE", dbname = vms_DB$db)
     selves[] <- incee
     enabled(ping_view_win) <- TRUE
@@ -185,7 +225,9 @@ gui_vms_view_ping <- function (vms_db_name = "", bathy_file_name = "")
   }
   if(bathy$path != "")
   {
-  svalue(cus_dep_lab) <- paste("File: ", strsplit(bathy$path, "/")[[1]][length(strsplit(bathy$path, "/")[[1]])], sep = "")
-  bathy$data <- readRDS(bathy$path)
+    #   svalue(cus_dep_lab) <- paste("File: ", strsplit(bathy$path, "/")[[1]][length(strsplit(bathy$path, "/")[[1]])], sep = "")
+    svalue(cus_dep_lab) <- paste("File: ", ifelse(.Platform$OS.type == "windows", strsplit(bathy$path, "\\\\")[[1]][length(strsplit(bathy$path, "\\\\")[[1]])],strsplit(bathy$path, "/")[[1]][length(strsplit(bathy$path, "/")[[1]])]), sep = "")
+    
+    bathy$data <- readRDS(bathy$path)
   }
 }

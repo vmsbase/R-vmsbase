@@ -42,8 +42,8 @@ gui_lb_db_stat <- function(lb_db_name = "")
            lb_DB$db <- gfile(text = "Select LogBook DataBase file",
                              type = "open",
                              filter = list("LogBook DB file" = list(patterns = c("*.lb.sqlite"))))
-           svalue(sel_lb_f) <- strsplit(lb_DB$db, "/")[[1]][length(strsplit(lb_DB$db, "/")[[1]])]
-           
+#            svalue(sel_lb_f) <- strsplit(lb_DB$db, "/")[[1]][length(strsplit(lb_DB$db, "/")[[1]])]
+           svalue(sel_lb_f) <- ifelse(.Platform$OS.type == "windows", strsplit(lb_DB$db, "\\\\")[[1]][length(strsplit(lb_DB$db, "\\\\")[[1]])],strsplit(lb_DB$db, "/")[[1]][length(strsplit(lb_DB$db, "/")[[1]])])
            n_log <- sqldf("select count(*) from elobo", dbname = lb_DB$db)
            if (n_log > 0)
            {
@@ -133,8 +133,8 @@ gui_lb_db_stat <- function(lb_db_name = "")
   visible(lb_stat_win) <- TRUE
   if(lb_DB$db != "") 
   {
-    svalue(sel_lb_f) <- strsplit(lb_DB$db, "/")[[1]][length(strsplit(lb_DB$db, "/")[[1]])]
-    
+#     svalue(sel_lb_f) <- strsplit(lb_DB$db, "/")[[1]][length(strsplit(lb_DB$db, "/")[[1]])]
+    svalue(sel_lb_f) <- ifelse(.Platform$OS.type == "windows", strsplit(lb_DB$db, "\\\\")[[1]][length(strsplit(lb_DB$db, "\\\\")[[1]])],strsplit(lb_DB$db, "/")[[1]][length(strsplit(lb_DB$db, "/")[[1]])])
     n_log <- sqldf("select count(*) from elobo", dbname = lb_DB$db)
     if (n_log > 0)
     {

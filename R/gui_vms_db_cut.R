@@ -55,7 +55,8 @@ gui_vms_db_cut <- function(vms_db_name = "")
            vms_DB$db <- gfile(text = "Select VMS DataBase file",
                               type = "open",
                               filter = list("VMS DB file" = list(patterns = c("*.vms.sqlite"))))
-           svalue(sel_vms_f) <- strsplit(vms_DB$db, "/")[[1]][length(strsplit(vms_DB$db, "/")[[1]])]
+           #            svalue(sel_vms_f) <- strsplit(vms_DB$db, "/")[[1]][length(strsplit(vms_DB$db, "/")[[1]])]
+           svalue(sel_vms_f) <- ifelse(.Platform$OS.type == "windows", strsplit(vms_DB$db, "\\\\")[[1]][length(strsplit(vms_DB$db, "\\\\")[[1]])],strsplit(vms_DB$db, "/")[[1]][length(strsplit(vms_DB$db, "/")[[1]])])
            enabled(start_b) <- TRUE
          })
   gimage(system.file("ico/application-exit-5.png", package="vmsbase"), container = vms_db_f,
@@ -218,92 +219,92 @@ gui_vms_db_cut <- function(vms_db_name = "")
               da_to <- which(out > median(pingfreq) & out > 0.08333)
               if(length(da_to) > 0)
               {
-              #           outmin = min(out[which(out > median(pingfreq) & out > 0.10417)])
-              outmin = min(out[da_to])
-              outliers = which((diff(track_data$DATE) >= outmin | diff(track_data$DATE) >= 0.125) & track_data$W_HARB[-c(nrow(track_data))] != 1 )
-              iter = 0
-              
-              if(length(outliers) > 0)
-              {
-                cat(" - Splitting Tracks ", sep = "")
-                for (k in 1:length(outliers))
-                {    
-                  #outliers = which((diff(track_data$DATE) >= outmin | diff(track_data$DATE) >= 0.125) & track_data$W_HARB[-c(nrow(track_data))] != 1 )
-                  cat(":", sep = "")
-                  
-                  if(nrow(useharb) == 0)
-                  {
+                #           outmin = min(out[which(out > median(pingfreq) & out > 0.10417)])
+                outmin = min(out[da_to])
+                outliers = which((diff(track_data$DATE) >= outmin | diff(track_data$DATE) >= 0.125) & track_data$W_HARB[-c(nrow(track_data))] != 1 )
+                iter = 0
+                
+                if(length(outliers) > 0)
+                {
+                  cat(" - Splitting Tracks ", sep = "")
+                  for (k in 1:length(outliers))
+                  {    
+                    #outliers = which((diff(track_data$DATE) >= outmin | diff(track_data$DATE) >= 0.125) & track_data$W_HARB[-c(nrow(track_data))] != 1 )
+                    cat(":", sep = "")
                     
-                    newdate1 <- track_data[(outliers[k]),"DATE"]+0.0002
-                    newdate2 <- newdate1
+                    if(nrow(useharb) == 0)
+                    {
+                      
+                      newdate1 <- track_data[(outliers[k]),"DATE"]+0.0002
+                      newdate2 <- newdate1
+                      
+                      track_data <- rbind(track_data[1:(outliers[k]), ], 
+                                          c(track_data[(outliers[k]),"I_NCEE"], track_data[(outliers[k]),"LAT"], track_data[(outliers[k]),"LON"], newdate1, 0, 0, 0, (track_data[(outliers[k]), "T_NUM"])),
+                                          c(track_data[(outliers[k]+1),"I_NCEE"], track_data[(outliers[k]+1),"LAT"], track_data[(outliers[k]+1),"LON"], newdate2, 0, 0, 0, (track_data[(outliers[k]+1), "T_NUM"])),
+                                          track_data[(outliers[k]+1):nrow(track_data),])
+                      
+                      track_data$T_NUM[(outliers[k]+2):nrow(track_data)] <- track_data$T_NUM[(outliers[k]+2):nrow(track_data)]+1
+                      
+                      outliers <- outliers + 2
+                      
+                      next
+                    }
+                    if(nrow(useharb) > 1)
+                    {
+                      dist1 <-spDistsN1(useharb[,1:2], 
+                                        as.matrix(c(track_data[outliers[k],"LON"], track_data[outliers[k],"LAT"])), 
+                                        longlat = TRUE)
+                    }
+                    
+                    if(nrow(useharb) == 1)
+                    {
+                      dist1 <- spDists(cbind(useharb[,1],useharb[,2]), 
+                                       (cbind(track_data[outliers[k],"LON"], track_data[outliers[k],"LAT"])),
+                                       longlat = TRUE)
+                    }
+                    
+                    hdist1 <- min(dist1)
+                    nearh1 <- which(dist1 == hdist1)
+                    
+                    if(nrow(useharb) > 1)
+                    {
+                      dist2 <-spDistsN1(useharb[,1:2],
+                                        as.matrix(c(track_data[(outliers[k]+1),"LON"], track_data[(outliers[k]+1),"LAT"])),
+                                        longlat = TRUE)
+                    }
+                    
+                    if(nrow(useharb) == 1)
+                    {
+                      dist2 <- spDists(cbind(useharb[,1],useharb[,2]), 
+                                       (cbind(track_data[(outliers[k]+1),"LON"], track_data[(outliers[k]+1),"LAT"])),
+                                       longlat = TRUE)
+                    }
+                    
+                    hdist2 <- min(dist2)
+                    nearh2 <- which(dist2 == hdist2)
+                    
+                    newdate1 <- track_data[(outliers[k]),"DATE"]+((1/24)*(spe3qua/hdist1))
+                    newdate1 <- ifelse(track_data[(outliers[k]+1),"DATE"] > newdate1 & newdate1 != Inf & newdate1 != -Inf, 
+                                       newdate1,
+                                       track_data[(outliers[k]),"DATE"]+0.0002)
+                    
+                    newdate2 <- track_data[(outliers[k]+1),"DATE"]-((1/24)*(spe3qua/hdist2))
+                    newdate2 <- ifelse(newdate1 < newdate2 & newdate2 != Inf & newdate2 != -Inf,
+                                       newdate2, 
+                                       newdate1)
+                    
                     
                     track_data <- rbind(track_data[1:(outliers[k]), ], 
-                                        c(track_data[(outliers[k]),"I_NCEE"], track_data[(outliers[k]),"LAT"], track_data[(outliers[k]),"LON"], newdate1, 0, 0, 0, (track_data[(outliers[k]), "T_NUM"])),
-                                        c(track_data[(outliers[k]+1),"I_NCEE"], track_data[(outliers[k]+1),"LAT"], track_data[(outliers[k]+1),"LON"], newdate2, 0, 0, 0, (track_data[(outliers[k]+1), "T_NUM"])),
+                                        c(track_data[(outliers[k]),"I_NCEE"], useharb[nearh[1],2], useharb[nearh[1],1], newdate1, 0, 0, 1, (track_data[(outliers[k]), "T_NUM"]), NA),
+                                        c(track_data[(outliers[k]+1),"I_NCEE"], useharb[nearh2[1],2], useharb[nearh2[1],1], newdate2, 0, 0, 1, (track_data[(outliers[k]+1), "T_NUM"]), NA),
                                         track_data[(outliers[k]+1):nrow(track_data),])
                     
                     track_data$T_NUM[(outliers[k]+2):nrow(track_data)] <- track_data$T_NUM[(outliers[k]+2):nrow(track_data)]+1
                     
                     outliers <- outliers + 2
-                    
-                    next
                   }
-                  if(nrow(useharb) > 1)
-                  {
-                    dist1 <-spDistsN1(useharb[,1:2], 
-                                      as.matrix(c(track_data[outliers[k],"LON"], track_data[outliers[k],"LAT"])), 
-                                      longlat = TRUE)
-                  }
-                  
-                  if(nrow(useharb) == 1)
-                  {
-                    dist1 <- spDists(cbind(useharb[,1],useharb[,2]), 
-                                     (cbind(track_data[outliers[k],"LON"], track_data[outliers[k],"LAT"])),
-                                     longlat = TRUE)
-                  }
-                  
-                  hdist1 <- min(dist1)
-                  nearh1 <- which(dist1 == hdist1)
-                  
-                  if(nrow(useharb) > 1)
-                  {
-                    dist2 <-spDistsN1(useharb[,1:2],
-                                      as.matrix(c(track_data[(outliers[k]+1),"LON"], track_data[(outliers[k]+1),"LAT"])),
-                                      longlat = TRUE)
-                  }
-                  
-                  if(nrow(useharb) == 1)
-                  {
-                    dist2 <- spDists(cbind(useharb[,1],useharb[,2]), 
-                                     (cbind(track_data[(outliers[k]+1),"LON"], track_data[(outliers[k]+1),"LAT"])),
-                                     longlat = TRUE)
-                  }
-                  
-                  hdist2 <- min(dist2)
-                  nearh2 <- which(dist2 == hdist2)
-                  
-                  newdate1 <- track_data[(outliers[k]),"DATE"]+((1/24)*(spe3qua/hdist1))
-                  newdate1 <- ifelse(track_data[(outliers[k]+1),"DATE"] > newdate1 & newdate1 != Inf & newdate1 != -Inf, 
-                                     newdate1,
-                                     track_data[(outliers[k]),"DATE"]+0.0002)
-                  
-                  newdate2 <- track_data[(outliers[k]+1),"DATE"]-((1/24)*(spe3qua/hdist2))
-                  newdate2 <- ifelse(newdate1 < newdate2 & newdate2 != Inf & newdate2 != -Inf,
-                                     newdate2, 
-                                     newdate1)
-                  
-                  
-                  track_data <- rbind(track_data[1:(outliers[k]), ], 
-                                      c(track_data[(outliers[k]),"I_NCEE"], useharb[nearh[1],2], useharb[nearh[1],1], newdate1, 0, 0, 1, (track_data[(outliers[k]), "T_NUM"]), NA),
-                                      c(track_data[(outliers[k]+1),"I_NCEE"], useharb[nearh2[1],2], useharb[nearh2[1],1], newdate2, 0, 0, 1, (track_data[(outliers[k]+1), "T_NUM"]), NA),
-                                      track_data[(outliers[k]+1):nrow(track_data),])
-                  
-                  track_data$T_NUM[(outliers[k]+2):nrow(track_data)] <- track_data$T_NUM[(outliers[k]+2):nrow(track_data)]+1
-                  
-                  outliers <- outliers + 2
                 }
-              }
-              
+                
               }else{
                 cat(" -  No Ping Frequency outliers found ", sep = "")
               }
@@ -342,7 +343,8 @@ gui_vms_db_cut <- function(vms_db_name = "")
   
   if(vms_DB$db != "")
   {
-    svalue(sel_vms_f) <- strsplit(vms_DB$db, "/")[[1]][length(strsplit(vms_DB$db, "/")[[1]])]    
+    #     svalue(sel_vms_f) <- strsplit(vms_DB$db, "/")[[1]][length(strsplit(vms_DB$db, "/")[[1]])]
+    svalue(sel_vms_f) <- ifelse(.Platform$OS.type == "windows", strsplit(vms_DB$db, "\\\\")[[1]][length(strsplit(vms_DB$db, "\\\\")[[1]])],strsplit(vms_DB$db, "/")[[1]][length(strsplit(vms_DB$db, "/")[[1]])])
     enabled(start_b) <- TRUE
   } 
   

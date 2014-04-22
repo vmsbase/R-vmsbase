@@ -9,7 +9,7 @@ gui_main <- function ()
   bathy_file <- ""
   
   main_win <- gwindow(paste("VMS Base - Version ", packageVersion("vmsbase"), sep = "") , visible = FALSE)
-#   main_win <- gwindow(paste("VMS Base - Version ", "1.0", sep = "") , visible = FALSE)
+  #   main_win <- gwindow(paste("VMS Base - Version ", "1.0", sep = "") , visible = FALSE)
   
   theg <- ggroup(horizontal = TRUE, container = main_win)
   
@@ -32,7 +32,9 @@ gui_main <- function ()
            vms_db_file <<- gfile(text = "Select VMS DataBase file",
                                  type = "open",
                                  filter = list("VMS DB file" = list(patterns = c("*.vms.sqlite"))))
-           svalue(sel_vms_f) <- strsplit(vms_db_file, "/")[[1]][length(strsplit(vms_db_file, "/")[[1]])]
+           #            svalue(sel_vms_f) <- strsplit(vms_db_file, "/")[[1]][length(strsplit(vms_db_file, "/")[[1]])]
+           svalue(sel_vms_f) <- ifelse(.Platform$OS.type == "windows", strsplit(vms_db_file, "\\\\")[[1]][length(strsplit(vms_db_file, "\\\\")[[1]])],strsplit(vms_db_file, "/")[[1]][length(strsplit(vms_db_file, "/")[[1]])])
+           
          })
   gimage(system.file("ico/application-exit-5.png", package="vmsbase"), container = vms_db_f,
          handler = function(h,...){
@@ -51,7 +53,8 @@ gui_main <- function ()
            lb_db_file <<- gfile(text = "Select LB DataBase file",
                                 type = "open",
                                 filter = list("LB DB file" = list(patterns = c("*.lb.sqlite"))))
-           svalue(sel_lb_f) <- strsplit(lb_db_file, "/")[[1]][length(strsplit(lb_db_file, "/")[[1]])]
+           #            svalue(sel_lb_f) <- strsplit(lb_db_file, "/")[[1]][length(strsplit(lb_db_file, "/")[[1]])]
+           svalue(sel_lb_f) <- ifelse(.Platform$OS.type == "windows", strsplit(lb_db_file, "\\\\")[[1]][length(strsplit(lb_db_file, "\\\\")[[1]])],strsplit(lb_db_file, "/")[[1]][length(strsplit(lb_db_file, "/")[[1]])])
          })
   gimage(system.file("ico/application-exit-5.png", package="vmsbase"), container = lb_db_f,
          handler = function(h,...){
@@ -69,10 +72,10 @@ gui_main <- function ()
   gimage(system.file("ico/folder-html.png", package="vmsbase"), container = cus_map_g,
          handler = function(h,...){
            themap_file <<- gfile(text = "Select Land ShapePoly map",
-                                type = "open",
-                                filter = list("shp data" = list(patterns = c("*.shp"))))
-           svalue(cus_map_lab) <- strsplit(themap_file, "/")[[1]][length(strsplit(themap_file, "/")[[1]])]
-         })
+                                 type = "open",
+                                 filter = list("shp data" = list(patterns = c("*.shp"))))
+           #            svalue(cus_map_lab) <- strsplit(themap_file, "/")[[1]][length(strsplit(themap_file, "/")[[1]])]
+           svalue(cus_map_lab) <- paste("Land: ", ifelse(.Platform$OS.type == "windows", strsplit(themap_file, "\\\\")[[1]][length(strsplit(themap_file, "\\\\")[[1]])],strsplit(themap_file, "/")[[1]][length(strsplit(themap_file, "/")[[1]])]), sep = "")         })
   gimage(system.file("ico/application-exit-5.png", package="vmsbase"), container = cus_map_g,
          handler = function(h,...){
            themap_file <<- ""
@@ -89,10 +92,10 @@ gui_main <- function ()
   gimage(system.file("ico/folder-man.png", package="vmsbase"), container = cus_har_g,
          handler = function(h,...){
            harb_file <<- gfile(text = "Select ShapePoints map",
-                              type = "open",
-                              filter = list("shp data" = list(patterns = c("*.shp"))))
-           svalue(cus_har_lab) <- strsplit(harb_file, "/")[[1]][length(strsplit(harb_file, "/")[[1]])]
-         })
+                               type = "open",
+                               filter = list("shp data" = list(patterns = c("*.shp"))))
+           #            svalue(cus_har_lab) <- strsplit(harb_file, "/")[[1]][length(strsplit(harb_file, "/")[[1]])]
+           svalue(cus_har_lab) <- paste("Harbour: ", ifelse(.Platform$OS.type == "windows", strsplit(harb_file, "\\\\")[[1]][length(strsplit(harb_file, "\\\\")[[1]])],strsplit(harb_file, "/")[[1]][length(strsplit(harb_file, "/")[[1]])]), sep = "")          })
   gimage(system.file("ico/application-exit-5.png", package="vmsbase"), container = cus_har_g,
          handler = function(h,...){
            harb_file <<- ""
@@ -109,9 +112,11 @@ gui_main <- function ()
   gimage(system.file("ico/folder-download.png", package="vmsbase"), container = cus_dep_g,
          handler = function(h,...){
            bathy_file <<- gfile(text = "Select Bathymetry File",
-                               type = "open",
-                               filter = list("bathy data" = list(patterns = c("*sqlitebathy.rData"))))
-           svalue(cus_dep_lab) <- strsplit(bathy_file, "/")[[1]][length(strsplit(bathy_file, "/")[[1]])]
+                                type = "open",
+                                filter = list("bathy data" = list(patterns = c("*sqlitebathy.rData"))))
+           #            svalue(cus_dep_lab) <- strsplit(bathy_file, "/")[[1]][length(strsplit(bathy_file, "/")[[1]])]
+           #            svalue(cus_dep_lab) <- ifelse(.Platform$OS.type == "windows", strsplit(bathy_file, "\\\\")[[1]][length(strsplit(bathy_file, "\\\\")[[1]])],strsplit(bathy_file, "/")[[1]][length(strsplit(bathy_file, "/")[[1]])])
+           svalue(cus_dep_lab) <- paste("Depth: ", ifelse(.Platform$OS.type == "windows", strsplit(bathy_file, "\\\\")[[1]][length(strsplit(bathy_file, "\\\\")[[1]])],strsplit(bathy_file, "/")[[1]][length(strsplit(bathy_file, "/")[[1]])]), sep = "")
          })
   gimage(system.file("ico/application-exit-5.png", package="vmsbase"), container = cus_dep_g,
          handler = function(h,...){
@@ -122,7 +127,7 @@ gui_main <- function ()
   sa_lo_ws_g <- ggroup(horizontal = TRUE, container = wo_sp_fr)
   addSpring(sa_lo_ws_g)
   save_ws_b <-gbutton(text = "Save\nWorkSpace", container = sa_lo_ws_g, handler = function(h,...)
-    {
+  {
     ws_file <- ""
     ws_file <- gfile(text = "Enter the WorkSpace name...",
                      initialfilename = "*.ws.rData",
@@ -131,9 +136,9 @@ gui_main <- function ()
     if(!is.na(ws_file))
     {
       cat(ls(name = parent.env(environment()), pattern = "file"), sep = " - ")
-    save(list = ls(name = parent.env(environment()), pattern = "file"), file = ws_file)
-    gmessage(paste("WorkSpace Saved!\n\nFile: ", ws_file, sep = ""), title="WorkSpace Saved",
-             icon = "info") 
+      save(list = ls(name = parent.env(environment()), pattern = "file"), file = ws_file)
+      gmessage(paste("WorkSpace Saved!\n\nFile: ", ws_file, sep = ""), title="WorkSpace Saved",
+               icon = "info") 
     }else{
       gmessage(paste("WorkSpace not saved!\n\nPlease enter a valid name and\ndestination of the WorkSpace file", sep = ""), title="WorkSpace Save Error!",
                icon = "error")
@@ -151,12 +156,12 @@ gui_main <- function ()
     {
       load(file = ws_file, envir = parent.env(environment()))
       
-      ifelse(harb_file != "", svalue(cus_har_lab) <- strsplit(harb_file, "/")[[1]][length(strsplit(harb_file, "/")[[1]])], svalue(cus_har_lab) <- "Select Harbours Shape File")
-      ifelse(bathy_file != "", svalue(cus_dep_lab) <- strsplit(bathy_file, "/")[[1]][length(strsplit(bathy_file, "/")[[1]])], svalue(cus_dep_lab) <- "Select Bathymetry File")
-      ifelse(themap_file != "", svalue(cus_map_lab) <- strsplit(themap_file, "/")[[1]][length(strsplit(themap_file, "/")[[1]])], svalue(cus_map_lab) <- "Select Land Shape File")
-      ifelse(lb_db_file != "", svalue(sel_lb_f) <- strsplit(lb_db_file, "/")[[1]][length(strsplit(lb_db_file, "/")[[1]])], svalue(sel_lb_f) <- "Select LB DB file")
-      ifelse(vms_db_file != "", svalue(sel_vms_f) <- strsplit(vms_db_file, "/")[[1]][length(strsplit(vms_db_file, "/")[[1]])], svalue(sel_vms_f) <- "Select VMS DB file")
-    
+      ifelse(harb_file != "", svalue(cus_har_lab) <- paste("Harbour: ", ifelse(.Platform$OS.type == "windows", strsplit(harb_file, "\\\\")[[1]][length(strsplit(harb_file, "\\\\")[[1]])],strsplit(harb_file, "/")[[1]][length(strsplit(harb_file, "/")[[1]])]), sep = ""), svalue(cus_har_lab) <- "Select Harbours Shape File")
+      ifelse(bathy_file != "",  svalue(cus_dep_lab) <- paste("Depth: ", ifelse(.Platform$OS.type == "windows", strsplit(bathy_file, "\\\\")[[1]][length(strsplit(bathy_file, "\\\\")[[1]])],strsplit(bathy_file, "/")[[1]][length(strsplit(bathy_file, "/")[[1]])]), sep = ""), svalue(cus_dep_lab) <- "Select Bathymetry File")
+      ifelse(themap_file != "", svalue(cus_map_lab) <- paste("Land: ", ifelse(.Platform$OS.type == "windows", strsplit(themap_file, "\\\\")[[1]][length(strsplit(themap_file, "\\\\")[[1]])],strsplit(themap_file, "/")[[1]][length(strsplit(themap_file, "/")[[1]])]), sep = ""), svalue(cus_map_lab) <- "Select Land Shape File")
+      ifelse(lb_db_file != "", svalue(sel_lb_f) <- ifelse(.Platform$OS.type == "windows", strsplit(lb_db_file, "\\\\")[[1]][length(strsplit(lb_db_file, "\\\\")[[1]])],strsplit(lb_db_file, "/")[[1]][length(strsplit(lb_db_file, "/")[[1]])]), svalue(sel_lb_f) <- "Select LB DB file")
+      ifelse(vms_db_file != "", svalue(sel_vms_f) <- ifelse(.Platform$OS.type == "windows", strsplit(vms_db_file, "\\\\")[[1]][length(strsplit(vms_db_file, "\\\\")[[1]])],strsplit(vms_db_file, "/")[[1]][length(strsplit(vms_db_file, "/")[[1]])]), svalue(sel_vms_f) <- "Select VMS DB file")
+      
       
       gmessage(paste("WorkSpace Loaded!\n\nFile: ", ws_file, sep = ""), title="WorkSpace Loaded",
                icon = "info") 
@@ -286,12 +291,12 @@ gui_main <- function ()
   gimage(system.file("ico/folder-saved-search.png", package="vmsbase"), container = lb_data_vie)
   gbutton("LogBook Data\n   Viewer", container = lb_data_vie, handler = function(h,...)
   {gui_lb_db_stat(lb_db_name = lb_db_file)})
-#   lb_clean <- ggroup(horizontal = FALSE, container = top_rig, spacing = 0)
-#   gimage(system.file("ico/configure-2.png", package="vmsbase"), container = lb_clean)
-#   gbutton("Edit DB\n   Data", container = lb_clean, handler = function(h,...)
-#   {
-#     #gui_lb_db_edit(lb_db_name = lb_db_file)
-#     })
+  #   lb_clean <- ggroup(horizontal = FALSE, container = top_rig, spacing = 0)
+  #   gimage(system.file("ico/configure-2.png", package="vmsbase"), container = lb_clean)
+  #   gbutton("Edit DB\n   Data", container = lb_clean, handler = function(h,...)
+  #   {
+  #     #gui_lb_db_edit(lb_db_name = lb_db_file)
+  #     })
   addSpring(top_rig)
   
   #LB EDIT
@@ -326,7 +331,7 @@ gui_main <- function ()
   gimage(system.file("ico/office-chart-area.png", package="vmsbase"), container = lb_vms_pred)
   gbutton("Predict\n Metier", container = lb_vms_pred, handler = function(h,...)
   {gui_vms_met_pred(vms_db_name = vms_db_file)})
-
+  
   addSpring(bot_rig)
   lb_vms_fish <- ggroup(horizontal = FALSE, container = bot_rig, spacing = 0)
   gimage(system.file("ico/office-chart-scatter.png", package="vmsbase"), container = lb_vms_fish)
@@ -358,8 +363,8 @@ gui_main <- function ()
   ### About
   addSpring(top2)
   gseparator(container = top2)
-#   abut_g <- ggroup(horizontal = TRUE, container = top2)
-#   addSpring(abut_g)
+  #   abut_g <- ggroup(horizontal = TRUE, container = top2)
+  #   addSpring(abut_g)
   left_b <- ggroup(horizontal = FALSE, container = top2)
   torver_logo <- gimage(system.file("img/torvergata.png", package = "vmsbase"))
   add(left_b, torver_logo)

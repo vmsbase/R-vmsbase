@@ -55,7 +55,8 @@ gui_vms_db_are <- function(vms_db_name = "")
            vms_DB$db <- gfile(text = "Select VMS DataBase file",
                               type = "open",
                               filter = list("VMS DB file" = list(patterns = c("*.vms.sqlite"))))
-           svalue(sel_vms_f) <- strsplit(vms_DB$db, "/")[[1]][length(strsplit(vms_DB$db, "/")[[1]])]
+           #            svalue(sel_vms_f) <- strsplit(vms_DB$db, "/")[[1]][length(strsplit(vms_DB$db, "/")[[1]])]
+           svalue(sel_vms_f) <- ifelse(.Platform$OS.type == "windows", strsplit(vms_DB$db, "\\\\")[[1]][length(strsplit(vms_DB$db, "\\\\")[[1]])],strsplit(vms_DB$db, "/")[[1]][length(strsplit(vms_DB$db, "/")[[1]])])
            if(themap$path != "" & vms_DB$db != "")
            {
              enabled(start_b) <- TRUE
@@ -80,7 +81,8 @@ gui_vms_db_are <- function(vms_db_name = "")
            themap$path <- gfile(text = "Select Area ShapePoly map",
                                 type = "open",
                                 filter = list("shp data" = list(patterns = c("*.shp"))))
-           svalue(cus_map_lab) <- paste("Area Map: ", strsplit(themap$path, "/")[[1]][length(strsplit(themap$path, "/")[[1]])], sep = "")
+           #            svalue(cus_map_lab) <- paste("Area Map: ", strsplit(themap$path, "/")[[1]][length(strsplit(themap$path, "/")[[1]])], sep = "")
+           svalue(cus_map_lab) <- paste("Area Map: ", ifelse(.Platform$OS.type == "windows", strsplit(themap$path, "\\\\")[[1]][length(strsplit(themap$path, "\\\\")[[1]])],strsplit(themap$path, "/")[[1]][length(strsplit(themap$path, "/")[[1]])]), sep = "")
            if(themap$path != "" & vms_DB$db != "")
            {
              enabled(start_b) <- TRUE
@@ -104,48 +106,48 @@ gui_vms_db_are <- function(vms_db_name = "")
     
     if(sqldf("select count(*) from track", dbname = vms_DB$db) > 0)
     {
-    
-    svalue(infolab_area) <- "Upadating...\nVMS DataBase"
-    sqldf("drop table if exists p_area", dbname = vms_DB$db)
-    sqldf("CREATE TABLE p_area(vess_id INT, t_num INT, AREA INT)", dbname = vms_DB$db)
-    
-    svalue(infolab_area) <- "Loading...\nArea Map"
-    themap$data <- readShapePoly(themap$path)
-    
-    svalue(infolab_area) <- "Generating...\nArea Box"
-    Area_box <- SpatialPolygons2PolySet(themap$data)
-    
-    incee <- sqldf("select distinct I_NCEE from ping", dbname = vms_DB$db)
-    for ( v in 1:nrow(incee) )
-    {
-      cat("\nAnnotating vessel ", v," of ", nrow(incee), "\n", spe = "")
-      svalue(infolab_area) <- paste("Loading...\nVessel: ", v," of ", nrow(incee), spe = "")
       
-      vessel <- fn$sqldf("select * from track where I_NCEE = `incee[v,1]` order by DATE", dbname = vms_DB$db)
+      svalue(infolab_area) <- "Upadating...\nVMS DataBase"
+      sqldf("drop table if exists p_area", dbname = vms_DB$db)
+      sqldf("CREATE TABLE p_area(vess_id INT, t_num INT, AREA INT)", dbname = vms_DB$db)
       
-      for(i in unique(vessel[,"T_NUM"]))
+      svalue(infolab_area) <- "Loading...\nArea Map"
+      themap$data <- readShapePoly(themap$path)
+      
+      svalue(infolab_area) <- "Generating...\nArea Box"
+      Area_box <- SpatialPolygons2PolySet(themap$data)
+      
+      incee <- sqldf("select distinct I_NCEE from ping", dbname = vms_DB$db)
+      for ( v in 1:nrow(incee) )
+      {
+        cat("\nAnnotating vessel ", v," of ", nrow(incee), "\n", spe = "")
+        svalue(infolab_area) <- paste("Loading...\nVessel: ", v," of ", nrow(incee), spe = "")
+        
+        vessel <- fn$sqldf("select * from track where I_NCEE = `incee[v,1]` order by DATE", dbname = vms_DB$db)
+        
+        for(i in unique(vessel[,"T_NUM"]))
         {
-        svalue(infolab_area) <- paste("\nVessel: ", v," of ", nrow(incee),
-                                      "\nTrack: ", i, " of ", length(unique(vessel[,"T_NUM"])), spe = "")
+          svalue(infolab_area) <- paste("\nVessel: ", v," of ", nrow(incee),
+                                        "\nTrack: ", i, " of ", length(unique(vessel[,"T_NUM"])), spe = "")
+          
+          cat(".", sep = "")
+          area <- Assign_Area(vessel[which(vessel[,"T_NUM"] == i),c("LON","LAT")], Area_box)
+          
+          trk_area <- as.data.frame(cbind(incee[v,1], i, area))
+          colnames(trk_area) <- c("I_NCEE", "T_NUM", "AREA")
+          
+          sqldf("insert into p_area select * from `trk_area`", dbname = vms_DB$db)    
+        }
+        cat("Completed!\n", sep = "")
         
-        cat(".", sep = "")
-        area <- Assign_Area(vessel[which(vessel[,"T_NUM"] == i),c("LON","LAT")], Area_box)
-        
-        trk_area <- as.data.frame(cbind(incee[v,1], i, area))
-        colnames(trk_area) <- c("I_NCEE", "T_NUM", "AREA")
-        
-        sqldf("insert into p_area select * from `trk_area`", dbname = vms_DB$db)    
       }
-      cat("Completed!\n", sep = "")
+      cat("\n\n   ---   End Assign Area   ---\n")
       
-    }
-    cat("\n\n   ---   End Assign Area   ---\n")
-    
-    gconfirm("VMS DB Area Annotation Completed!",
-             title = "Confirm",
-             icon = "info",
-             parent = vms_db_are_win,
-             handler = function(h,...){dispose(vms_db_are_win)})
+      gconfirm("VMS DB Area Annotation Completed!",
+               title = "Confirm",
+               icon = "info",
+               parent = vms_db_are_win,
+               handler = function(h,...){dispose(vms_db_are_win)})
     }else{
       
       gconfirm("Track data not available\n\nExecute Track Cut first!",
@@ -163,11 +165,13 @@ gui_vms_db_are <- function(vms_db_name = "")
   
   if(vms_DB$db != "")
   {
-    svalue(sel_vms_f) <- strsplit(vms_DB$db, "/")[[1]][length(strsplit(vms_DB$db, "/")[[1]])]    
+    #     svalue(sel_vms_f) <- strsplit(vms_DB$db, "/")[[1]][length(strsplit(vms_DB$db, "/")[[1]])]
+    svalue(sel_vms_f) <- ifelse(.Platform$OS.type == "windows", strsplit(vms_DB$db, "\\\\")[[1]][length(strsplit(vms_DB$db, "\\\\")[[1]])],strsplit(vms_DB$db, "/")[[1]][length(strsplit(vms_DB$db, "/")[[1]])])
   } 
   if(themap$path != "")
   {
-  svalue(cus_map_lab) <- paste("Area Map: ", strsplit(themap$path, "/")[[1]][length(strsplit(themap$path, "/")[[1]])], sep = "")
+    #   svalue(cus_map_lab) <- paste("Area Map: ", strsplit(themap$path, "/")[[1]][length(strsplit(themap$path, "/")[[1]])], sep = "")
+    svalue(cus_map_lab) <- paste("Area Map: ", ifelse(.Platform$OS.type == "windows", strsplit(themap$path, "\\\\")[[1]][length(strsplit(themap$path, "\\\\")[[1]])],strsplit(themap$path, "/")[[1]][length(strsplit(themap$path, "/")[[1]])]), sep = "")
   }
   if(themap$path != "" & vms_DB$db != "")
   {

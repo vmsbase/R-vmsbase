@@ -20,15 +20,19 @@ saveRawLogBook <- function (rawfile,
                             widget)
 {
   vess <- widget[1]
-  sta_sel <- widget[2]
-  sdate <- widget[3]
-  stime <- widget[4]
-  end_sel <- widget[5]
-  edate <- widget[6]
-  etime <- widget[7]
-  species <- widget[8]
-  qty <- widget[9]
-  if(widget[10] == "DD/MM/YYYY")
+  th_met_s <- widget[2]
+  th_meti <- widget[3]
+  th_gea_s <- widget[4]
+  th_gear <- widget[5]
+  #   sta_sel <- widget[2]
+  sdate <- widget[6]
+  stime <- widget[7]
+  #   end_sel <- widget[5]
+  edate <- widget[8]
+  etime <- widget[9]
+  species <- widget[10]
+  qty <- widget[11]
+  if(widget[12] == "DD/MM/YYYY")
   {data_frm <-  c(dates = "d/m/y", times = "h:m:s")
   }else{
     data_frm <- c(dates = "m/d/y", times = "h:m:s")
@@ -43,55 +47,57 @@ saveRawLogBook <- function (rawfile,
                         "s_utc" = numeric(numlines),
                         "e_utc" = numeric(numlines),
                         "specie" = character(numlines),
-                        "qty" = numeric(numlines))
+                        "qty" = numeric(numlines),
+                        "gear" = numeric(numlines),
+                        "metier" = numeric(numlines))
   
   
   vess_id <- which(colnames(rawfile$data) == vess)
   logbook["vessUE"] <- rawfile$data[,vess_id]
   
-  if(sta_sel == "Yes")
-  {
-    log_sdate <- which(colnames(rawfile$data) == sdate)
-    log_stime <- which(colnames(rawfile$data) == stime)
-    sdts <- gsub("\"", "", as.character(rawfile$data[,log_sdate]))
-    stms <- gsub("\"", "", as.character(rawfile$data[,log_stime]))
-    toes <- which(nchar(stms) == 5)
-    if(length(toes) > 0){stms[toes] <- paste(stms[toes], ":00", sep = "")}
-    sta_utc <- as.numeric(chron(dates. = sdts, times. = stms, format = data_frm))
-    
-    tole_sutc <- which(is.na(sta_utc))
-    cat("\n   -   ", length(tole_sutc), " NAs found in Start Times...", sep = "")
-    if(length(tole_sutc) > 0)
-    {
-      rawfile$data <- rawfile$data[-tole_sutc,]
-      sta_utc <- sta_utc[-tole_sutc]
-      logbook <- logbook[-tole_sutc,]
-    }
-    
-    logbook["s_utc"] <- sta_utc
-  }else{logbook["s_utc"] <- 0}
+  #   if(sta_sel == "Yes")
+  #   {
+  log_sdate <- which(colnames(rawfile$data) == sdate)
+  log_stime <- which(colnames(rawfile$data) == stime)
+  sdts <- gsub("\"", "", as.character(rawfile$data[,log_sdate]))
+  stms <- gsub("\"", "", as.character(rawfile$data[,log_stime]))
+  toes <- which(nchar(stms) == 5)
+  if(length(toes) > 0){stms[toes] <- paste(stms[toes], ":00", sep = "")}
+  sta_utc <- as.numeric(chron(dates. = sdts, times. = stms, format = data_frm))
   
-  if(end_sel == "Yes")
+  tole_sutc <- which(is.na(sta_utc))
+  cat("\n   -   ", length(tole_sutc), " NAs found in Start Times...", sep = "")
+  if(length(tole_sutc) > 0)
   {
-    log_edate <- which(colnames(rawfile$data) == edate)
-    log_etime <- which(colnames(rawfile$data) == etime)
-    edts <- gsub("\"", "", as.character(rawfile$data[,log_edate]))
-    etms <- gsub("\"", "", as.character(rawfile$data[,log_etime]))
-    toee <- which(nchar(etms) == 5)
-    if(length(toee) > 0){etms[toee] <- paste(etms[toee], ":00", sep = "")}
-    end_utc <- as.numeric(chron(dates. = edts, times. = etms, format = data_frm))
-    
-    tole_eutc <- which(is.na(end_utc))
-    cat("\n   -   ", length(tole_eutc), " NAs found in End Times...", sep = "")
-    if(length(tole_eutc) > 0)
-    {
-      rawfile$data <- rawfile$data[-tole_eutc,]
-      end_utc <- end_utc[-tole_eutc]
-      logbook <- logbook[-tole_eutc,]
-    }
-    
-    logbook["e_utc"] <- end_utc
-  }else{logbook["e_utc"] <- 0}
+    rawfile$data <- rawfile$data[-tole_sutc,]
+    sta_utc <- sta_utc[-tole_sutc]
+    logbook <- logbook[-tole_sutc,]
+  }
+  
+  logbook["s_utc"] <- sta_utc
+  #   }else{logbook["s_utc"] <- 0}
+  
+  #   if(end_sel == "Yes")
+  #   {
+  log_edate <- which(colnames(rawfile$data) == edate)
+  log_etime <- which(colnames(rawfile$data) == etime)
+  edts <- gsub("\"", "", as.character(rawfile$data[,log_edate]))
+  etms <- gsub("\"", "", as.character(rawfile$data[,log_etime]))
+  toee <- which(nchar(etms) == 5)
+  if(length(toee) > 0){etms[toee] <- paste(etms[toee], ":00", sep = "")}
+  end_utc <- as.numeric(chron(dates. = edts, times. = etms, format = data_frm))
+  
+  tole_eutc <- which(is.na(end_utc))
+  cat("\n   -   ", length(tole_eutc), " NAs found in End Times...", sep = "")
+  if(length(tole_eutc) > 0)
+  {
+    rawfile$data <- rawfile$data[-tole_eutc,]
+    end_utc <- end_utc[-tole_eutc]
+    logbook <- logbook[-tole_eutc,]
+  }
+  
+  logbook["e_utc"] <- end_utc
+  #   }else{logbook["e_utc"] <- 0}
   
   
   spcs <- which(colnames(rawfile$data) == species)
@@ -118,7 +124,41 @@ saveRawLogBook <- function (rawfile,
   
   logbook["qty"] <- rawfile$data[,sp_qty]
   
-  cat("\n\nRemoved ", round((100/numlines) * (numlines-nrow(logbook)), 2), "% of data, that is ", numlines-nrow(logbook)," logbooks\n",
+  
+  if(th_met_s == "Yes")
+  {
+    log_meti <- which(colnames(rawfile$data) == th_meti)
+    met_inf <- gsub("\"", "", as.character(rawfile$data[,log_meti]))
+    tole_met <- which(is.na(met_inf))
+    cat("\n   -   ", length(tole_met), " NAs found in Metier...", sep = "")
+    if(length(tole_met) > 0)
+    {
+      rawfile$data <- rawfile$data[-tole_met,]
+      met_inf <- met_inf[-tole_met]
+      logbook <- logbook[-tole_met,]
+    }
+    logbook["metier"] <- met_inf
+  }else{logbook["metier"] <- 0}
+  
+  if(th_gea_s == "Yes")
+  {
+    log_gear <- which(colnames(rawfile$data) == th_gear)
+    gea_inf <- gsub("\"", "", as.character(rawfile$data[,log_gear]))
+    tole_gea <- which(is.na(gea_inf))
+    cat("\n   -   ", length(tole_gea), " NAs found in Gear...", sep = "")
+    if(length(tole_gea) > 0)
+    {
+      rawfile$data <- rawfile$data[-tole_gea,]
+      gea_inf <- gea_inf[-tole_gea]
+      logbook <- logbook[-tole_gea,]
+    }
+    logbook["gear"] <- gea_inf
+  }else{logbook["gear"] <- 0}
+  
+  
+  cat("\n\nRemoved ",
+      round((100/numlines) * (numlines-nrow(logbook)), 2), "% of data, that is ",
+      numlines-nrow(logbook)," logbooks\n",
       "\n\n   ---   Raw Logbooks Editing Complete!   ---\n\n", sep = "")
   
   

@@ -46,7 +46,8 @@ gui_lb_met_cla <- function(lb_db_name = "")
            lb_DB$db <<- gfile(text = "Select LB DataBase file",
                               type = "open",
                               filter = list("LB DB file" = list(patterns = c("*.lb.sqlite"))))
-           svalue(sel_lb_f) <- strsplit(lb_DB$db, "/")[[1]][length(strsplit(lb_DB$db, "/")[[1]])]
+           #            svalue(sel_lb_f) <- strsplit(lb_DB$db, "/")[[1]][length(strsplit(lb_DB$db, "/")[[1]])]
+           svalue(sel_lb_f) <- ifelse(.Platform$OS.type == "windows", strsplit(lb_DB$db, "\\\\")[[1]][length(strsplit(lb_DB$db, "\\\\")[[1]])],strsplit(lb_DB$db, "/")[[1]][length(strsplit(lb_DB$db, "/")[[1]])])
            enabled(g_input) <- TRUE
            enabled(b_met_cla) <- TRUE
          })
@@ -66,12 +67,12 @@ gui_lb_met_cla <- function(lb_db_name = "")
   glabel("Use Standard\nClassification?", container = me_cl_st_g)
   sta_cla_sel <- gradio(c("Yes", "No"), container = me_cl_st_g, horizontal = FALSE,
                         handler = function(h,...)
-                          {enabled(cus_cla_g) <- !enabled(cus_cla_g)
-                            enabled(b_met_cla) <- !enabled(b_met_cla)
-                           if(lb_DB$db == "")
-                           {
-                             enabled(b_met_cla) <- FALSE
-                           }
+                        {enabled(cus_cla_g) <- !enabled(cus_cla_g)
+                         enabled(b_met_cla) <- !enabled(b_met_cla)
+                         if(lb_DB$db == "")
+                         {
+                           enabled(b_met_cla) <- FALSE
+                         }
                         })
   
   cus_cla_g <- ggroup(horizontal = TRUE, container = met_c_f)
@@ -82,7 +83,8 @@ gui_lb_met_cla <- function(lb_db_name = "")
            cla_file <- gfile(text = "Select Metier file",
                              type = "open",
                              filter = list("Metier data" = list(patterns = c("*.rData"))))
-           svalue(sta_cla_lab) <- paste(strsplit(cla_file, "/")[[1]][length(strsplit(cla_file, "/")[[1]])])
+           #            svalue(sta_cla_lab) <- paste(strsplit(cla_file, "/")[[1]][length(strsplit(cla_file, "/")[[1]])])
+           svalue(sta_cla_lab) <- ifelse(.Platform$OS.type == "windows", strsplit(cla_file, "\\\\")[[1]][length(strsplit(cla_file, "\\\\")[[1]])],strsplit(cla_file, "/")[[1]][length(strsplit(cla_file, "/")[[1]])])
            if(lb_DB$db != "")
            {
              enabled(b_met_cla) <- TRUE
@@ -136,56 +138,56 @@ gui_lb_met_cla <- function(lb_db_name = "")
       
       if(nrow(lb_data) > 0)
       {
-      same_col <- which(colnames(lb_data) %in% colnames(medoids))
-      same_col2 <- which(colnames(medoids) %in% colnames(lb_data))
-      
-      
-      same_dat <- lb_data[,same_col]
-      
-      num_lb <- nrow(same_dat)    
-      
-      res_diss <- data.frame(vessel = vess[i,1],
-                             log_num = numeric(num_lb),
-                             met_fo = numeric(num_lb),
-                             met_des = character(num_lb))
-      
-      res_diss[,4] <- NA
-      #                            res_diss[1:num_lb,2] <- 1:num_lb
-      
-      fuzz <- 2
-      
-      cat("\n", num_lb, " logbooks - Calculating... ", sep = "")
-      for(k in 1:num_lb)
-      {
+        same_col <- which(colnames(lb_data) %in% colnames(medoids))
+        same_col2 <- which(colnames(medoids) %in% colnames(lb_data))
         
-        if(sum(same_dat[k,]) == 0)
-        {next}
         
-        diss_dat <- rbind(same_dat[k,], medoids[,same_col2])
+        same_dat <- lb_data[,same_col]
         
-        diss_res <- distance(diss_dat, method = svalue(met_cla_sel))
+        num_lb <- nrow(same_dat)    
         
-        mat_res <- as.matrix(diss_res)[,1]
+        res_diss <- data.frame(vessel = vess[i,1],
+                               log_num = numeric(num_lb),
+                               met_fo = numeric(num_lb),
+                               met_des = character(num_lb))
         
-        vec_res <- as.numeric(mat_res[-1]) 
+        res_diss[,4] <- NA
+        #                            res_diss[1:num_lb,2] <- 1:num_lb
         
-        memb <- numeric(length(vec_res))
+        fuzz <- 2
         
-        for(h in 1:length(vec_res))
+        cat("\n", num_lb, " logbooks - Calculating... ", sep = "")
+        for(k in 1:num_lb)
         {
-          memb[h] <- 1/sum((vec_res[h]/vec_res)^(2/(fuzz-1)))
+          
+          if(sum(same_dat[k,]) == 0)
+          {next}
+          
+          diss_dat <- rbind(same_dat[k,], medoids[,same_col2])
+          
+          diss_res <- distance(diss_dat, method = svalue(met_cla_sel))
+          
+          mat_res <- as.matrix(diss_res)[,1]
+          
+          vec_res <- as.numeric(mat_res[-1]) 
+          
+          memb <- numeric(length(vec_res))
+          
+          for(h in 1:length(vec_res))
+          {
+            memb[h] <- 1/sum((vec_res[h]/vec_res)^(2/(fuzz-1)))
+          }
+          res_diss[k,2] <- lb_data[k,"rowid"]
+          res_diss[k,3] <- which.max(memb)
+          if(length(options) != 0 & res_diss[k,3] != 0)
+          {
+            res_diss[k,4]  <- options[res_diss[k,3]]
+          }
         }
-        res_diss[k,2] <- lb_data[k,"rowid"]
-        res_diss[k,3] <- which.max(memb)
-        if(length(options) != 0 & res_diss[k,3] != 0)
-        {
-          res_diss[k,4]  <- options[res_diss[k,3]]
-        }
-      }
-      
-      cat("Complete!\n\n", sep = "")
-      
-      sqldf("INSERT INTO lb_cla SELECT * FROM `res_diss`", dbname = lb_DB$db)
+        
+        cat("Complete!\n\n", sep = "")
+        
+        sqldf("INSERT INTO lb_cla SELECT * FROM `res_diss`", dbname = lb_DB$db)
       }else{
         
         cat(" - Skipped \n", sep = "")
@@ -206,7 +208,8 @@ gui_lb_met_cla <- function(lb_db_name = "")
   
   if(lb_DB$db != "")
   {
-    svalue(sel_lb_f) <- strsplit(lb_DB$db, "/")[[1]][length(strsplit(lb_DB$db, "/")[[1]])]
+    #     svalue(sel_lb_f) <- strsplit(lb_DB$db, "/")[[1]][length(strsplit(lb_DB$db, "/")[[1]])]
+    svalue(sel_lb_f) <- ifelse(.Platform$OS.type == "windows", strsplit(lb_DB$db, "\\\\")[[1]][length(strsplit(lb_DB$db, "\\\\")[[1]])],strsplit(lb_DB$db, "/")[[1]][length(strsplit(lb_DB$db, "/")[[1]])])
     enabled(b_met_cla) <- TRUE
     enabled(g_input) <- TRUE
   }

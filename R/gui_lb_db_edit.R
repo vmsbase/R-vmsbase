@@ -20,7 +20,8 @@ gui_lb_db_edit <- function(lb_db_name = "")
            lb_DB$db <<- gfile(text = "Select LB DataBase file",
                               type = "open",
                               filter = list("LB DB file" = list(patterns = c("*.lb.sqlite"))))
-           svalue(sel_lb_f) <- strsplit(lb_DB$db, "/")[[1]][length(strsplit(lb_DB$db, "/")[[1]])]
+#            svalue(sel_lb_f) <- strsplit(lb_DB$db, "/")[[1]][length(strsplit(lb_DB$db, "/")[[1]])]
+           svalue(sel_lb_f) <- ifelse(.Platform$OS.type == "windows", strsplit(lb_DB$db, "\\\\")[[1]][length(strsplit(lb_DB$db, "\\\\")[[1]])],strsplit(lb_DB$db, "/")[[1]][length(strsplit(lb_DB$db, "/")[[1]])])
            enabled(start_b) <- TRUE
          })
   gimage(system.file("ico/application-exit-5.png", package="vmsbase"), container = lb_db_f,
@@ -104,7 +105,8 @@ gui_lb_db_edit <- function(lb_db_name = "")
   
   if(lb_DB$db != "")
   {
-    svalue(sel_lb_f) <- strsplit(lb_DB$db, "/")[[1]][length(strsplit(lb_DB$db, "/")[[1]])]
+#     svalue(sel_lb_f) <- strsplit(lb_DB$db, "/")[[1]][length(strsplit(lb_DB$db, "/")[[1]])]
+    svalue(sel_lb_f) <- ifelse(.Platform$OS.type == "windows", strsplit(lb_DB$db, "\\\\")[[1]][length(strsplit(lb_DB$db, "\\\\")[[1]])],strsplit(lb_DB$db, "/")[[1]][length(strsplit(lb_DB$db, "/")[[1]])])
     enabled(start_b) <- TRUE
   }
   

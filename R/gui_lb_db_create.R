@@ -60,7 +60,7 @@ gui_lb_db_create <- function()
     dbConnect(SQLite(), dbname = lb_DB$db)
     
     firstline <- readLines(svalue(dats), n = 1)
-    if(nchar(firstline) > 30)
+    if(nchar(firstline) > 45)
     {
       read.csv.sql(svalue(dats), sql = "CREATE TABLE elobo AS SELECT * FROM file", dbname = lb_DB$db, eol = "\n")
       sqldf("CREATE TABLE lb_cla(vessel INT, log_num INT, met_fo INT, met_des CHAR)", dbname = lb_DB$db)
@@ -73,7 +73,7 @@ gui_lb_db_create <- function()
     
     ##############
     
-    distin <- sqldf("select distinct vessUE, s_utc, e_utc from logbook order by s_utc, e_utc", dbname = lb_DB$db)
+    distin <- sqldf("select distinct vessUE, s_utc, e_utc, gear, metier from logbook order by s_utc, e_utc", dbname = lb_DB$db)
     
     cat("\n\n   ---   Logbook Editing Started   ---\n", sep = "")
     
@@ -88,10 +88,12 @@ gui_lb_db_create <- function()
     colnames(spclst) <- paste("FAO_", species, sep = "")
     proto_log <- data.frame("vessUE" = numeric(1),
                             "s_utc" = numeric(1),
-                            "e_utc" = numeric(1))
+                            "e_utc" = numeric(1),
+                            "gear" = character(1),
+                            "metier" = character(1))
     proto_log <- cbind(proto_log, spclst)
-    hea_str <- paste("vessUE INT,", paste(colnames(proto_log[2:3]), "REAL",  sep = " ", collapse = ", "))
-    cre_str <- paste(colnames(proto_log[4:ncol(proto_log)]), "INT", sep = " ", collapse = ", ")
+    hea_str <- paste("vessUE INT, ", paste(colnames(proto_log[2:3]), "REAL", sep = " ", collapse = ", "), ", ", paste(colnames(proto_log[4:5]), "CHAR", sep = " ", collapse = ", "), sep = "")
+    cre_str <- paste(colnames(proto_log[6:ncol(proto_log)]), "INT", sep = " ", collapse = ", ")
     fin_str <- paste(hea_str, cre_str, sep = ", ")
     
     sqldf("drop table if exists elobo", dbname = lb_DB$db)
@@ -122,13 +124,15 @@ gui_lb_db_create <- function()
         cat(" - Skipped!", sep = "")
         next
       }
-      nclm <- (which(species %in% temp[,1]))+3
+      nclm <- (which(species %in% temp[,1]))+5
       if(max(as.numeric(table(temp[,1])))>1) temp <- as.data.frame(cbind(names(tapply(as.numeric(temp[,2]),temp[,1],sum)),as.numeric(tapply(as.numeric(temp[,2]),temp[,1],sum))))
-      new_log <- data.frame("vessUE" = numeric(1), "s_utc" = numeric(1), "e_utc" = numeric(1))
+      new_log <- data.frame("vessUE" = numeric(1), "s_utc" = numeric(1), "e_utc" = numeric(1), "gear" = character(1), "metier" = character(1))
       new_log <- cbind(new_log, spclst)
       new_log["vessUE"] <- vess_id
       new_log["e_utc"] <- utc_re
       new_log["s_utc"] <- utc_rs
+      new_log["gear"] <- distin[n,"gear"]
+      new_log["metier"] <- distin[n,"metier"]
       new_log[nclm] = new_log[nclm]+abs(as.numeric(temp[,2]))
       sqldf("insert into elobo select * from `new_log`", dbname = lb_DB$db)
     }

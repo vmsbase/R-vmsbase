@@ -164,6 +164,85 @@ dH3 = function(x) return(3*x^2 - 2*x)
 # dH3 = function(x) return((3*x^2) - (2*x))
 
 
+recu_dep <- function(xmin, xmax, ymin, ymax, resolut = 2, the_db = "")
+{
+	if(the_db != "")
+	{
+	
+  co_ce <- fn$sqldf("select count(*) from intrp where LON > `xmin` and LON < `xmax` and LAT > `ymin` and LAT < `ymax`", dbname = the_db)
+  
+  if(co_ce[1,1] == 0)
+  {
+    cat("\n   -     Skipped block: x(", xmin, ",",xmax, ")*y(",ymin,",",ymax,")     -\n", sep = "")
+  }else{
+    xrange = c(xmin, xmax)
+    yrange = c(ymin, ymax)
+    # 	map("worldHires", xlim = xrange, ylim = yrange, bg = "darkorange2", col = "black", fill = T)
+    # 	map.axes()
+    l_x <- xmax - xmin
+    l_y <- ymax - ymin
+    if(l_x <= 0.25 | l_y <= 0.25)
+    {
+      cat("\n   -     New valid block: x(", xmin, ",",xmax, ")*y(",ymin,",",ymax,")     -\n", sep = "")
+      deppoi <- fn$sqldf("select ROWID, * from intrp where LON > `xmin` and LON < `xmax` and LAT > `ymin` and LAT < `ymax`", dbname = the_db)
+      
+      cat("\n   -     Analyzing ", nrow(deppoi), " points     -\n\n", sep = "")
+      
+      bat_blo <- getNOAA.bathy(xmin-0.1,
+                               xmax+0.1,
+                               ymin-0.1,
+                               ymax+0.1, resolution = resolut)
+      plot(bat_blo, image = T)
+      points(deppoi[,"LON"], deppoi[,"LAT"], pch = 20, col = "firebrick")
+      
+      xlon <- rep(as.numeric(rownames(bat_blo)),length(as.numeric(colnames(bat_blo))))
+      ylat <- rep(as.numeric(colnames(bat_blo)),each=length(as.numeric(rownames(bat_blo))))
+      zdep <- as.numeric(bat_blo)
+      cat("\n   -     Calculating Spline...     -", sep = "")
+      SplineD <- Tps(cbind(xlon, ylat), zdep, lon.lat=TRUE)
+      rm(bat_blo, zdep, xlon, ylat)
+      cat("\n   -     Predicting depth", sep = "")
+      if(nrow(deppoi)<= 10000){
+        cat(" ", sep = "")
+        dept <- as.numeric(predict(SplineD, deppoi[,c("LON","LAT")]))
+        dep_v <- as.data.frame(cbind(deppoi[,"rowid"], deppoi[,"I_NCEE"], dept))
+        sqldf("insert into p_depth select * from `dep_v`", dbname = the_db)
+        rm(dept, dep_v)
+        gc()
+      }else{
+        nPin <- ceiling(nrow(deppoi)/10000)
+        for(pi in 1:nPin)
+        {
+          cat(".", sep = "")
+          r1 <- 10000*(pi-1)+1
+          r2 <- min(nrow(deppoi),r1+10000-1)
+          dept <- as.numeric(predict(SplineD, deppoi[r1:r2,c("LON","LAT")]))
+          dep_v <- as.data.frame(cbind(deppoi[r1:r2,"rowid"], deppoi[r1:r2,"I_NCEE"], dept))
+          sqldf("insert into p_depth select * from `dep_v`", dbname = the_db)
+          rm(dept, dep_v)
+          gc()
+        }            
+      }
+      cat(" - Completed!     -\n", sep = "")
+      rm(SplineD)
+      gc()
+    }else{
+      xmin_2 <- xmin+((xmax-xmin)/2)
+      ymin_2 <- ymin+((ymax-ymin)/2)
+      cat("\n   -     Splitting block...     -\n", sep = "")
+      recu_dep(xmin, xmin_2, ymin, ymin_2, resolut = resolut, the_db)
+      recu_dep(xmin_2, xmax, ymin, ymin_2, resolut = resolut, the_db)
+      recu_dep(xmin, xmin_2, ymin_2, ymax, resolut = resolut, the_db)
+      recu_dep(xmin_2, xmax, ymin_2, ymax, resolut = resolut, the_db)
+    }
+  }
+  } else {
+  cat("\n\n   -     Error! Bad Database File      -\n", sep = "")
+  }
+}
+
+
+
 #' Assign Area - Internal Function
 #'  
 #' 

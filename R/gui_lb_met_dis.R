@@ -46,7 +46,8 @@ gui_lb_met_dis <- function(lb_db_name = "")
            lb_DB$db <<- gfile(text = "Select LB DataBase file",
                               type = "open",
                               filter = list("LB DB file" = list(patterns = c("*.lb.sqlite"))))
-           svalue(sel_lb_f) <- strsplit(lb_DB$db, "/")[[1]][length(strsplit(lb_DB$db, "/")[[1]])]
+#            svalue(sel_lb_f) <- strsplit(lb_DB$db, "/")[[1]][length(strsplit(lb_DB$db, "/")[[1]])]
+           svalue(sel_lb_f) <- ifelse(.Platform$OS.type == "windows", strsplit(lb_DB$db, "\\\\")[[1]][length(strsplit(lb_DB$db, "\\\\")[[1]])],strsplit(lb_DB$db, "/")[[1]][length(strsplit(lb_DB$db, "/")[[1]])])
            enabled(start_b) <- TRUE
            enabled(g_sup) <- TRUE
          })
@@ -142,14 +143,14 @@ gui_lb_met_dis <- function(lb_db_name = "")
       }
       
       divid <- tms
-      for(l in 1:(ncol(x)-4)){divid <- cbind(divid, tms)}
-      x[,4:ncol(x)] <- x[,4:ncol(x)]/divid
+      for(l in 1:(ncol(x)-6)){divid <- cbind(divid, tms)}
+      x[,6:ncol(x)] <- x[,6:ncol(x)]/divid
       rm(divid)
     }
     
     cat("\nClearing Header...")
     svalue(sb) <- "Clearing Header..."
-    x <- x[,-c(1,2,3)]
+    x <- x[,-c(1,2,3,4,5)]
     
 
     if(svalue(cles_ex) == TRUE)
@@ -182,20 +183,6 @@ gui_lb_met_dis <- function(lb_db_name = "")
       }
     }
     
-#     if(svalue(cles_ca) == TRUE)
-#     {
-#       cat("\nExcluding logbook with extreme total catch ", svalue(cles_ca_q)*10,
-#           "\n and > ", (1-svalue(cles_ca_q))*10, sep = "")
-# #       svalue(sb) <- paste("Excluding logbooks with extreme total catch ", svalue(cles_ca_q), sep = "")
-#       tot_ca <- apply(x, 1, sum)
-#       tot_tot <- median(tot_ca)
-#       tolo_ca <- which(tot_ca > (tot_tot * (svalue(cles_ca_q)/10)) & tot_ca < (tot_tot * (1-(svalue(cles_ca_q)/10))))
-#       if(length(tolo_ca) > 0)
-#       {
-#         cat(" - Removing ", length(tolo_ca), " logs", sep = "")
-#         x <- x[-tolo_ca,]
-#       }
-#     }
     
     #Rimuove gli outliers
     if(svalue(cles_ou) == TRUE)
@@ -257,7 +244,7 @@ gui_lb_met_dis <- function(lb_db_name = "")
     #Perform the CLARA
     i=thr=0
     max_siz <- max(svalue(s_size), max(krange))
-    cat("\n\nBeginning Metier Discovery!\n\nTesting partioning:\n")
+    cat("\n\n   -     Beginning Metier Discovery!     -\n\n - Testing partioning:\n")
     svalue(sb) <- "Metier Discovery..."
     tonorm <- ifelse((svalue(s_metr) == "Bray-Curtis"),FALSE,TRUE)
     S1=Sys.time()
@@ -343,7 +330,8 @@ gui_lb_met_dis <- function(lb_db_name = "")
   
   if(lb_DB$db != "")
   {
-    svalue(sel_lb_f) <- strsplit(lb_DB$db, "/")[[1]][length(strsplit(lb_DB$db, "/")[[1]])]
+#     svalue(sel_lb_f) <- strsplit(lb_DB$db, "/")[[1]][length(strsplit(lb_DB$db, "/")[[1]])]
+    svalue(sel_lb_f) <- ifelse(.Platform$OS.type == "windows", strsplit(lb_DB$db, "\\\\")[[1]][length(strsplit(lb_DB$db, "\\\\")[[1]])],strsplit(lb_DB$db, "/")[[1]][length(strsplit(lb_DB$db, "/")[[1]])])
     enabled(start_b) <- TRUE
     enabled(g_sup) <- TRUE
   }

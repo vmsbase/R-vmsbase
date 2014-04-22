@@ -65,11 +65,11 @@ gui_vms_db_clean <- function(vms_db_name = "", map_file_name = "", harb_file_nam
            vms_DB$db <- gfile(text = "Select VMS DataBase file",
                               type = "open",
                               filter = list("VMS DB file" = list(patterns = c("*.vms.sqlite"))))
-           svalue(sel_vms_f) <- strsplit(vms_DB$db, "/")[[1]][length(strsplit(vms_DB$db, "/")[[1]])]
-           
+           #            svalue(sel_vms_f) <- strsplit(vms_DB$db, "/")[[1]][length(strsplit(vms_DB$db, "/")[[1]])]
+           svalue(sel_vms_f) <- ifelse(.Platform$OS.type == "windows", strsplit(vms_DB$db, "\\\\")[[1]][length(strsplit(vms_DB$db, "\\\\")[[1]])],strsplit(vms_DB$db, "/")[[1]][length(strsplit(vms_DB$db, "/")[[1]])])
            if(themap$path != "" & harb$path != "" & vms_DB$db != "")
            {
-           enabled(start_b) <- TRUE
+             enabled(start_b) <- TRUE
            }
          })
   gimage(system.file("ico/application-exit-5.png", package="vmsbase"), container = vms_db_f,
@@ -89,9 +89,10 @@ gui_vms_db_clean <- function(vms_db_name = "", map_file_name = "", harb_file_nam
   gimage(system.file("ico/folder-html.png", package="vmsbase"), container = cus_map_g,
          handler = function(h,...){
            themap$path <- gfile(text = "Select Land ShapePoly map",
-                             type = "open",
-                             filter = list("shp data" = list(patterns = c("*.shp"))))
-           svalue(cus_map_lab) <- paste("Land: ", strsplit(themap$path, "/")[[1]][length(strsplit(themap$path, "/")[[1]])], sep = "")
+                                type = "open",
+                                filter = list("shp data" = list(patterns = c("*.shp"))))
+           #            svalue(cus_map_lab) <- paste("Land: ", strsplit(themap$path, "/")[[1]][length(strsplit(themap$path, "/")[[1]])], sep = "")
+           svalue(cus_map_lab) <- paste("Land: ", ifelse(.Platform$OS.type == "windows", strsplit(themap$path, "\\\\")[[1]][length(strsplit(themap$path, "\\\\")[[1]])],strsplit(themap$path, "/")[[1]][length(strsplit(themap$path, "/")[[1]])]), sep = "")
            if(themap$path != "" & harb$path != "" & vms_DB$db != "")
            {
              enabled(start_b) <- TRUE
@@ -113,9 +114,10 @@ gui_vms_db_clean <- function(vms_db_name = "", map_file_name = "", harb_file_nam
   gimage(system.file("ico/folder-man.png", package="vmsbase"), container = cus_har_g,
          handler = function(h,...){
            harb$path <- gfile(text = "Select ShapePoints map",
-                                type = "open",
-                                filter = list("shp data" = list(patterns = c("*.shp"))))
-           svalue(cus_har_lab) <- paste("Harbour: ", strsplit(harb$path, "/")[[1]][length(strsplit(harb$path, "/")[[1]])], sep = "")
+                              type = "open",
+                              filter = list("shp data" = list(patterns = c("*.shp"))))
+           #            svalue(cus_har_lab) <- paste("Harbour: ", strsplit(harb$path, "/")[[1]][length(strsplit(harb$path, "/")[[1]])], sep = "")
+           svalue(cus_har_lab) <- paste("Harbour: ", ifelse(.Platform$OS.type == "windows", strsplit(harb$path, "\\\\")[[1]][length(strsplit(harb$path, "\\\\")[[1]])],strsplit(harb$path, "/")[[1]][length(strsplit(harb$path, "/")[[1]])]), sep = "")
            if(themap$path != "" & harb$path != "" & vms_DB$db != "")
            {
              enabled(start_b) <- TRUE
@@ -138,13 +140,13 @@ gui_vms_db_clean <- function(vms_db_name = "", map_file_name = "", harb_file_nam
     enabled(start_b) <- FALSE
     
     svalue(infolab) <- "Loading...\n Standard Harbours"
-#     harb$path <- system.file("shp/harb_it.shp", package="vmsbase")
+    #     harb$path <- system.file("shp/harb_it.shp", package="vmsbase")
     harb$data <- readShapePoints(harb$path)
     XCOORD <- harb$data@coords[,1]
     YCOORD <- harb$data@coords[,2]
     
     svalue(infolab) <- "Loading...\nLand Map"
-#     themap$path <- system.file("shp/Med_Poly.shp", package="vmsbase")
+    #     themap$path <- system.file("shp/Med_Poly.shp", package="vmsbase")
     themap$data <- readShapePoly(themap$path)
     
     svalue(infolab) <- "Updating...\nVMS DataBase"
@@ -329,15 +331,19 @@ gui_vms_db_clean <- function(vms_db_name = "", map_file_name = "", harb_file_nam
   
   if(vms_DB$db != "")
   {
-    svalue(sel_vms_f) <- strsplit(vms_DB$db, "/")[[1]][length(strsplit(vms_DB$db, "/")[[1]])]    
+    #     svalue(sel_vms_f) <- strsplit(vms_DB$db, "/")[[1]][length(strsplit(vms_DB$db, "/")[[1]])]    
+    svalue(sel_vms_f) <- ifelse(.Platform$OS.type == "windows", strsplit(vms_DB$db, "\\\\")[[1]][length(strsplit(vms_DB$db, "\\\\")[[1]])],strsplit(vms_DB$db, "/")[[1]][length(strsplit(vms_DB$db, "/")[[1]])])
   }
   if(themap$path != "")
   {
-    svalue(cus_map_lab) <- paste("Land: ", strsplit(themap$path, "/")[[1]][length(strsplit(themap$path, "/")[[1]])], sep = "")
+    #     svalue(cus_map_lab) <- paste("Land: ", strsplit(themap$path, "/")[[1]][length(strsplit(themap$path, "/")[[1]])], sep = "")
+    svalue(cus_map_lab) <- paste("Land: ", ifelse(.Platform$OS.type == "windows", strsplit(themap$path, "\\\\")[[1]][length(strsplit(themap$path, "\\\\")[[1]])],strsplit(themap$path, "/")[[1]][length(strsplit(themap$path, "/")[[1]])]), sep = "")
+    
   }
   if(harb$path != "")
   {
-    svalue(cus_har_lab) <- paste("Harbour: ", strsplit(harb$path, "/")[[1]][length(strsplit(harb$path, "/")[[1]])], sep = "")
+    #     svalue(cus_har_lab) <- paste("Harbour: ", strsplit(harb$path, "/")[[1]][length(strsplit(harb$path, "/")[[1]])], sep = "")
+    svalue(cus_har_lab) <- paste("Harbour: ", ifelse(.Platform$OS.type == "windows", strsplit(harb$path, "\\\\")[[1]][length(strsplit(harb$path, "\\\\")[[1]])],strsplit(harb$path, "/")[[1]][length(strsplit(harb$path, "/")[[1]])]), sep = "")
   }
   if(themap$path != "" & harb$path != "" & vms_DB$db != "")
   {

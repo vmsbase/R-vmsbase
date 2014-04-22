@@ -40,7 +40,7 @@ gui_join_lb_vms <- function(lb_db_name = "", vms_db_name = "")
   
   g_input <- ggroup(horizontal = TRUE, container = big_g)
   addSpring(big_g)
-  g_go <- ggroup(horizontal = TRUE, container = big_g)
+  g_go <- ggroup(horizontal = FALSE, container = big_g)
   
   addSpring(g_input)
   lb_db_f <- gframe(text = "LogBook DB file", horizontal = TRUE, container = g_input)
@@ -52,7 +52,8 @@ gui_join_lb_vms <- function(lb_db_name = "", vms_db_name = "")
            lb_DB$db <<- gfile(text = "Select LB DataBase file",
                               type = "open",
                               filter = list("LB DB file" = list(patterns = c("*.lb.sqlite"))))
-           svalue(sel_lb_f) <- strsplit(lb_DB$db, "/")[[1]][length(strsplit(lb_DB$db, "/")[[1]])]
+           #            svalue(sel_lb_f) <- strsplit(lb_DB$db, "/")[[1]][length(strsplit(lb_DB$db, "/")[[1]])]           
+           svalue(sel_lb_f) <- ifelse(.Platform$OS.type == "windows", strsplit(lb_DB$db, "\\\\")[[1]][length(strsplit(lb_DB$db, "\\\\")[[1]])],strsplit(lb_DB$db, "/")[[1]][length(strsplit(lb_DB$db, "/")[[1]])])
            
            if(vms_DB$db != "")
            {
@@ -77,7 +78,8 @@ gui_join_lb_vms <- function(lb_db_name = "", vms_db_name = "")
            vms_DB$db <- gfile(text = "Select VMS DataBase file",
                               type = "open",
                               filter = list("VMS DB file" = list(patterns = c("*.vms.sqlite"))))
-           svalue(sel_vms_f) <- strsplit(vms_DB$db, "/")[[1]][length(strsplit(vms_DB$db, "/")[[1]])]
+           #            svalue(sel_vms_f) <- strsplit(vms_DB$db, "/")[[1]][length(strsplit(vms_DB$db, "/")[[1]])]
+           svalue(sel_vms_f) <- ifelse(.Platform$OS.type == "windows", strsplit(vms_DB$db, "\\\\")[[1]][length(strsplit(vms_DB$db, "\\\\")[[1]])],strsplit(vms_DB$db, "/")[[1]][length(strsplit(vms_DB$db, "/")[[1]])])
            
            if(lb_DB$db != "")
            {
@@ -93,9 +95,8 @@ gui_join_lb_vms <- function(lb_db_name = "", vms_db_name = "")
   addSpring(g_input)
   addSpring(g_go)
   
-  info_lab <- glabel("", container = big_g)
-  
-  addSpring(g_go)
+  info_lab <- glabel("", container = g_go)
+  #   addSpring(g_go)
   b_lb_vms_match <- gbutton(text = "   Start\nMatching", container = g_go, handler = function(h,...)
   {
     enabled(g_input) <- FALSE
@@ -218,7 +219,10 @@ gui_join_lb_vms <- function(lb_db_name = "", vms_db_name = "")
     cat("\n   -     Matched Metier: ", no_mes, "     -\n", sep = "")
     
     cat("\n\n   ---   END VMS-Logbook Matching   ---\n\n", sep = "")
-    svalue(info_lab) <- paste("END VMS-Logbook Matching", sep = "")
+    svalue(info_lab) <- paste("  ---  END VMS-Logbook Matching  ---",
+                              "\n\n   -     VMS DB tracks: ",  no_cov, " - LB DB logs: ", no_lobo, " - estimated VMS Coverage: ", round(100/no_cov*no_lobo, 2), "%   -",
+                              "\n   -     VMS-LB match: ",  no_mat, " - LB*VMS track: ", round(no_elog/no_mat, 2) , " - real VMS Coverage: ", round(100/no_cov*no_mat, 2), "%   -",
+                              "\n   -     Matched Metier: ", no_mes, "     -\n\n\n", sep = "")
     gconfirm("LogBook - Vms Matching Complete!",
              title = "Confirm",
              icon = "info",
@@ -231,11 +235,15 @@ gui_join_lb_vms <- function(lb_db_name = "", vms_db_name = "")
   
   if(lb_DB$db != "")
   {
-    svalue(sel_lb_f) <- strsplit(lb_DB$db, "/")[[1]][length(strsplit(lb_DB$db, "/")[[1]])]
+    #     svalue(sel_lb_f) <- strsplit(lb_DB$db, "/")[[1]][length(strsplit(lb_DB$db, "/")[[1]])]
+    svalue(sel_lb_f) <- ifelse(.Platform$OS.type == "windows", strsplit(lb_DB$db, "\\\\")[[1]][length(strsplit(lb_DB$db, "\\\\")[[1]])],strsplit(lb_DB$db, "/")[[1]][length(strsplit(lb_DB$db, "/")[[1]])])
+    
   }
   if(vms_DB$db != "")
   {
-    svalue(sel_vms_f) <- strsplit(vms_DB$db, "/")[[1]][length(strsplit(vms_DB$db, "/")[[1]])]    
+    #     svalue(sel_vms_f) <- strsplit(vms_DB$db, "/")[[1]][length(strsplit(vms_DB$db, "/")[[1]])]    
+    svalue(sel_vms_f) <- ifelse(.Platform$OS.type == "windows", strsplit(vms_DB$db, "\\\\")[[1]][length(strsplit(vms_DB$db, "\\\\")[[1]])],strsplit(vms_DB$db, "/")[[1]][length(strsplit(vms_DB$db, "/")[[1]])])
+    
   }
   if(lb_DB$db != "" & vms_DB$db != "")
   {

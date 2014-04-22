@@ -163,28 +163,50 @@ gui_lb_editraw <- function ()
   glabel("Vessel Id", container = g2u)
   vessUE <- gcombobox(c("Select column"), container = g2u)
   addSpring(g2u)
+  g3_meti <- gframe(text = "Metier data", container = g2, spacing = 5, horizontal = T)
+  addSpring(g3_meti)
+  glabel("Available", container = g3_meti) 
+  g3_met_r <- gradio(c("Yes","No"), horizontal = T, container = g3_meti,
+                     handler = function(h,...){
+                       ifelse(svalue(g3_met_r) == "No",enabled(the_meti) <- F, enabled(the_meti) <- T)
+                     })  
+  addSpring(g3_meti)
+  the_meti <- gcombobox(c("Select column"), container = g3_meti)
+  addSpring(g3_meti)
+  
+  g3_gear <- gframe(text = "Gear data", container = g2, spacing = 5, horizontal = T)
+  addSpring(g3_gear)
+  glabel("Available", container = g3_gear) 
+  g3_gea_r <- gradio(c("Yes","No"), horizontal = T, container = g3_gear,
+                     handler = function(h,...){
+                       ifelse(svalue(g3_gea_r) == "No",enabled(the_gear) <- F, enabled(the_gear) <- T)
+                     })  
+  addSpring(g3_gear)
+  the_gear <- gcombobox(c("Select column"), container = g3_gear)
+  addSpring(g3_gear)
   
   g3 <- gframe(text = "Logbook Data", container = group, spacing = 5, horizontal = F)
   g3_frm <- ggroup(horizontal = TRUE, container = g3)
   addSpring(g3_frm)
   date_frm <- gradio(c("DD/MM/YYYY","MM/DD/YYYY"), horizontal = T, container = g3_frm)
   addSpring(g3_frm)
-  g3start <- gframe(text = "Departure Date & Time", container = g3, spacing = 5, horizontal = T)
+  g3_datim <- ggroup(horizontal = TRUE, container = g3)
+  g3start <- gframe(text = "Departure Date & Time", container = g3_datim, spacing = 5, horizontal = T)
   addSpring(g3start)
-  glabel("Available", container = g3start) 
-  g3sq <- gradio(c("Yes","No"), horizontal = T, container = g3start,
-                 handler = function(h,...){
-                   ifelse(svalue(g3sq) == "No",
-{
-  enabled(sdate) <- F
-  enabled(stime) <- F
-},
-{
-  enabled(sdate) <- T
-  enabled(stime) <- T
-})
-                 })    
-  addSpring(g3start)
+  #   glabel("Available", container = g3start) 
+  #   g3sq <- gradio(c("Yes","No"), horizontal = T, container = g3start,
+  #                  handler = function(h,...){
+  #                    ifelse(svalue(g3sq) == "No",
+  # {
+  #   enabled(sdate) <- F
+  #   enabled(stime) <- F
+  # },
+  # {
+  #   enabled(sdate) <- T
+  #   enabled(stime) <- T
+  # })
+  # })    
+  #   addSpring(g3start)
   g3s <-ggroup(horizontal = F, container = g3start)
   g3s1 <-ggroup(horizontal = T, container = g3s)
   glabel("Start date", container = g3s1)   
@@ -194,21 +216,21 @@ gui_lb_editraw <- function ()
   stime <- gcombobox(c("Select column"), container = g3s2)
   addSpring(g3start)
   
-  g3end <- gframe(text = "Arrival Date & Time", container = g3, spacing = 5, horizontal = T)
+  g3end <- gframe(text = "Arrival Date & Time", container = g3_datim, spacing = 5, horizontal = T)
   addSpring(g3end)
-  glabel("Available", container = g3end) 
-  g3eq <- gradio(c("Yes","No"), horizontal = T, container = g3end,
-                 handler = function(h,...){
-                   ifelse(svalue(g3eq) == "No",
-{
-  enabled(edate) <- F
-  enabled(etime) <- F
-},
-{
-  enabled(edate) <- T
-  enabled(etime) <- T
-})})  
-  addSpring(g3end)
+  #   glabel("Available", container = g3end) 
+  #   g3eq <- gradio(c("Yes","No"), horizontal = T, container = g3end,
+  #                  handler = function(h,...){
+  #                    ifelse(svalue(g3eq) == "No",
+  # {
+  #   enabled(edate) <- F
+  #   enabled(etime) <- F
+  # },
+  # {
+  #   enabled(edate) <- T
+  #   enabled(etime) <- T
+  # })})  
+  #   addSpring(g3end)
   g3e <-ggroup(horizontal = F, container = g3end)
   g3e1 <-ggroup(horizontal = T, container = g3e)
   glabel("End date", container = g3e1)   
@@ -218,20 +240,24 @@ gui_lb_editraw <- function ()
   etime <- gcombobox(c("Select column"), container = g3e2)
   addSpring(g3end)
   
-  g3cat <- gframe(text = "Catch Data", container = g3, spacing = 5, horizontal = F)
+  g3cat <- gframe(text = "Catch Data", container = g3, spacing = 5, horizontal = T)
   addSpring(g3cat)
-  g3cat1 <-ggroup(horizontal = T, container = g3cat)
-  addSpring(g3cat1)
-  glabel("Species", container = g3cat1)   
-  species <- gcombobox(c("Select column"), container = g3cat1)
-  addSpring(g3cat1)
+#   g3cat1 <-ggroup(horizontal = T, container = g3cat)
+#   addSpring(g3cat1)
+  glabel("Species", container = g3cat)   
+  species <- gcombobox(c("Select column"), container = g3cat)
+#   addSpring(g3cat1)
   addSpring(g3cat)
-  g3cat2 <-ggroup(horizontal = T, container = g3cat)
-  addSpring(g3cat2)
-  glabel("Catch quantity", container = g3cat2)
-  qty <- gcombobox(c("Select column"), container = g3cat2)
-  addSpring(g3cat2)
+#   g3cat2 <-ggroup(horizontal = T, container = g3cat)
+#   addSpring(g3cat2)
+  glabel("Quantity", container = g3cat)
+  qty <- gcombobox(c("Select column"), container = g3cat)
+#   addSpring(g3cat2)
   addSpring(g3cat)
+  
+#   g3_extra <- gframe(text = "Metier & Gear", container = g3, spacing = 5, horizontal = F)
+  
+  
   
   # Saving, new, append, ok, cancel
   g8 <- gframe(container = group, spacing = 5, text = "Save & Exit")
@@ -299,8 +325,18 @@ gui_lb_editraw <- function ()
   })
   gbutton("cancel", handler = function(h,...) dispose(lb_editraw_win), container=g8)
   
-  wdgt_lst <- c(vessUE, g3sq, sdate, stime, g3eq, edate, etime, species, qty, date_frm)
-  wdgt_w_val <- c(vessUE, sdate, stime, edate, etime, species, qty)
+  wdgt_lst <- c(vessUE,
+                g3_met_r,
+                the_meti,
+                g3_gea_r,
+                the_gear,
+#                 g3sq,
+                sdate, stime,
+#                 g3eq,
+                edate, etime,
+                species, qty,
+                date_frm)
+  wdgt_w_val <- c(vessUE, sdate, stime, edate, etime, species, qty, the_meti, the_gear)
   
   turn_wdgt_off(wdgt_lst)
   
