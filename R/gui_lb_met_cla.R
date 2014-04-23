@@ -84,30 +84,45 @@ gui_lb_met_cla <- function(lb_db_name = "")
                           enabled(g_input) <- FALSE
                         }
                       })
-  gimage(system.file("ico/document-properties.png", package="vmsbase"), container = in_sel_f,
+  
+  img_g <- ggroup(horizontal = FALSE, container = in_sel_f)
+  
+  gimage(system.file("ico/document-properties.png", package="vmsbase"), container = img_g,
          handler = function(h,...){
            if(lb_DB$db != "")
            {
              met_lst <- sqldf("select metier from elobo", dbname = lb_DB$db)
+             ok_met <- which(met_lst != 0)
+             if(length(ok_met) != 0)
+             {
              met_tbl <- sort(table(met_lst), decreasing = TRUE)
              met_dia <- gbasicdialog(title="Logbook DB Metier Data")
              met_lab <- glabel(paste("\n\tN. of records:\t\t\tMetier Name:\n\n\t\t", paste(as.numeric(met_tbl)[which(as.numeric(met_tbl) >= (nrow(met_lst)/100))], names(met_tbl)[which(as.numeric(met_tbl) >= (nrow(met_lst)/100))]
                                                                                            , sep = "  \t\t\t", collapse = "\t\n\t\t"), "\n\n", paste("\t\t\t...and other ", length(which(!as.numeric(met_tbl) >= (nrow(met_lst)/100))), " metier with a frequency < 1%\n\n", sep = ""), sep = ""),
                                container = met_dia)
              visible(met_dia, set=TRUE)
+             }else{
+               gmessage("\n\n      ERROR! Metier Data not available!     ", icon = "error")
+             }
            }
          })
-  gimage(system.file("ico/document-properties.png", package="vmsbase"), container = in_sel_f,
+  gimage(system.file("ico/document-properties.png", package="vmsbase"), container = img_g,
          handler = function(h,...){
            if(lb_DB$db != "")
            {
              gea_lst <- sqldf("select gear from elobo", dbname = lb_DB$db)
+             ok_gea <- which(gea_lst != 0)
+             if(length(ok_gea) != 0)
+             {
              gea_tbl <- sort(table(gea_lst), decreasing = TRUE)
              gea_dia <- gbasicdialog(title="Logbook DB Gear Data")
              gea_lab <- glabel(paste("\n\tN. of records:\t\t\tGear Name:\n\n\t\t", paste(as.numeric(gea_tbl)[which(as.numeric(gea_tbl) >= (nrow(gea_lst)/100))], names(gea_tbl)[which(as.numeric(gea_tbl) >= (nrow(gea_lst)/100))]
                                                                                          , sep = "  \t\t\t", collapse = "\t\n\t\t"), "\n\n", paste("\t\t\t...and other ", length(which(!as.numeric(gea_tbl) >= (nrow(gea_lst)/100))), " gears with a frequency < 1%\n\n", sep = ""), sep = ""),
                                container = gea_dia)
              visible(gea_dia, set=TRUE)
+           }else{
+             gmessage("\n\n      ERROR! Gear Data not available!     ", icon = "error")
+           }
            }
          })
   
