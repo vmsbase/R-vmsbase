@@ -64,11 +64,11 @@ gui_out_grid <- function(vms_db_name = "")
            vms_DB$db <- gfile(text = "Select VMS DataBase file",
                               type = "open",
                               filter = list("VMS DB file" = list(patterns = c("*.vms.sqlite"))))
-#            svalue(sel_vms_f) <- strsplit(vms_DB$db, "/")[[1]][length(strsplit(vms_DB$db, "/")[[1]])]
+           #            svalue(sel_vms_f) <- strsplit(vms_DB$db, "/")[[1]][length(strsplit(vms_DB$db, "/")[[1]])]
            svalue(sel_vms_f) <- ifelse(.Platform$OS.type == "windows", strsplit(vms_DB$db, "\\\\")[[1]][length(strsplit(vms_DB$db, "\\\\")[[1]])],strsplit(vms_DB$db, "/")[[1]][length(strsplit(vms_DB$db, "/")[[1]])])
            if(vms_DB$db != "")
            {
-#              met_sel_d[] <- sqldf("select distinct(met_des) from vms_lb", dbname = vms_DB$db)[,1]
+             #              met_sel_d[] <- sqldf("select distinct(met_des) from vms_lb", dbname = vms_DB$db)[,1]
              svalue(met_sel_d, index = TRUE) <- 1
              enabled(gri_g3f3) <- TRUE
              enabled(gri_g3f4) <- TRUE
@@ -101,16 +101,21 @@ gui_out_grid <- function(vms_db_name = "")
   addSpring(cus_map_g)
   gimage(system.file("ico/folder-html.png", package="vmsbase"), container = cus_map_g,
          handler = function(h,...){
-
+           
            themap$path <- gfile(text = "Select ShapePoly map",
                                 type = "open",
                                 filter = list("shp data" = list(patterns = c("*.shp"))))
-#            svalue(cus_map_lab) <- paste("Grid map: ", strsplit(themap$path, "/")[[1]][length(strsplit(themap$path, "/")[[1]])], sep = "")
+           #            svalue(cus_map_lab) <- paste("Grid map: ", strsplit(themap$path, "/")[[1]][length(strsplit(themap$path, "/")[[1]])], sep = "")
            svalue(cus_map_lab) <- paste("Grid map: ", ifelse(.Platform$OS.type == "windows", strsplit(themap$path, "\\\\")[[1]][length(strsplit(themap$path, "\\\\")[[1]])],strsplit(themap$path, "/")[[1]][length(strsplit(themap$path, "/")[[1]])]), sep = "")
            
            if(themap$path != "" & vms_DB$db != "")
            {
-             met_sel_d[] <- sqldf("select distinct(met_des) from vms_lb", dbname = vms_DB$db)[,1]
+             if(svalue(dat_sel_d) == "VMS-LB Match")
+             {
+               met_sel_d[] <- sqldf("select distinct(met_des) from vms_lb", dbname = vms_DB$db)[,1]
+             }else{
+               met_sel_d[] <- sqldf("select distinct(met_des) from nn_clas", dbname = vms_DB$db)[,1]
+             }
              svalue(met_sel_d, index = TRUE) <- 1
              enabled(gri_g3f3) <- TRUE
              enabled(gri_g3f4) <- TRUE
@@ -121,7 +126,15 @@ gui_out_grid <- function(vms_db_name = "")
          handler = function(h,...){
            themap$path <- ""
            svalue(cus_map_lab) <- "Select ShapePoly map"
-           
+           if(vms_DB$db != "")
+           {
+             if(svalue(dat_sel_d) == "VMS-LB Match")
+             {
+               met_sel_d[] <- sqldf("select distinct(met_des) from vms_lb", dbname = vms_DB$db)[,1]
+             }else{
+               met_sel_d[] <- sqldf("select distinct(met_des) from nn_clas", dbname = vms_DB$db)[,1]
+             }
+           }
            enabled(start_b) <- FALSE
            enabled(set_count_g) <- FALSE
            enabled(save_j_b) <- FALSE
@@ -146,17 +159,17 @@ gui_out_grid <- function(vms_db_name = "")
   addSpring(gri_g3f4)
   dat_sel_f <- gframe(text = "Metier Data Source", horizontal=TRUE, container = gri_g3f4) 
   dat_sel_d <- gdroplist(c("VMS-LB Match", "NN Prediction"), selected = 1, container = dat_sel_f, 
-      handler = function(h,...){
-    if(vms_DB$db != "")
-    {
-    if(svalue(dat_sel_d) == "VMS-LB Match")
-    {
-      met_sel_d[] <- sqldf("select distinct(met_des) from vms_lb", dbname = vms_DB$db)[,1]
-    }else{
-      met_sel_d[] <- sqldf("select distinct(met_des) from nn_clas", dbname = vms_DB$db)[,1]
-    }
-    }
-  }) 
+                         handler = function(h,...){
+                           if(vms_DB$db != "")
+                           {
+                             if(svalue(dat_sel_d) == "VMS-LB Match")
+                             {
+                               met_sel_d[] <- sqldf("select distinct(met_des) from vms_lb", dbname = vms_DB$db)[,1]
+                             }else{
+                               met_sel_d[] <- sqldf("select distinct(met_des) from nn_clas", dbname = vms_DB$db)[,1]
+                             }
+                           }
+                         }) 
   addSpring(gri_g3f4)
   enabled(gri_g3f4) <- FALSE
   
@@ -181,12 +194,13 @@ gui_out_grid <- function(vms_db_name = "")
     
     cat("\n   -     Loading Data From DB...", sep = "")
     sel_met <- svalue(met_sel_d)
-    f_poi <- sqldf("select i_id from p_fish where FISH = 1", dbname = vms_DB$db)
+    #     f_poi <- sqldf("select i_id from p_fish where FISH = 1", dbname = vms_DB$db)
     
     re_pi <- data.frame()
     if(svalue(dat_sel_d) == "VMS-LB Match")
     {
       p_met_mat <- fn$sqldf("select intrp.ROWID, LON, LAT, met_des from intrp, vms_lb where vms_lb.vessel = intrp.I_NCEE and intrp.T_NUM = vms_lb.track and vms_lb.met_des = '`sel_met`'", dbname = vms_DB$db)
+      f_poi <- sqldf("select i_id from p_fish where FISH = 1", dbname = vms_DB$db)
       re_pi <- p_met_mat[which(p_met_mat[,1] %in% f_poi[,1]),2:3]
       cat("Completed!     -", sep = "")
     }else{
@@ -194,6 +208,7 @@ gui_out_grid <- function(vms_db_name = "")
       if(nn_tab == 1)
       {
         p_met_pre <- fn$sqldf("select intrp.ROWID, LON, LAT, met_des from intrp, nn_clas where nn_clas.I_NCEE = intrp.I_NCEE and intrp.T_NUM = nn_clas.T_NUM and nn_clas.met_des = '`sel_met`'", dbname = vms_DB$db)
+        f_poi <- sqldf("select i_id from p_fish_nn where FISH = 1", dbname = vms_DB$db)
         re_pi <- p_met_pre[which(p_met_pre[,1] %in% f_poi[,1]),2:3]
         
         cat("Completed!     -", sep = "")
@@ -232,21 +247,21 @@ gui_out_grid <- function(vms_db_name = "")
       
       if(sum(count) != 0)
       {
-      plot(themap$data, lty = "blank", 
-           col=s.cols[s.vals], add = T)
-      
-      map("worldHires", fill=T, col="springgreen4",
-          mar = c(0,0,0,0),
-          xlim=c(themap$data@bbox[1,1],themap$data@bbox[1,2]*1.11),
-          ylim=c(themap$data@bbox[2,1]*0.98,themap$data@bbox[2,2]), add = TRUE)
-      
-      legend(x = "bottomright",
-             legend = round(s.int,1),
-             cex = 0.7,
-             title = "Fishing Times",
-             col = s.cols,
-             bg = "aliceblue",
-             lty = 1, lwd = 1, pch = 15)
+        plot(themap$data, lty = "blank", 
+             col=s.cols[s.vals], add = T)
+        
+        map("worldHires", fill=T, col="springgreen4",
+            mar = c(0,0,0,0),
+            xlim=c(themap$data@bbox[1,1],themap$data@bbox[1,2]*1.11),
+            ylim=c(themap$data@bbox[2,1]*0.98,themap$data@bbox[2,2]), add = TRUE)
+        
+        legend(x = "bottomright",
+               legend = round(s.int,1),
+               cex = 0.7,
+               title = "Fishing Times",
+               col = s.cols,
+               bg = "aliceblue",
+               lty = 1, lwd = 1, pch = 15)
       }else{
         cat("\n -     No Fishing Points found for metier ", sel_met, " in the submitted area     -\n", sep = "")
       }
@@ -437,9 +452,18 @@ gui_out_grid <- function(vms_db_name = "")
   addSpring(save_vesh_g)
   if(vms_DB$db != "")
   {
-#     svalue(sel_vms_f) <- strsplit(vms_DB$db, "/")[[1]][length(strsplit(vms_DB$db, "/")[[1]])]
+    #     svalue(sel_vms_f) <- strsplit(vms_DB$db, "/")[[1]][length(strsplit(vms_DB$db, "/")[[1]])]
     svalue(sel_vms_f) <- ifelse(.Platform$OS.type == "windows", strsplit(vms_DB$db, "\\\\")[[1]][length(strsplit(vms_DB$db, "\\\\")[[1]])],strsplit(vms_DB$db, "/")[[1]][length(strsplit(vms_DB$db, "/")[[1]])])
-    met_sel_d[] <- sqldf("select distinct(met_des) from vms_lb", dbname = vms_DB$db)[,1]
+    #     met_sel_d[] <- sqldf("select distinct(met_des) from vms_lb", dbname = vms_DB$db)[,1]
+    if(vms_DB$db != "")
+    {
+      if(svalue(dat_sel_d) == "VMS-LB Match")
+      {
+        met_sel_d[] <- sqldf("select distinct(met_des) from vms_lb", dbname = vms_DB$db)[,1]
+      }else{
+        met_sel_d[] <- sqldf("select distinct(met_des) from nn_clas", dbname = vms_DB$db)[,1]
+      }
+    }    
     svalue(met_sel_d, index = TRUE) <- 1
     enabled(gri_g3f3) <- TRUE
     enabled(gri_g3f4) <- TRUE
