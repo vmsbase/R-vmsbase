@@ -305,7 +305,7 @@ gui_lb_editraw <- function ()
       
       write.table(saveRawLogBook(rawfile,
                                  get_wdgt_vals(wdgt_lst)),
-                  file = gfile(text = "Select where to append edited LogBook data",
+                  file = gfile(text = "Append Edited LogBook Data to existing file:",
                                type = "save",
                                filter = list("logBook files" = list(patterns = c("*.logbook")))),
                   sep = ",",
