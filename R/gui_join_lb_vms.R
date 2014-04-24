@@ -52,7 +52,6 @@ gui_join_lb_vms <- function(lb_db_name = "", vms_db_name = "")
            lb_DB$db <<- gfile(text = "Select LB DataBase file",
                               type = "open",
                               filter = list("LB DB file" = list(patterns = c("*.lb.sqlite"))))
-           #            svalue(sel_lb_f) <- strsplit(lb_DB$db, "/")[[1]][length(strsplit(lb_DB$db, "/")[[1]])]           
            svalue(sel_lb_f) <- ifelse(.Platform$OS.type == "windows", strsplit(lb_DB$db, "\\\\")[[1]][length(strsplit(lb_DB$db, "\\\\")[[1]])],strsplit(lb_DB$db, "/")[[1]][length(strsplit(lb_DB$db, "/")[[1]])])
            
            if(vms_DB$db != "")
@@ -78,9 +77,7 @@ gui_join_lb_vms <- function(lb_db_name = "", vms_db_name = "")
            vms_DB$db <- gfile(text = "Select VMS DataBase file",
                               type = "open",
                               filter = list("VMS DB file" = list(patterns = c("*.vms.sqlite"))))
-           #            svalue(sel_vms_f) <- strsplit(vms_DB$db, "/")[[1]][length(strsplit(vms_DB$db, "/")[[1]])]
            svalue(sel_vms_f) <- ifelse(.Platform$OS.type == "windows", strsplit(vms_DB$db, "\\\\")[[1]][length(strsplit(vms_DB$db, "\\\\")[[1]])],strsplit(vms_DB$db, "/")[[1]][length(strsplit(vms_DB$db, "/")[[1]])])
-           
            if(lb_DB$db != "")
            {
              enabled(b_lb_vms_match) <- TRUE
@@ -125,7 +122,7 @@ gui_join_lb_vms <- function(lb_db_name = "", vms_db_name = "")
         svalue(info_lab) <- paste("Vessel: ", vess[i], " - N.", i, " of ", num_vess, sep = "")
         cat("\n   -   Vessel: ", vess[i], " - N.", i, " of ", num_vess, sep = "")
         vms_data <- fn$sqldf("select * from track where I_NCEE = `vess[i]` order by DATE", dbname = vms_DB$db)
-        lb_data <- fn$sqldf("select elobo.ROWID, * from elobo, lb_cla where vessUE = `vess[i]` and vessUE = vessel and log_num = elobo.rowid order by s_utc, e_utc", dbname = lb_DB$db)
+        lb_data <- fn$sqldf("select elobo.ROWID, * from elobo, lb_cla where vessUE = `vess[i]` and log_num = elobo.rowid order by s_utc, e_utc", dbname = lb_DB$db)
         
         #                                 if(is.null(nrow(vms_data["T_NUM"])) | nrow(lb_data) == 1)
         if(nrow(vms_data) == 0 | nrow(lb_data) == 0)
@@ -133,14 +130,7 @@ gui_join_lb_vms <- function(lb_db_name = "", vms_db_name = "")
           cat(" - Skipped, not enough data!\n")
           next
         }else{
-          
-          #         if(length(which(lb_data[,"s_utc"] == 0)) != 0 & nrow(lb_data) > 1){
-          #           lb_data[2:nrow(lb_data),"s_utc"] = lb_data[1:(nrow(lb_data)-1), "e_utc"] + 0.00035
-          #         }
-          #         #                                   if(lb_data["s_utc"] == 0 & nrow(lb_data) == 1){
-          #         #                                     lb_data[1,"s_utc"] <- 
-          #         #                                   }
-          
+        
           num_track <- max(vms_data["T_NUM"])
           
           res_over <- data.frame(vessel = vess[i],
@@ -213,7 +203,8 @@ gui_join_lb_vms <- function(lb_db_name = "", vms_db_name = "")
     no_mat <- nrow(sqldf("select distinct vessel, track from vms_lb", dbname = vms_DB$db))
     no_cov <- nrow(sqldf("select distinct I_NCEE, T_NUM from track", dbname = vms_DB$db))
     no_lobo <- sqldf("select count(*) from elobo", dbname = lb_DB$db)[1,]
-    "/home/io/Scrivania/prove/lb_test.lb.sqlite"
+
+    
     cat("\n\n   -     VMS DB tracks: ",  no_cov, "  -  LB DB logs: ", no_lobo, "  -  estimated VMS Coverage: ", round(100/no_cov*no_lobo, 2), "%     -", sep = "")
     cat("\n   -     VMS-LB match: ",  no_mat, "  -  LB*VMS track: ", round(no_elog/no_mat, 2) , "  -  real VMS Coverage: ", round(100/no_cov*no_mat, 2), "%     -", sep = "")
     cat("\n   -     Matched Metier: ", no_mes, "     -\n", sep = "")
@@ -235,15 +226,11 @@ gui_join_lb_vms <- function(lb_db_name = "", vms_db_name = "")
   
   if(lb_DB$db != "")
   {
-    #     svalue(sel_lb_f) <- strsplit(lb_DB$db, "/")[[1]][length(strsplit(lb_DB$db, "/")[[1]])]
     svalue(sel_lb_f) <- ifelse(.Platform$OS.type == "windows", strsplit(lb_DB$db, "\\\\")[[1]][length(strsplit(lb_DB$db, "\\\\")[[1]])],strsplit(lb_DB$db, "/")[[1]][length(strsplit(lb_DB$db, "/")[[1]])])
-    
   }
   if(vms_DB$db != "")
   {
-    #     svalue(sel_vms_f) <- strsplit(vms_DB$db, "/")[[1]][length(strsplit(vms_DB$db, "/")[[1]])]    
     svalue(sel_vms_f) <- ifelse(.Platform$OS.type == "windows", strsplit(vms_DB$db, "\\\\")[[1]][length(strsplit(vms_DB$db, "\\\\")[[1]])],strsplit(vms_DB$db, "/")[[1]][length(strsplit(vms_DB$db, "/")[[1]])])
-    
   }
   if(lb_DB$db != "" & vms_DB$db != "")
   {
