@@ -122,7 +122,7 @@ saveRawLogBook <- function (rawfile,
     logbook <- logbook[-tole_qty,]
   }
   
-  logbook["qty"] <- rawfile$data[,sp_qty]
+  logbook["qty"] <- as.numeric(rawfile$data[,sp_qty])
   
   
   if(th_met_s == "Yes")

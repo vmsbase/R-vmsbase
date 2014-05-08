@@ -115,13 +115,14 @@ StandardizeByCol <- function(xdata){
 
 Join2shp <- function(shpfile, datavector, dirdest)
 {
-  diror <- paste(unlist(strsplit(shpfile, "/"))[1:length(unlist(strsplit(shpfile, "/")))-1], collapse = "/")
+	sys_typ <- ifelse(.Platform$OS.type == "windows", "\\\\" , "/")
+  diror <- paste(unlist(strsplit(shpfile, sys_typ))[1:length(unlist(strsplit(shpfile, sys_typ)))-1], collapse = sys_typ)
   if(diror == dirdest)
   {
-    dirdest <- paste(dirdest,"/grid", sep = "")
+    dirdest <- paste(dirdest, sys_typ, "grid", sep = "")
     dir.create(dirdest)
   }
-  file_anm <- unlist(strsplit(unlist(strsplit(shpfile, "/"))[length(unlist(strsplit(shpfile, "/")))], "[.]"))[1]
+  file_anm <- unlist(strsplit(unlist(strsplit(shpfile, sys_typ))[length(unlist(strsplit(shpfile, sys_typ)))], "[.]"))[1]
   
   otherfiles <- dir(diror)
   otherfiles <- otherfiles[grep(file_anm, otherfiles)]
@@ -130,14 +131,14 @@ Join2shp <- function(shpfile, datavector, dirdest)
   
   for(iff in 1:length(otherfiles))
   {
-    file.copy(from = paste(diror, "/", otherfiles[iff], sep = "", collapse = ""), 
-             to = paste(dirdest, "/", new_name, ".", unlist(strsplit(otherfiles[iff], "[.]"))[length(unlist(strsplit(otherfiles[iff], "[.]")))], sep = "", collapse = ""))      
+    file.copy(from = paste(diror, sys_typ, otherfiles[iff], sep = "", collapse = ""), 
+             to = paste(dirdest, sys_typ, new_name, ".", unlist(strsplit(otherfiles[iff], "[.]"))[length(unlist(strsplit(otherfiles[iff], "[.]")))], sep = "", collapse = ""))      
   }    
-  dbfdata <- read.dbf(paste(diror, "/",file_anm, ".dbf", sep = ""), as.is = TRUE)
+  dbfdata <- read.dbf(paste(diror, sys_typ,file_anm, ".dbf", sep = ""), as.is = TRUE)
   
   dbfdata$Count <- datavector
   
-  write.dbf(dbfdata, paste(dirdest, "/", new_name, ".dbf", sep = "", collapse = ""))
+  write.dbf(dbfdata, paste(dirdest, sys_typ, new_name, ".dbf", sep = "", collapse = ""))
 }
 
 # Original spline basis
