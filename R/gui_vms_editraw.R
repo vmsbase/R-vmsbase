@@ -157,6 +157,13 @@ gui_vms_editraw <- function()
   timeHour <- gcombobox(c("Hour"), container = g5d)
   timeMinute <- gcombobox(c("Minute"), container = g5d)
   timeSecond <- gcombobox(c("Second"), container = g5d)
+    addSpring(g5)
+
+  g5aa <- ggroup(horizontal = F, container = g5)
+  addSpring(g5aa)
+  g5ab <- gframe(text = "Date Format", horizontal = T, container = g5aa)
+  date_frm <- gradio(c("DD/MM/YYYY","MM/DD/YYYY"), horizontal = F, container = g5ab)
+
   addSpring(g5)
   
   # Speed label, mode selector, dropdown list menu
@@ -270,7 +277,7 @@ Heading: dropdown list to select the column in the raw vms file with the Heading
                 lonModeSel, lonDeg, lonMin, lonSec, lonDir, lonDec,
                 timeModeSel, timeUtc, timeDate2a, timeDate2b, timeDate, timeHour, timeMinute, timeSecond,
                 speedModeSel, speedCol,
-                headModeSel, headCol)
+                headModeSel, headCol, date_frm)
   
   wdgt_w_val <- c(vessId,
                   latDeg, latMin, latSec, latDir, latDec,

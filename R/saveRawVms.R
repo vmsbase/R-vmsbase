@@ -48,6 +48,12 @@ saveRawVms <- function (rawfile, widget)
   headModeSel <- widget[24]
   headCol <- widget[25]
   
+  if(widget[26] == "DD/MM/YYYY")
+  {data_frm <-  c(dates = "d/m/y", times = "h:m:s")
+  }else{
+    data_frm <- c(dates = "m/d/y", times = "h:m:s")
+  }
+  
   numlines <- length(rawfile$data[,1])
   cat("\n\n   ---   Raw Pings Editing Started!   ---\n",
       "\nProcessing ", numlines, " raw pings...\n", sep = "")
@@ -265,8 +271,7 @@ saveRawVms <- function (rawfile, widget)
     }
     vmsdata["DATE"] <- as.numeric(chron(as.character(rawfile$data[,date]),
                                         as.character(rawfile$data[,time]),
-                                        format = c(dates = "d/m/y",
-                                                   times = "h:m:s")))    
+                                        data_frm))    
   }
   
   if (timeMode == "Date + H M S")
@@ -310,8 +315,7 @@ saveRawVms <- function (rawfile, widget)
     time <- paste(rawfile$data[,hour], rawfile$data[,minute], rawfile$data[,second], sep = ":")
     vmsdata["DATE"] <- as.numeric(chron(as.character(rawfile$data[,date]),
                                         as.character(time),
-                                        format = c(dates = "d/m/y",
-                                                   times = "h:m:s")))
+                                        data_frm))
   }
   
   tole_vda <- which(is.na(vmsdata["DATE"]))
