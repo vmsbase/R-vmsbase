@@ -2,7 +2,7 @@ Package: vmsbase
 Type: Package
 Title: VMSbase GUI tools to process, analyze and plot your VMS and
         Logbook data.
-Version: 1.1.4
+Version: 1.1.5
 Depends: gWidgets, gWidgetsRGtk2, maps, mapdata, ggmap, sqldf,
         cairoDevice, PBSmapping, outliers, fields, ecodist, maptools,
         AMORE, e1071, chron
