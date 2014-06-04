@@ -388,7 +388,7 @@ gui_mark_fis_poi <- function(vms_db_name = "", harb_file_name = "")
         {
           if(length(tochk)<= 10000){
             cat("...", sep = "")
-            dismat <- spDists(as.matrix(sin_tra[tochk,c("LON","LAT")]), as.matrix(harbs@data), longlat = TRUE)
+            dismat <- spDists(as.matrix(sin_tra[tochk,c("LON","LAT")]), as.matrix(harbs@coords), longlat = TRUE)
             tochk <- tochk[-which(dismat < (3*1.85200), arr.ind = TRUE)[,1]]
             rm(dismat)
             gc()
