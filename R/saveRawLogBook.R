@@ -174,7 +174,9 @@ saveRawEflalo <- function (rawfile)
   
   logbook <- data.frame("vessUE" = numeric(numlines),
                         "s_utc" = numeric(numlines),
-                        "e_utc" = numeric(numlines))
+                        "e_utc" = numeric(numlines),
+                        "gear" = character(numlines),
+                        "metier" = character(numlines))
   
   vess_id <- which(colnames(rawfile$data) == "VE_REF")
   logbook["vessUE"] <- rawfile$data[,vess_id]
@@ -214,6 +216,12 @@ saveRawEflalo <- function (rawfile)
   }
   
   logbook["e_utc"] <- end_utc
+  
+  metco <- grep("LE_MET", colnames(rawfile$data))  
+  logbook[,"metier"] <- as.character(rawfile$data[,metco])
+  
+  geaco <- grep("LE_GEAR", colnames(rawfile$data))  
+  logbook[,"gear"] <- as.character(rawfile$data[,geaco])
   
   speco <- grep("LE_KG", colnames(rawfile$data))  
   spequ <- rawfile$data[,speco]
