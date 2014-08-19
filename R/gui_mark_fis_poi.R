@@ -32,20 +32,16 @@ gui_mark_fis_poi <- function(vms_db_name = "", harb_file_name = "")
   harb <- harbCoo$new()
   harb$path <- harb_file_name
   
-  #   sta_met <- read.table(file = system.file("extdata/EU_MET_DATA.csv", package="vmsbase"),
-  #                         sep = ";",
-  #                         header = TRUE)
   met_list <- data.frame()
   
   mark_fis_poi_win <- gwindow(title = "Mark Fishing Points Tool",
                               visible = FALSE,
-                              width = 600,
+                              width = 950,
                               height = 350)
   
-  big_g <- ggroup(horizontal = FALSE, container = mark_fis_poi_win)
+  big_g <- ggroup(horizontal = FALSE, container = mark_fis_poi_win, use.scrollwindow = TRUE)
   
   g_input <- ggroup(horizontal = TRUE, container = big_g)
-  
   
   #### Load VMS DB
   
@@ -66,20 +62,50 @@ gui_mark_fis_poi <- function(vms_db_name = "", harb_file_name = "")
            {
              svalue(sel_vms_f) <- ifelse(.Platform$OS.type == "windows", strsplit(vms_DB$db, "\\\\")[[1]][length(strsplit(vms_DB$db, "\\\\")[[1]])],strsplit(vms_DB$db, "/")[[1]][length(strsplit(vms_DB$db, "/")[[1]])])
              
-#              nn_tab <- as.numeric(sqldf("SELECT count(*) FROM sqlite_master WHERE type='table' AND name='pre_nn'", dbname = vms_DB$db))
-#              if(nn_tab == 1)
-#              {
-#                nn_tab <- as.numeric(sqldf("SELECT count(*) FROM sqlite_master WHERE type='table' AND name='nn_clas'", dbname = vms_DB$db))
-#                if(nn_tab == 1)
-#                {
-                 enabled(gri_g3f4) <- TRUE
-#                }
-               if(harb$path != "")
-               {
-                 enabled(gri_alg) <- TRUE
-                 enabled(b_mark_fis_poi) <- TRUE
+             #              nn_tab <- as.numeric(sqldf("SELECT count(*) FROM sqlite_master WHERE type='table' AND name='pre_nn'", dbname = vms_DB$db))
+             #              if(nn_tab == 1)
+             #              {
+             #                nn_tab <- as.numeric(sqldf("SELECT count(*) FROM sqlite_master WHERE type='table' AND name='nn_clas'", dbname = vms_DB$db))
+             #                if(nn_tab == 1)
+             #                {
+             enabled(gri_g3f4) <- TRUE
+             #                }
+             
+             met_list <<- sqldf("select distinct met_des from vms_lb", dbname = vms_DB$db)
+             if(nrow(met_list) == 0){
+               nn_tab <- as.numeric(sqldf("SELECT count(*) FROM sqlite_master WHERE type='table' AND name='nn_:clas'", dbname = vms_DB$db))
+               if(nn_tab == 1){
+                 met_list <<- sqldf("select distinct met_des from nn_clas", dbname = vms_DB$db)
                }
-#              }
+             }
+             if(nrow(met_list) > 0)
+             {
+               delete(big_g, up_g)
+               up_g <<- gframe(text = "Filter Parameters", horizontal = TRUE, container = big_g)
+               addSpring(up_g)
+               lay_win <<- glayout(spacing = 5, container = up_g)
+               lay_win[1,1, anchor = 0] <- "Metier"
+               lay_win[1,2, anchor = 0] <- "Min Vel Kn"
+               lay_win[1,3, anchor = 0] <- "Max Vel Kn"
+               lay_win[1,4, anchor = 0] <- "Min Depth Mt"
+               lay_win[1,5, anchor = 0] <- "Max Depth Mt"
+               lay_win[1,6, anchor = 0] <- "Harb Dist Km"
+               addSpring(up_g)
+               for(i in 1:nrow(met_list))
+               {
+                 lay_win[i+1,1] <- as.character(met_list[i,1])
+                 lay_win[i+1,2] <- gedit(text = "0", width = 10, container = lay_win)
+                 lay_win[i+1,3] <- gedit(text = "Inf", width = 10, container = lay_win)
+                 lay_win[i+1,4] <- gedit(text = "0", width = 10, container = lay_win)
+                 lay_win[i+1,5] <- gedit(text = "-Inf", width = 10, container = lay_win)
+                 lay_win[i+1,6] <- gedit(text = 3*1.85200, width = 10, container = lay_win)
+               }
+             }
+             if(harb$path != "")
+             {
+               enabled(gri_alg) <- TRUE
+               enabled(b_mark_fis_poi) <- TRUE
+             }
            }
          })
   
@@ -477,11 +503,11 @@ gui_mark_fis_poi <- function(vms_db_name = "", harb_file_name = "")
   {
     #     svalue(sel_vms_f) <- strsplit(vms_DB, "/")[[1]][length(strsplit(vms_DB, "/")[[1]])]
     svalue(sel_vms_f) <- ifelse(.Platform$OS.type == "windows", strsplit(vms_DB$db, "\\\\")[[1]][length(strsplit(vms_DB$db, "\\\\")[[1]])],strsplit(vms_DB$db, "/")[[1]][length(strsplit(vms_DB$db, "/")[[1]])])
-#     nn_tab <- as.numeric(sqldf("SELECT count(*) FROM sqlite_master WHERE type='table' AND name='nn_clas'", dbname = vms_DB$db))
-#     if(nn_tab == 1)
-#     {
-      enabled(gri_g3f4) <- TRUE
-#     }
+    #     nn_tab <- as.numeric(sqldf("SELECT count(*) FROM sqlite_master WHERE type='table' AND name='nn_clas'", dbname = vms_DB$db))
+    #     if(nn_tab == 1)
+    #     {
+    enabled(gri_g3f4) <- TRUE
+    #     }
   }
   if(harb$path != "")
   {

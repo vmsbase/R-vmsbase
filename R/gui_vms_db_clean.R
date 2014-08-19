@@ -165,147 +165,147 @@ gui_vms_db_clean <- function(vms_db_name = "", map_file_name = "", harb_file_nam
       
       numlines <- nrow(vessel)
       cat(" with ", numlines, " pings", sep = "")
-      
-      ann_data <- data.frame("ROWID" = numeric(numlines), 
-                             "W_DUPL" = NA, 
-                             "W_HARB" = NA, 
-                             "W_LAND" = NA, 
-                             "W_COHE" = integer(numlines))
-      
-      ann_data["ROWID"] <- vessel["rowid"]
-      
-      # Check duplicated pings
-      cat("\nChecking duplicated pings", sep = "")
-      ann_data["W_DUPL"] <- duplicated(vessel[,2:7])
-      cat(" - Completed!", sep = "")
-      
-      cat("\nChecking pings in harbour and coherence", sep = "")
-      for (j in 1:numlines)
+      if(numlines == 0)
       {
-        #         svalue(proglab) <- paste("Vessel: ", i," of ", nrow(incee), spe = "")      
+        cat(" - Skipped!", sep = "")
+        next
+      }else{
+        ann_data <- data.frame("ROWID" = numeric(numlines), 
+                               "W_DUPL" = NA, 
+                               "W_HARB" = NA, 
+                               "W_LAND" = NA, 
+                               "W_COHE" = integer(numlines))
         
-        #Check pings in harbour
-        hdist <- min(spDistsN1(cbind(XCOORD, YCOORD), as.matrix(c(vessel[j,"LON"],vessel[j,"LAT"])), longlat = TRUE))
-        ifelse(hdist < 2, ann_data[j,"W_HARB"] <- T, ann_data[j,"W_HARB"] <- F)
+        ann_data["ROWID"] <- vessel["rowid"]
         
-        #Check pings coherence
-        if(j == 1)
+        # Check duplicated pings
+        cat("\nChecking duplicated pings", sep = "")
+        ann_data["W_DUPL"] <- duplicated(vessel[,2:7])
+        cat(" - Completed!", sep = "")
+        
+        cat("\nChecking pings in harbour and coherence", sep = "")
+        for (j in 1:numlines)
         {
-          if(nrow(ann_data) > 1)
+          #         svalue(proglab) <- paste("Vessel: ", i," of ", nrow(incee), spe = "")      
+          
+          #Check pings in harbour
+          hdist <- min(spDistsN1(cbind(XCOORD, YCOORD), as.matrix(c(vessel[j,"LON"],vessel[j,"LAT"])), longlat = TRUE))
+          ifelse(hdist < 2, ann_data[j,"W_HARB"] <- T, ann_data[j,"W_HARB"] <- F)
+          
+          #Check pings coherence
+          if(j == 1)
           {
-            if(ann_data[j+1,"W_DUPL"] == F)
+            if(nrow(ann_data) > 1)
+            {
+              if(ann_data[j+1,"W_DUPL"] == F)
+              {
+                succdist <- spDists(matrix(c(vessel[j,"LON"],vessel[j,"LAT"]), ncol = 2), matrix(c(vessel[j+1,"LON"],vessel[j+1,"LAT"]), ncol = 2), longlat = TRUE)
+                succlag <- (vessel[j+1,"DATE"]-vessel[j,"DATE"])*24
+                if(succlag == 0) {succlag <- 0.01}
+                succvel <- succdist/succlag
+                ifelse(succvel < 50, ann_data[j,"W_COHE"] <- 2, ann_data[j,"W_COHE"] <- 0)
+              }
+              else{
+                ann_data[j,"W_COHE"] <- 2
+              }
+            }
+            else{
+              ann_data[j,"W_COHE"] <- 3
+            }
+            next
+          }
+          
+          if(j == numlines)
+          {
+            if(ann_data[j,"W_DUPL"] == F)
+            {
+              predist <- spDists(matrix(c(vessel[j,"LON"],vessel[j,"LAT"]), ncol = 2), matrix(c(vessel[j-1,"LON"],vessel[j-1,"LAT"]), ncol = 2), longlat = TRUE)
+              prelag <- (vessel[j,"DATE"]-vessel[j-1,"DATE"])*24
+              if(prelag == 0) {prelag <- 0.01}
+              prevel <- predist/prelag
+              ifelse(prevel < 50, ann_data[j,"W_COHE"] <- 1, ann_data[j,"W_COHE"] <- 0)
+            }
+            else{
+              ann_data[j,"W_COHE"] <- 1
+            }
+            next
+          }
+          
+          if (j > 1 & j < numlines)
+          {
+            if(ann_data[j,"W_DUPL"] == T)
+            {
+              ann_data[j,"W_COHE"] <- ann_data[j-1,"W_COHE"]
+              next
+            }
+            
+            if(ann_data[j-1,"W_DUPL"] == T)
             {
               succdist <- spDists(matrix(c(vessel[j,"LON"],vessel[j,"LAT"]), ncol = 2), matrix(c(vessel[j+1,"LON"],vessel[j+1,"LAT"]), ncol = 2), longlat = TRUE)
               succlag <- (vessel[j+1,"DATE"]-vessel[j,"DATE"])*24
               if(succlag == 0) {succlag <- 0.01}
               succvel <- succdist/succlag
               ifelse(succvel < 50, ann_data[j,"W_COHE"] <- 2, ann_data[j,"W_COHE"] <- 0)
+              next
             }
-            else
-            { ann_data[j,"W_COHE"] <- 2 }
-          }
-          else
-          { ann_data[j,"W_COHE"] <- 3 }
-          next
-        }
-        
-        if(j == numlines)
-        {
-          if(ann_data[j,"W_DUPL"] == F)
-          {
-            predist <- spDists(matrix(c(vessel[j,"LON"],vessel[j,"LAT"]), ncol = 2), matrix(c(vessel[j-1,"LON"],vessel[j-1,"LAT"]), ncol = 2), longlat = TRUE)
-            prelag <- (vessel[j,"DATE"]-vessel[j-1,"DATE"])*24
-            if(prelag == 0) {prelag <- 0.01}
-            prevel <- predist/prelag
-            ifelse(prevel < 50, ann_data[j,"W_COHE"] <- 1, ann_data[j,"W_COHE"] <- 0)
-          }
-          else
-          { ann_data[j,"W_COHE"] <- 1 }
-          next
-        }
-        
-        if (j > 1 & j < numlines)
-        {
-          if(ann_data[j,"W_DUPL"] == T)
-          {
-            ann_data[j,"W_COHE"] <- ann_data[j-1,"W_COHE"]
-            next
-          }
-          
-          if(ann_data[j-1,"W_DUPL"] == T)
-          {
+            
+            if(ann_data[j+1,"W_DUPL"] == T)
+            {
+              predist <- spDists(matrix(c(vessel[j,"LON"],vessel[j,"LAT"]), ncol = 2), matrix(c(vessel[j-1,"LON"],vessel[j-1,"LAT"]), ncol = 2), longlat = TRUE)
+              prelag <- (vessel[j,"DATE"]-vessel[j-1,"DATE"])*24
+              if(prelag == 0) {prelag <- 0.01}
+              prevel <- predist/prelag
+              ifelse(prevel < 50, ann_data[j,"W_COHE"] <- 1, ann_data[j,"W_COHE"] <- 0)
+              next
+            }
             
             succdist <- spDists(matrix(c(vessel[j,"LON"],vessel[j,"LAT"]), ncol = 2), matrix(c(vessel[j+1,"LON"],vessel[j+1,"LAT"]), ncol = 2), longlat = TRUE)
             succlag <- (vessel[j+1,"DATE"]-vessel[j,"DATE"])*24
             if(succlag == 0) {succlag <- 0.01}
             succvel <- succdist/succlag
             
-            ifelse(succvel < 50, ann_data[j,"W_COHE"] <- 2, ann_data[j,"W_COHE"] <- 0)
-            
-            next
-            
-          }
-          
-          if(ann_data[j+1,"W_DUPL"] == T)
-          {
-            
             predist <- spDists(matrix(c(vessel[j,"LON"],vessel[j,"LAT"]), ncol = 2), matrix(c(vessel[j-1,"LON"],vessel[j-1,"LAT"]), ncol = 2), longlat = TRUE)
             prelag <- (vessel[j,"DATE"]-vessel[j-1,"DATE"])*24
             if(prelag == 0) {prelag <- 0.01}
             prevel <- predist/prelag
             
-            ifelse(prevel < 50, ann_data[j,"W_COHE"] <- 1, ann_data[j,"W_COHE"] <- 0)
+            if(prevel < 50)
+            {
+              ann_data[j,"W_COHE"] <- 1
+            }
+            if(succvel < 50)
+            {
+              ann_data[j,"W_COHE"] <- 2
+            }
+            if(prevel < 50 & succvel < 50)
+            {
+              ann_data[j,"W_COHE"] <- 3
+            }
+            if(prevel > 50 & succvel > 50)
+            {
+              ann_data[j,"W_COHE"] <- 0
+            }
             
-            next
-            
           }
-          
-          succdist <- spDists(matrix(c(vessel[j,"LON"],vessel[j,"LAT"]), ncol = 2), matrix(c(vessel[j+1,"LON"],vessel[j+1,"LAT"]), ncol = 2), longlat = TRUE)
-          succlag <- (vessel[j+1,"DATE"]-vessel[j,"DATE"])*24
-          if(succlag == 0) {succlag <- 0.01}
-          succvel <- succdist/succlag
-          
-          predist <- spDists(matrix(c(vessel[j,"LON"],vessel[j,"LAT"]), ncol = 2), matrix(c(vessel[j-1,"LON"],vessel[j-1,"LAT"]), ncol = 2), longlat = TRUE)
-          prelag <- (vessel[j,"DATE"]-vessel[j-1,"DATE"])*24
-          if(prelag == 0) {prelag <- 0.01}
-          prevel <- predist/prelag
-          
-          if(prevel < 50)
-          {
-            ann_data[j,"W_COHE"] <- 1
-          }
-          if(succvel < 50)
-          {
-            ann_data[j,"W_COHE"] <- 2
-          }
-          if(prevel < 50 & succvel < 50)
-          {
-            ann_data[j,"W_COHE"] <- 3
-          }
-          if(prevel > 50 & succvel > 50)
-          {
-            ann_data[j,"W_COHE"] <- 0
-          }
-          
         }
+        cat(" - Completed!", sep = "")
+        
+        #Check pings on land
+        
+        cat("\nChecking pings on land", sep = "")
+        
+        onland <- over(SpatialPoints(c(vessel["LON"], vessel["LAT"])), themap$data)
+        olpts <- which(!is.na(onland[,1]))
+        nlpts <- which(is.na(onland[,1]))
+        
+        ann_data[olpts,"W_LAND"] <- T
+        ann_data[nlpts,"W_LAND"] <- F
+        
+        cat(" - Completed!\n", sep = "")
+        
+        sqldf("insert into warn select * from `ann_data`", dbname = vms_DB$db)
+        
       }
-      cat(" - Completed!", sep = "")
-      
-      #Check pings on land
-      
-      cat("\nChecking pings on land", sep = "")
-      
-      onland <- over(SpatialPoints(c(vessel["LON"], vessel["LAT"])), themap$data)
-      olpts <- which(!is.na(onland[,1]))
-      nlpts <- which(is.na(onland[,1]))
-      
-      ann_data[olpts,"W_LAND"] <- T
-      ann_data[nlpts,"W_LAND"] <- F
-      
-      cat(" - Completed!\n", sep = "")
-      
-      sqldf("insert into warn select * from `ann_data`", dbname = vms_DB$db)
-      
     }
     
     cat("\n\n   ---   End Ping Cleaning   ---\n", sep = "")
