@@ -64,7 +64,7 @@ gui_out_grid <- function(vms_db_name = "")
            vms_DB$db <- gfile(text = "Select VMS DataBase file",
                               type = "open",
                               filter = list("VMS DB file" = list(patterns = c("*.vms.sqlite"))))
-#            svalue(sel_vms_f) <- strsplit(vms_DB$db, "/")[[1]][length(strsplit(vms_DB$db, "/")[[1]])]
+           #            svalue(sel_vms_f) <- strsplit(vms_DB$db, "/")[[1]][length(strsplit(vms_DB$db, "/")[[1]])]
            svalue(sel_vms_f) <- ifelse(.Platform$OS.type == "windows", strsplit(vms_DB$db, "\\\\")[[1]][length(strsplit(vms_DB$db, "\\\\")[[1]])],strsplit(vms_DB$db, "/")[[1]][length(strsplit(vms_DB$db, "/")[[1]])])
            
            if(vms_DB$db != "")
@@ -102,12 +102,12 @@ gui_out_grid <- function(vms_db_name = "")
   addSpring(cus_map_g)
   gimage(system.file("ico/folder-html.png", package="vmsbase"), container = cus_map_g,
          handler = function(h,...){
-
+           
            themap$path <- gfile(text = "Select ShapePoly map",
                                 type = "open",
                                 filter = list("shp data" = list(patterns = c("*.shp"))))
            svalue(cus_map_lab) <- paste("Grid map: ", ifelse(.Platform$OS.type == "windows", strsplit(themap$path, "\\\\")[[1]][length(strsplit(themap$path, "\\\\")[[1]])],strsplit(themap$path, "/")[[1]][length(strsplit(themap$path, "/")[[1]])]), sep = "")
-            
+           
            
            if(themap$path != "" & vms_DB$db != "")
            {
@@ -146,7 +146,11 @@ gui_out_grid <- function(vms_db_name = "")
   gri_g3f4 <- ggroup(horizontal = TRUE, container = gri_g3)
   addSpring(gri_g3f4)
   dat_sel_f <- gframe(text = "Metier Data Source", horizontal=TRUE, container = gri_g3f4) 
-  dat_sel_d <- gdroplist(c("VMS-LB Match", "NN Prediction"), selected = 1, container = dat_sel_f) 
+  dat_sel_d <- gdroplist(c("VMS-LB Match", "NN Prediction"), selected = 1, container = dat_sel_f, handler = function(h,...)
+  {
+    met_sel_d[] <- sqldf(paste("select distinct met_des from ",ifelse(svalue(dat_sel_d) == "VMS-LB Match", "vms_lb","nn_clas"),sep = ""), dbname = vms_DB$db)
+  }
+  ) 
   addSpring(gri_g3f4)
   enabled(gri_g3f4) <- FALSE
   
@@ -179,9 +183,9 @@ gui_out_grid <- function(vms_db_name = "")
       
       if(nrow(f_poi) > 0)
       {
-      p_met_mat <- fn$sqldf("select intrp.ROWID, LON, LAT, met_des from intrp, vms_lb where vms_lb.vessel = intrp.I_NCEE and intrp.T_NUM = vms_lb.track and vms_lb.met_des = '`sel_met`'", dbname = vms_DB$db)
-      re_pi <- p_met_mat[which(p_met_mat[,1] %in% f_poi[,1]),2:3]
-      cat("Completed!     -", sep = "")
+        p_met_mat <- fn$sqldf("select intrp.ROWID, LON, LAT, met_des from intrp, vms_lb where vms_lb.vessel = intrp.I_NCEE and intrp.T_NUM = vms_lb.track and vms_lb.met_des = '`sel_met`'", dbname = vms_DB$db)
+        re_pi <- p_met_mat[which(p_met_mat[,1] %in% f_poi[,1]),2:3]
+        cat("Completed!     -", sep = "")
       }else{
         cat("Error! No Fishing points!")
       }
@@ -192,10 +196,10 @@ gui_out_grid <- function(vms_db_name = "")
         f_poi <- sqldf("select i_id from p_fish_nn where FISH = 1", dbname = vms_DB$db)
         if(nrow(f_poi) > 0)
         {
-        p_met_pre <- fn$sqldf("select intrp.ROWID, LON, LAT, met_des from intrp, nn_clas where nn_clas.I_NCEE = intrp.I_NCEE and intrp.T_NUM = nn_clas.T_NUM and nn_clas.met_des = '`sel_met`'", dbname = vms_DB$db)
-        re_pi <- p_met_pre[which(p_met_pre[,1] %in% f_poi[,1]),2:3]
-        
-        cat("Completed!     -", sep = "")
+          p_met_pre <- fn$sqldf("select intrp.ROWID, LON, LAT, met_des from intrp, nn_clas where nn_clas.I_NCEE = intrp.I_NCEE and intrp.T_NUM = nn_clas.T_NUM and nn_clas.met_des = '`sel_met`'", dbname = vms_DB$db)
+          re_pi <- p_met_pre[which(p_met_pre[,1] %in% f_poi[,1]),2:3]
+          
+          cat("Completed!     -", sep = "")
         }else{
           cat("Error! No Fishing points!")
         }
@@ -234,21 +238,21 @@ gui_out_grid <- function(vms_db_name = "")
       
       if(sum(count) != 0)
       {
-      plot(themap$data, lty = "blank", 
-           col=s.cols[s.vals], add = T)
-      
-      map("worldHires", fill=T, col="springgreen4",
-          mar = c(0,0,0,0),
-          xlim=c(themap$data@bbox[1,1],themap$data@bbox[1,2]*1.11),
-          ylim=c(themap$data@bbox[2,1]*0.98,themap$data@bbox[2,2]), add = TRUE)
-      
-      legend(x = "bottomright",
-             legend = round(s.int,1),
-             cex = 0.7,
-             title = "Fishing Times",
-             col = s.cols,
-             bg = "aliceblue",
-             lty = 1, lwd = 1, pch = 15)
+        plot(themap$data, lty = "blank", 
+             col=s.cols[s.vals], add = T)
+        
+        map("worldHires", fill=T, col="springgreen4",
+            mar = c(0,0,0,0),
+            xlim=c(themap$data@bbox[1,1],themap$data@bbox[1,2]*1.11),
+            ylim=c(themap$data@bbox[2,1]*0.98,themap$data@bbox[2,2]), add = TRUE)
+        
+        legend(x = "bottomright",
+               legend = round(s.int,1),
+               cex = 0.7,
+               title = "Fishing Times",
+               col = s.cols,
+               bg = "aliceblue",
+               lty = 1, lwd = 1, pch = 15)
       }else{
         cat("\n -     No Fishing Points found for metier ", sel_met, " in the submitted area     -\n", sep = "")
       }
@@ -299,14 +303,15 @@ gui_out_grid <- function(vms_db_name = "")
                            {
                              s.int <- seq(floor(min(count)), ceiling(max(count)), length=(length(s.cols)))
                              s.vals <- findInterval(count, s.int)
-                             lege <- round(s.int,0)
+#                              lege <- round(s.int,0)
                            }else{
                              log_count <- log(count+1)
                              s.int <- seq(floor(min(log_count)), ceiling(max(log_count)), length=(length(s.cols)))
                              s.vals <- findInterval(log_count, s.int)
-                             lege <- round(s.int,1)
+#                              lege <- round(s.int,1)
                            }
-                           
+#                            s.vals <- findInterval(log_count, s.int)
+                           lege <- round(s.int,1)
                            map("worldHires", fill=T, col="springgreen4", bg = "deepskyblue4",
                                mar = c(0,0,0,0),
                                xlim=c(themap$data@bbox[1,1],themap$data@bbox[1,2]*1.11),
@@ -328,7 +333,7 @@ gui_out_grid <- function(vms_db_name = "")
                            legend(x = "bottomright",
                                   legend = round(s.int,1),
                                   cex = 0.7,
-                                  title = "Log Fishing Times",
+                                  title =  ifelse(svalue(set_count_yn) == "Sum", "Fishing Times","Log Fishing Times"),
                                   col = s.cols,
                                   bg = "aliceblue",
                                   lty = 1, lwd = 1, pch = 15
@@ -375,15 +380,16 @@ gui_out_grid <- function(vms_db_name = "")
     if(svalue(set_count_yn) == "Sum")
     {
       s.int <- seq(floor(min(count)), ceiling(max(count)), length=(length(s.cols)))
-      s.vals <- findInterval(count, s.int)
-      lege <- round(s.int,0)
+                                   s.vals <- findInterval(count, s.int)
+      #                              lege <- round(s.int,0)
     }else{
       log_count <- log(count+1)
       s.int <- seq(floor(min(log_count)), ceiling(max(log_count)), length=(length(s.cols)))
-      s.vals <- findInterval(log_count, s.int)
-      lege <- round(s.int,1)
+                                   s.vals <- findInterval(log_count, s.int)
+      #                              lege <- round(s.int,1)
     }
-    
+#     s.vals <- findInterval(log_count, s.int)
+    lege <- round(s.int,1)
     map("worldHires", fill=T, col="springgreen4", bg = "deepskyblue4",
         mar = c(0,0,0,0),
         xlim=c(themap$data@bbox[1,1],themap$data@bbox[1,2]*1.11),
@@ -405,7 +411,7 @@ gui_out_grid <- function(vms_db_name = "")
     legend(x = "bottomright",
            legend = round(s.int,1),
            cex = 0.7,
-           title = "Log Fishing Times",
+           title =  ifelse(svalue(set_count_yn) == "Sum", "Fishing Times","Log Fishing Times"),
            col = s.cols,
            bg = "aliceblue",
            lty = 1, lwd = 1, pch = 15
@@ -439,7 +445,7 @@ gui_out_grid <- function(vms_db_name = "")
   addSpring(save_vesh_g)
   if(vms_DB$db != "")
   {
-#     svalue(sel_vms_f) <- strsplit(vms_DB$db, "/")[[1]][length(strsplit(vms_DB$db, "/")[[1]])]
+    #     svalue(sel_vms_f) <- strsplit(vms_DB$db, "/")[[1]][length(strsplit(vms_DB$db, "/")[[1]])]
     svalue(sel_vms_f) <- ifelse(.Platform$OS.type == "windows", strsplit(vms_DB$db, "\\\\")[[1]][length(strsplit(vms_DB$db, "\\\\")[[1]])],strsplit(vms_DB$db, "/")[[1]][length(strsplit(vms_DB$db, "/")[[1]])])
     
     met_sel_d[] <- sqldf("select distinct(met_des) from vms_lb", dbname = vms_DB$db)[,1]
