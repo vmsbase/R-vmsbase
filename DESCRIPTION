@@ -2,7 +2,7 @@ Package: vmsbase
 Type: Package
 Title: VMSbase GUI tools to process, analyze and plot your VMS and
         Logbook data.
-Version: 1.1.7
+Version: 1.1.8
 Depends: gWidgets, gWidgetsRGtk2, maps, mapdata, ggmap, sqldf,
         cairoDevice, PBSmapping, outliers, fields, ecodist, maptools,
         AMORE, e1071, chron
@@ -12,7 +12,7 @@ Author: Lorenzo D'Andrea, Tommaso Russo, Antonio Parisi, Stefano Cataudella
 Maintainer: Lorenzo D'Andrea <support@vmsbase.org>
 Description: VMSbase package gives you the tools you need to process, analyze and plot your VMS and Logbook data. VMSbase is equipped by Viewer Tools to visually inspect data at different steps of the analyses and to produce effective outputs for reports and scientific publications. Viewers are conceived to show the VMS pings, to visualize single or multiple tracks for fishing vessels, or to represent the VMS data on Google Viewer, so that the user can produce easy to interpret and more realistic visualization of both fishing effort and effort behaviour.  VMSbase represents the implementation of several R routines which have been developed by the "Tor Vergata" University of Rome Team involved in the Italian National Program for the Data Collection Framework for Fisheries Data between 2009-2012.
 License: GPL (>= 2)
-Packaged: 2014-08-19
+Packaged: 2014-11-07
 LazyLoad: yes
 LazyData: yes
 ByteCompile: yes
