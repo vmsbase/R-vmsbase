@@ -60,12 +60,14 @@ gui_vms_db_dep <- function(vms_db_name = "")
            thebo <<- as.numeric(sqldf("select max(LON), min(LON), max(LAT), min(LAT) from intrp", dbname = vms_DB$db))
            
            enabled(start_b) <- TRUE
+           enabled(start_off) <- TRUE
            enabled(set_g) <- TRUE
          })
   gimage(system.file("ico/application-exit-5.png", package="vmsbase"), container = vms_db_f,
          handler = function(h,...){
            vms_DB$db <- ""
            enabled(start_b) <- FALSE
+           enabled(start_off) <- FALSE
            enabled(set_g) <- FALSE
            svalue(sel_vms_f) <- "Select VMS DB file"
          })
@@ -168,12 +170,12 @@ gui_vms_db_dep <- function(vms_db_name = "")
   
   addSpring(dep_g)
   
-  start_b <- gbutton("Start\nDepth Annotation", container = dep_g, handler = function(h,...)
+  start_b <- gbutton("Start Online\nDepth Annotation", container = dep_g, handler = function(h,...)
   {
     enabled(res_g) <- FALSE
     enabled(vms_db_f) <- FALSE
     enabled(start_b) <- FALSE
-    
+    enabled(start_off) <- FALSE
     cat("\n  7 - ", thebo, sep = "|")
     if(sqldf("select count(*) from intrp", dbname = vms_DB$db)[1,1] > 0)
     {
@@ -182,7 +184,7 @@ gui_vms_db_dep <- function(vms_db_name = "")
       
       #       
       #       thebo <- as.numeric(sqldf("select max(LON), min(LON), max(LAT), min(LAT) from track", dbname = vms_DB$db))
-  
+      
       
       if(svalue(use_alg) == "Slow & Light")
       {
@@ -232,10 +234,10 @@ gui_vms_db_dep <- function(vms_db_name = "")
             svalue(infolab_dep) <- paste("Analyzing block [", m, ",", n, "]\n",
                                          "N. ",cou, " of " ,xblock * yblock, " blocks", sep = "")
             
-            bat_blo <- getNOAA.bathy(new_xmin-0.1,
-                                     new_xmax+0.1,
-                                     new_ymin-0.1,
-                                     new_ymax+0.1, resolution = svalue(use_res))
+            bat_blo <- getmarmap.bathy(new_xmin-0.1,
+                                       new_xmax+0.1,
+                                       new_ymin-0.1,
+                                       new_ymax+0.1, resolution = svalue(use_res))
             plot(bat_blo, image = T)
             points(pings[,"LON"], pings[,"LAT"], pch = 20, col = "firebrick")
             
@@ -304,11 +306,76 @@ gui_vms_db_dep <- function(vms_db_name = "")
   })
   enabled(start_b) <- FALSE
   
+  
+  
+  
+  
+  
+  
+  
+  start_off <- gbutton("Start Offline\nDepth Annotation", container = dep_g, handler = function(h,...)
+  {
+    enabled(res_g) <- FALSE
+    enabled(vms_db_f) <- FALSE
+    enabled(start_b) <- FALSE
+    enabled(start_off) <- FALSE    
+    cat("\n  7 - ", thebo, sep = "|")
+    
+    sel_bath <- gfile(text = "Select Bathymetry file downloaded with Get Isobath tool",
+                      type = "open",
+                      filter = list("Bathymetry file" = list(patterns = c("*.sqlitebathy.rData"))))
+    
+    my_bat <- readRDS(sel_bath)
+    
+    if(sqldf("select count(*) from intrp", dbname = vms_DB$db)[1,1] > 0)
+    {
+      sqldf("drop table if exists p_depth", dbname = vms_DB$db)
+      sqldf("CREATE TABLE p_depth(i_id INT, vess_id INT, DEPTH REAL)", dbname = vms_DB$db)
+      
+      xmax <- thebo[1]
+      xmin <- thebo[2]
+      ymax <- thebo[3]
+      ymin <- thebo[4]
+      
+      recu_dep_RDS(bat_all = my_bat,
+                   xmin = thebo[2],
+                   xmax = thebo[1],
+                   ymin = thebo[4],
+                   ymax = thebo[3],
+                   the_db = vms_DB$db,
+                   the_bbo = thebo)
+      
+      gconfirm("VMS DB Depth Annotation Completed!",
+               title = "Confirm",
+               icon = "info",
+               parent = vms_db_dep_win,
+               handler = function(h,...){dispose(vms_db_dep_win)})
+      
+    }else{
+      gconfirm("Interpolated track data not available\n\nRun Interpolation first!",
+               title = "Error",
+               icon = "error",
+               parent = vms_db_dep_win,
+               handler = function(h,...){dispose(vms_db_dep_win)})
+    }
+    
+  })
+  enabled(start_off) <- FALSE
+  
+  
+  
+  
+  
+  
+  
+  
+  
   if(vms_DB$db != "")
   {
     #    svalue(sel_vms_f) <- strsplit(vms_DB$db, "/")[[1]][length(strsplit(vms_DB$db, "/")[[1]])]    
     svalue(sel_vms_f) <- ifelse(.Platform$OS.type == "windows", strsplit(vms_DB$db, "\\\\")[[1]][length(strsplit(vms_DB$db, "\\\\")[[1]])],strsplit(vms_DB$db, "/")[[1]][length(strsplit(vms_DB$db, "/")[[1]])])
     enabled(start_b) <- TRUE
+    enabled(start_off) <- TRUE
   } 
   
   visible(vms_db_dep_win) <- TRUE

@@ -97,7 +97,7 @@ gui_vms_save_bat <- function(vms_db_name = "")
     xrange = extendrange(c(xmax, xmin), f = 0.05)
     yrange = extendrange(c(ymax, ymin), f = 0.05)
     
-    bat_blo <- getNOAA.bathy(xmin-0.1,
+    bat_blo <- getmarmap.bathy(xmin-0.1,
                              xmax+0.1,
                              ymin-0.1,
                              ymax+0.1, resolution = svalue(use_res))
