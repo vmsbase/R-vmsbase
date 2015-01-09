@@ -200,7 +200,7 @@ recu_dep <- function(xmin, xmax, ymin, ymax, resolut = 2, the_db = "")
       ylat <- rep(as.numeric(colnames(bat_blo)),each=length(as.numeric(rownames(bat_blo))))
       zdep <- as.numeric(bat_blo)
       cat("\n   -     Calculating Spline...     -", sep = "")
-      SplineD <- Tps(cbind(xlon, ylat), zdep, lon.lat=TRUE)
+      SplineD <- o_Tps(cbind(xlon, ylat), zdep, lon.lat=TRUE)
       rm(bat_blo, zdep, xlon, ylat)
       cat("\n   -     Predicting depth", sep = "")
       if(nrow(deppoi)<= 10000){
@@ -278,7 +278,7 @@ recu_dep_RDS <- function(bat_all, xmin, xmax, ymin, ymax, the_db = "", max_siz =
         points(deppoi[,"LON"], deppoi[,"LAT"], pch = 20, col = "firebrick")
         
         cat("   -   Calculating Spline...   ", sep = "")
-        SplineD <- Tps(cbind(xlon, ylat), zdep, lon.lat=TRUE)
+        SplineD <- o_Tps(cbind(xlon, ylat), zdep, lon.lat=TRUE)
         rm(bat_blo, zdep, xlon, ylat)
         
         cat("Predicting depth...", sep = "")
@@ -376,6 +376,38 @@ Assign_Area = function(evnt, box){
 }
 
 
+
+o_Tps <- function(x, Y, m = NULL, p = NULL, scale.type = "range", 
+                  lon.lat = FALSE, miles = TRUE, ...) {
+  x <- as.matrix(x)
+  d <- ncol(x)
+  if (is.null(p)) {
+    if (is.null(m)) {
+      m <- max(c(2, ceiling(d/2 + 0.1)))
+    }
+    p <- (2 * m - d)
+    if (p <= 0) {
+      stop(" m is too small  you must have 2*m -d >0")
+    }
+  }
+  Tpscall <- match.call()
+  if (!lon.lat) {
+    Tpscall$cov.function <- "Thin plate spline radial basis functions (Rad.cov) "
+    Krig(x, Y, cov.function = Rad.cov, m = m, scale.type = scale.type, 
+         p = p, GCV = TRUE, ...)
+  }
+  else {
+    # use different coding of the radial basis fucntions to use with great circle distance.
+    Tpscall$cov.function <- "Thin plate spline radial basis functions (RadialBasis.cov) using great circle distance "
+    Krig(x, Y, cov.function = stationary.cov, m = m, scale.type = scale.type, 
+         GCV = TRUE, cov.args = list(Covariance = "RadialBasis", 
+                                     M = m, dimension = 2, Distance = "rdist.earth", 
+                                     Dist.args = list(miles = miles)), ...)
+  }
+}
+
+
+
 #' Effort Count - Internal Function
 #'  
 #' 
@@ -436,90 +468,4 @@ CountMap = function(xy, GridPS){
     }
   }
   return(GridCount[,2])
-}
-
-getmarmap.bathy <- function (lon1, lon2, lat1, lat2, resolution = 4, keep = FALSE, 
-          antimeridian = FALSE) {
-  x1 = x2 = y1 = y2 = NULL
-  if (lon1 < lon2) {
-    x1 <- lon1
-    x2 <- lon2
-  }
-  else {
-    x2 <- lon1
-    x1 <- lon2
-  }
-  if (lat1 < lat2) {
-    y1 <- lat1
-    y2 <- lat2
-  }
-  else {
-    y2 <- lat1
-    y1 <- lat2
-  }
-  res = resolution * 0.0166666666666667
-  fetch <- function(x1, y1, x2, y2, res) {
-    WEB.REQUEST <- paste("http://maps.ngdc.noaa.gov/mapviewer-support/wcs-proxy/wcs.groovy?filename=etopo1.xyz&request=getcoverage&version=1.0.0&service=wcs&coverage=etopo1&CRS=EPSG:4326&format=xyz&resx=", 
-                         res, "&resy=", res, "&bbox=", x1, ",", y1, ",", x2, 
-                         ",", y2, sep = "")
-    dat <- suppressWarnings(try(read.table(WEB.REQUEST), 
-                                silent = TRUE))
-    return(dat)
-  }
-  if (antimeridian) {
-    FILE <- paste("marmap_coord_", x1, ":", y1, ":", x2, 
-                  ":", y2, "_res_", resolution, "_anti", ".csv", sep = "")
-  }
-  else {
-    FILE <- paste("marmap_coord_", x1, ":", y1, ":", x2, 
-                  ":", y2, "_res_", resolution, ".csv", sep = "")
-  }
-  if (FILE %in% list.files()) {
-    cat("File already exists ; loading '", FILE, "'", sep = "")
-    exisiting.bathy <- read.bathy(FILE, header = T)
-    return(exisiting.bathy)
-  }
-  else {
-    if (antimeridian) {
-      l1 <- x2
-      l2 <- 180
-      l3 <- -180
-      l4 <- x1
-      cat("Querying NOAA database ...\n")
-      cat("This may take seconds to minutes, depending on grid size\n")
-      left <- fetch(l1, y1, l2, y2, res)
-      right <- fetch(l3, y1, l4, y2, res)
-      if (is(left, "try-error") | is(right, "try-error")) {
-        stop("The NOAA server cannot be reached\n")
-      }
-      else {
-        cat("Building bathy matrix ...\n")
-        left <- as.bathy(left)
-        left <- left[-nrow(left), ]
-        right <- as.bathy(right)
-        rownames(right) <- as.numeric(rownames(right)) + 
-          360
-        bath2 <- rbind(left, right)
-        class(bath2) <- "bathy"
-        bath <- as.xyz(bath2)
-      }
-    }
-    else {
-      cat("Querying NOAA database ...\n")
-      cat("This may take seconds to minutes, depending on grid size\n")
-      bath <- fetch(x1, y1, x2, y2, res)
-      if (is(bath, "try-error")) {
-        stop("The NOAA server cannot be reached\n")
-      }
-      else {
-        cat("Building bathy matrix ...\n")
-        bath2 <- as.bathy(bath)
-      }
-    }
-    if (keep) {
-      write.table(bath, file = FILE, sep = ",", quote = FALSE, 
-                  row.names = FALSE)
-    }
-    return(bath2)
-  }
 }

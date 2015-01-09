@@ -234,7 +234,7 @@ gui_vms_db_dep <- function(vms_db_name = "")
             svalue(infolab_dep) <- paste("Analyzing block [", m, ",", n, "]\n",
                                          "N. ",cou, " of " ,xblock * yblock, " blocks", sep = "")
             
-            bat_blo <- getmarmap.bathy(new_xmin-0.1,
+            bat_blo <- getNOAA.bathy(new_xmin-0.1,
                                        new_xmax+0.1,
                                        new_ymin-0.1,
                                        new_ymax+0.1, resolution = svalue(use_res))
