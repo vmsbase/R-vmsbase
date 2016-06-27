@@ -19,13 +19,11 @@
 
 latsex2dec <- function (degree, minute, second, direction)
 {
-  
-  declat <- ifelse(
-         (direction == "N"),
-          degree+(minute/60)+(second/3600),
-        -(degree+(minute/60)+(second/3600))
-  )
-  
+  if(direction == "N")
+  {
+    declat <- degree+(minute/60)+(second/3600)
+  }else{
+    declat <- -(degree+(minute/60)+(second/3600))
+  }
   return(declat)
-  
 }

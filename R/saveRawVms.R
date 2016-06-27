@@ -14,8 +14,6 @@
 #' @export saveRawVms
 #'@seealso \code{\link{gui_vms_editraw}}
 
-
-
 saveRawVms <- function (rawfile, widget)
 {
   
@@ -66,7 +64,7 @@ saveRawVms <- function (rawfile, widget)
                         "HEA" = numeric(numlines))
   
   vessid <- which(colnames(rawfile$data) == vessIdSel)
-  vmsdata["I_NCEE"] <- rawfile$data[,vessid]
+  vmsdata[,"I_NCEE"] <- rawfile$data[,vessid]
   
   if (latModeSel == "sex")
   {
@@ -112,13 +110,13 @@ saveRawVms <- function (rawfile, widget)
     tole_prelat <- which(pre_lat < -90 | pre_lat > 90)
     if(length(tole_prelat) > 0)
     {
-      pre_lat <- pre_lat[-tole_prelat,1]
+      pre_lat <- pre_lat[-tole_prelat]
       vmsdata <- vmsdata[-tole_prelat,]
-      
+      rawfile$data <- rawfile$data[-tole_prelat,]
     }
     cat("\n   -   ", length(tole_prelat), " Latitudes out of range ( -90 / 90 )", sep = "")
     
-    vmsdata["LAT"] <- pre_lat
+    vmsdata[,"LAT"] <- pre_lat
     
   }
   
@@ -140,12 +138,13 @@ saveRawVms <- function (rawfile, widget)
     tole_prelat <- which(pre_lat < -90 | pre_lat > 90)
     if(length(tole_prelat) > 0)
     {
-      pre_lat <- pre_lat[-tole_prelat,1]
+      pre_lat <- pre_lat[-tole_prelat]
       vmsdata <- vmsdata[-tole_prelat,]
+      rawfile$data <- rawfile$data[-tole_prelat,]
     }
     cat("\n   -   ", length(tole_prelat), " Latitudes out of range ( -90 / 90 )", sep = "")
     
-    vmsdata["LAT"] <- pre_lat
+    vmsdata[,"LAT"] <- pre_lat
     
   }
   
@@ -195,12 +194,13 @@ saveRawVms <- function (rawfile, widget)
     tole_prelon <- which(pre_lon < -180 | pre_lon > 180)
     if(length(tole_prelon) > 0)
     {
-      pre_lon <- pre_lon[-tole_prelon,1]
+      pre_lon <- pre_lon[-tole_prelon]
       vmsdata <- vmsdata[-tole_prelon,]
+      rawfile$data <- rawfile$data[-tole_prelon,]
     }
     cat("\n   -   ", length(tole_prelon), " Longitudes out of range ( -180 / 180 )", sep = "")
     
-    vmsdata["LON"] <- pre_lon
+    vmsdata[,"LON"] <- pre_lon
     
   }
   
@@ -210,7 +210,6 @@ saveRawVms <- function (rawfile, widget)
     londec <- which(colnames(rawfile$data) == lonDec)
     tole_lode <- which(is.na(rawfile$data[,londec]))
     cat("\n   -   ", length(tole_lode), " NAs found in decimal longitude...", sep = "")
-    #to_rep <- paste(to_rep, "\n   -   ", length(tole_lode), " NAs found in decimal longitude...\n", sep = "")
     if(length(tole_lode) > 0)
     {
       rawfile$data <- rawfile$data[-tole_lode,]
@@ -222,12 +221,13 @@ saveRawVms <- function (rawfile, widget)
     tole_prelon <- which(pre_lon < -180 | pre_lon > 180)
     if(length(tole_prelon) > 0)
     {
-      pre_lon <- pre_lon[-tole_prelon,1]
+      pre_lon <- pre_lon[-tole_prelon]
       vmsdata <- vmsdata[-tole_prelon,]
+      rawfile$data <- rawfile$data[-tole_prelon,]
     }
     cat("\n   -   ", length(tole_prelon), " Longitudes out of range ( -180 / 180 )", sep = "")
     
-    vmsdata["LON"] <- pre_lon
+    vmsdata[,"LON"] <- pre_lon
     
   }
   
@@ -244,7 +244,7 @@ saveRawVms <- function (rawfile, widget)
       rawfile$data <- rawfile$data[-tole_ti,]
       vmsdata <- vmsdata[-tole_ti,]
     }
-    vmsdata["DATE"] <- rawfile$data[,timeutc]
+    vmsdata[,"DATE"] <- rawfile$data[,timeutc]
     
   }
   
@@ -269,7 +269,7 @@ saveRawVms <- function (rawfile, widget)
       rawfile$data <- rawfile$data[-tole_dati,]
       vmsdata <- vmsdata[-tole_dati,]
     }
-    vmsdata["DATE"] <- as.numeric(chron(as.character(rawfile$data[,date]),
+    vmsdata[,"DATE"] <- as.numeric(chron(as.character(rawfile$data[,date]),
                                         as.character(rawfile$data[,time]),
                                         data_frm))    
   }
@@ -313,12 +313,12 @@ saveRawVms <- function (rawfile, widget)
       vmsdata <- vmsdata[-tole_sec,]
     }
     time <- paste(rawfile$data[,hour], rawfile$data[,minute], rawfile$data[,second], sep = ":")
-    vmsdata["DATE"] <- as.numeric(chron(as.character(rawfile$data[,date]),
+    vmsdata[,"DATE"] <- as.numeric(chron(as.character(rawfile$data[,date]),
                                         as.character(time),
                                         data_frm))
   }
   
-  tole_vda <- which(is.na(vmsdata["DATE"]))
+  tole_vda <- which(is.na(vmsdata[,"DATE"]))
   cat("\n   -   ", length(tole_vda), " dates found with bad format...", sep = "")
   #to_rep <- paste(to_rep, "\n   -   ", length(tole_vda), " dates found with bad format...\n", sep = "")
   if(length(tole_vda) > 0)
@@ -339,7 +339,7 @@ saveRawVms <- function (rawfile, widget)
       rawfile$data <- rawfile$data[-tole_kn,]
       vmsdata <- vmsdata[-tole_kn,]
     }
-    vmsdata["SPE"] <- kno2kmh(rawfile$data[,knots])
+    vmsdata[,"SPE"] <- kno2kmh(rawfile$data[,knots])
     
   }
   
@@ -355,7 +355,7 @@ saveRawVms <- function (rawfile, widget)
       rawfile$data <- rawfile$data[-tole_km,]
       vmsdata <- vmsdata[-tole_km,]
     }
-    vmsdata["SPE"] <- rawfile$data[,kmh]
+    vmsdata[,"SPE"] <- rawfile$data[,kmh]
     
   }
   
@@ -372,7 +372,7 @@ saveRawVms <- function (rawfile, widget)
       rawfile$data <- rawfile$data[-tole_ra,]
       vmsdata <- vmsdata[-tole_ra,]
     }
-    vmsdata["HEA"] <- rad2deg(rawfile$data[,rad])
+    vmsdata[,"HEA"] <- rad2deg(rawfile$data[,rad])
     
   }
   
@@ -388,7 +388,7 @@ saveRawVms <- function (rawfile, widget)
       rawfile$data <- rawfile$data[-tole_de,]
       vmsdata <- vmsdata[-tole_de,]
     }
-    vmsdata["HEA"] <- rawfile$data[,deg]
+    vmsdata[,"HEA"] <- rawfile$data[,deg]
     
   }
   cat("\nRemoved ", round((100/numlines) * (numlines-nrow(vmsdata)), 2), "% of data, that is ", numlines-nrow(vmsdata)," pings\n",

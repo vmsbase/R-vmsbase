@@ -1,8 +1,6 @@
 
-
 #' VMS DB View Interpolated Data GUI
 #'  
-#' 
 #' The \code{gui_vms_view_intrp} function implements the graphical user interface for the
 #'  VMS DB routine to view interpolated data.
 #' 
@@ -14,16 +12,11 @@
 #'   
 #' @return This function does not return a value. 
 #' 
-#' 
 #' @usage gui_vms_view_intrp(vms_db_name = "", bathy_file_name = "")
 #' 
 #' @export gui_vms_view_intrp
 #'
-#'
-#'@references free text reference Pointers to the literature related to this object.
 #'@seealso \code{\link{gui_vms_view_ping}} \code{\link{gui_vms_view_track}} \code{\link{gui_vms_save_bat}}
-
-
 
 gui_vms_view_intrp <- function (vms_db_name = "", bathy_file_name = "")
 {
@@ -36,7 +29,6 @@ gui_vms_view_intrp <- function (vms_db_name = "", bathy_file_name = "")
   vnum <- 0
   trackn <- 0
   
-  #Avvio Interfaccia
   intrp_view_win <- gwindow("Interpolated VMS Viewer", visible = FALSE)
   big_g <- ggroup(horizontal = T, container = intrp_view_win)
   left_g <- ggroup(horizontal = F, container = big_g)
@@ -54,16 +46,10 @@ gui_vms_view_intrp <- function (vms_db_name = "", bathy_file_name = "")
            vms_DB$db <- gfile(text = "Select VMS DataBase file",
                               type = "open",
                               filter = list("VMS DB file" = list(patterns = c("*.vms.sqlite"))))
-           #            svalue(sel_vms_f) <- strsplit(vms_DB$db, "/")[[1]][length(strsplit(vms_DB$db, "/")[[1]])]
            svalue(sel_vms_f) <- ifelse(.Platform$OS.type == "windows", strsplit(vms_DB$db, "\\\\")[[1]][length(strsplit(vms_DB$db, "\\\\")[[1]])],strsplit(vms_DB$db, "/")[[1]][length(strsplit(vms_DB$db, "/")[[1]])])
-           
            incee <- sqldf("select distinct I_NCEE from intrp order by I_NCEE", dbname = vms_DB$db)
            selves[] <- incee
-           
            turn_wdgt_on(c(selves, vestra))
-           #            enabled(selves) <- TRUE
-           #            enabled(vestra) <- TRUE
-           
          })
   gimage(system.file("ico/application-exit-5.png", package="vmsbase"), container = vms_db_f,
          handler = function(h,...){
@@ -75,10 +61,7 @@ gui_vms_view_intrp <- function (vms_db_name = "", bathy_file_name = "")
          })
   addSpring(chk_g3)
   #################
-  ################
-  
   addSpring(expo_gr)
-  
   save_ves_jpeg <- gbutton(text = "save jpeg", container = expo_gr, handler = function(h,...)
   {
     enabled(intrp_view_win) <- FALSE
@@ -103,7 +86,7 @@ gui_vms_view_intrp <- function (vms_db_name = "", bathy_file_name = "")
         {
           xrange <- c(svalue(mi_lo), svalue(ma_lo))
           yrange <- c(svalue(mi_la), svalue(ma_la))
-          intrpview(vessel, bathy, xrange, yrange)
+          trackview(vessel, bathy, xrange, yrange)
         }
       }else{
         fishi <- sqldf("select count(*) from p_fish", dbname = vms_DB$db)
@@ -132,17 +115,13 @@ gui_vms_view_intrp <- function (vms_db_name = "", bathy_file_name = "")
     enabled(intrp_view_win) <- TRUE
   })
   #   enabled(save_ves_jpeg) <- FALSE
-  
   #################
-  
   addSpring(expo_gr)
   export_csv <- gbutton(text = "export csv", container = expo_gr, handler = function(h,...)
   {
     turn_wdgt_off(c(left_g1, selves, vestra, save_ves_jpeg, cus_dep_g, vms_db_f, bbox_exp, expo_gr))
-    
     if(vnum != 0)
     {
-      
       if(trackn == 0)
       {
         vessel <- fn$sqldf("select * from intrp where I_NCEE = `vnum` order by DATE", dbname = vms_DB$db)
@@ -151,9 +130,7 @@ gui_vms_view_intrp <- function (vms_db_name = "", bathy_file_name = "")
           csv_fil_na <- gfile(text = "Saving vessel route as CSV file", type = "save", initialfilename = "*.csv", 
                               filter = list("All files" = list(patterns = c("*")), "CSV files" =
                                               list(patterns = "*.csv")))
-          
           if(length(unlist(strsplit(csv_fil_na, "[.]"))) == 1){csv_fil_na <- paste(csv_fil_na, ".csv", sep = "")}
-          
           write.table(vessel,
                       file = csv_fil_na,
                       append = FALSE,
@@ -167,7 +144,6 @@ gui_vms_view_intrp <- function (vms_db_name = "", bathy_file_name = "")
         if(fishi == 0)
         {
           track  <- fn$sqldf("select * from intrp where I_NCEE = `vnum` and T_NUM = `trackn` order by DATE", dbname = vms_DB$db)      
-          
           csv_fil_na <- gfile(text = "Saving single vessel track as CSV file", type = "save", initialfilename = "*.csv", 
                               filter = list("All files" = list(patterns = c("*")), "CSV files" =
                                               list(patterns = "*.csv")))
@@ -244,8 +220,11 @@ gui_vms_view_intrp <- function (vms_db_name = "", bathy_file_name = "")
       {
         xrange <- c(svalue(mi_lo), svalue(ma_lo))
         yrange <- c(svalue(mi_la), svalue(ma_la))
-        
-        intrpview(vessel, bathy, xrange, yrange)
+        if(nrow(vessel) > 1){
+          trackview(vessel, bathy, xrange, yrange)
+        }else{
+          pingview(vessel, bathy, xrange, yrange)
+        }
       }
     }else{
       fishi <- sqldf("select count(*) from p_fish", dbname = vms_DB$db)
@@ -272,11 +251,7 @@ gui_vms_view_intrp <- function (vms_db_name = "", bathy_file_name = "")
     
   })
   enabled(bbox_exp) <- FALSE
-  
-  
-  
   #################
-  
   left_g1 <- gframe(horizontal = T, container = left_g)
   glabel("show Fishing Points", container = left_g1)
   sho_fis <- gradio(c("Yes", "No"), horizontal = TRUE, container = left_g1)
@@ -285,9 +260,6 @@ gui_vms_view_intrp <- function (vms_db_name = "", bathy_file_name = "")
   selves <- gtable(data.frame("Vessel" = numeric(0)), chosencol = 1, container = left_g2, expand = T, handler = function(h,...)
   {
     turn_wdgt_off(c(left_g1, selves, vestra, save_ves_jpeg, cus_dep_g, vms_db_f, bbox_exp, expo_gr))
-    #     enabled(save_ves_jpeg) <- FALSE
-    #     enabled(vestra) <- FALSE
-    #     enabled(selves) <- FALSE
     trackn <<- 0
     vnum <<- svalue(selves)
     vessel <- fn$sqldf("select * from intrp where I_NCEE = `vnum` order by DATE", dbname = vms_DB$db)
@@ -301,23 +273,19 @@ gui_vms_view_intrp <- function (vms_db_name = "", bathy_file_name = "")
       svalue(mi_lo) <- xrange[1]
       svalue(ma_lo) <- xrange[2]
       svalue(mi_la) <- yrange[1]
-      intrpview(vessel, bathy, xrange, yrange)
+      if(nrow(vessel) > 1){
+        trackview(vessel, bathy, xrange, yrange)
+      }else{
+        pingview(vessel, bathy, xrange, yrange)
+      }
     }
     turn_wdgt_on(c(left_g1, selves, vestra, save_ves_jpeg, cus_dep_g, vms_db_f, bbox_exp, expo_gr))
-    #     enabled(vestra) <- TRUE
-    #     enabled(selves) <- TRUE
-    #     enabled(save_ves_jpeg) <- TRUE
   })
   enabled(selves) <- FALSE
   
   vestra <- gtable(data.frame("Track" = numeric(0)), chosencol = 1, container = left_g2, expand = T, handler = function(h,...)
   {
     turn_wdgt_off(c(left_g1, selves, vestra, save_ves_jpeg, cus_dep_g, vms_db_f, bbox_exp, expo_gr))
-    
-    #     enabled(vestra) <- FALSE
-    #     enabled(selves) <- FALSE
-    #     enabled(save_ves_jpeg) <- FALSE
-    
     trackn <<- svalue(vestra)
     fishi <- sqldf("select count(*) from p_fish", dbname = vms_DB$db)
     if(fishi == 0)
@@ -342,11 +310,7 @@ gui_vms_view_intrp <- function (vms_db_name = "", bathy_file_name = "")
       svalue(mi_la) <- yrange[1]
       intrpview2(track, trackn, bathy, fishi = ifelse((svalue(sho_fis) == "Yes" & fishi != 0), TRUE, FALSE), xrange, yrange)
     }
-    #     enabled(vestra) <- TRUE
-    #     enabled(selves) <- TRUE
-    #     enabled(save_ves_jpeg) <- TRUE
     turn_wdgt_on(c(left_g1, selves, vestra, save_ves_jpeg, cus_dep_g, vms_db_f, bbox_exp, expo_gr))
-    
   })
   enabled(vestra) <- FALSE
   ###################
@@ -370,19 +334,15 @@ gui_vms_view_intrp <- function (vms_db_name = "", bathy_file_name = "")
   ###################
   right_g <- gframe(horizontal = F, container = big_g, expand = T)
   theplot <- ggraphics(container = right_g, expand = T)
-  
   visible(intrp_view_win) <- TRUE
-  
-  map("world",fill=T,col="black", bg = "darkorange2", mar = c(6,6,0,0))
-  map.axes()
-  title(main = "VMSbase - Interpolation Viewer", line = 0.3)
+  maps::map("world",col="black", bg = "lightsteelblue1", mar=c(6,6,0,0), fill = TRUE, interior = FALSE)
+  maps::map.axes()
+  title(main = "Interpolation Viewer", line = 0.3)
   title(xlab = "Lon", ylab = "Lat", line = 2)
   if(vms_DB$db != "")
   {
     enabled(intrp_view_win) <- FALSE
-    #     svalue(sel_vms_f) <- strsplit(vms_DB$db, "/")[[1]][length(strsplit(vms_DB$db, "/")[[1]])]
     svalue(sel_vms_f) <- ifelse(.Platform$OS.type == "windows", strsplit(vms_DB$db, "\\\\")[[1]][length(strsplit(vms_DB$db, "\\\\")[[1]])],strsplit(vms_DB$db, "/")[[1]][length(strsplit(vms_DB$db, "/")[[1]])])
-    
     incee <- sqldf("select distinct I_NCEE from intrp order by I_NCEE", dbname = vms_DB$db)
     selves[] <- incee
     enabled(intrp_view_win) <- TRUE
@@ -390,9 +350,7 @@ gui_vms_view_intrp <- function (vms_db_name = "", bathy_file_name = "")
   }
   if(bathy$path != "")
   {
-    #     svalue(cus_dep_lab) <- paste("File: ", strsplit(bathy$path, "/")[[1]][length(strsplit(bathy$path, "/")[[1]])], sep = "")
     svalue(cus_dep_lab) <- paste("File: ", ifelse(.Platform$OS.type == "windows", strsplit(bathy$path, "\\\\")[[1]][length(strsplit(bathy$path, "\\\\")[[1]])],strsplit(bathy$path, "/")[[1]][length(strsplit(bathy$path, "/")[[1]])]), sep = "")
     bathy$data <- readRDS(bathy$path)
   }
 }
-

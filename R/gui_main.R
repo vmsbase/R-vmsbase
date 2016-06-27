@@ -1,5 +1,16 @@
-#main window
-# 
+#' VMSbase main GUI
+#' 
+#' The \code{gui_main} function implements the main graphical user interface of the
+#'  VMSbase package
+#' 
+#' With this gui the user can access all the functionalities of VMSbase
+#' 
+#' @return This function does not return a value. 
+#' 
+#' @usage gui_main()
+#' 
+#' @export gui_main
+
 gui_main <- function ()
 {
   vms_db_file <- ""
@@ -9,14 +20,11 @@ gui_main <- function ()
   bathy_file <- ""
   
   main_win <- gwindow(paste("VMS Base - Version ", packageVersion("vmsbase"), sep = "") , visible = FALSE)
-  #   main_win <- gwindow(paste("VMS Base - Version ", "1.0", sep = "") , visible = FALSE)
   
   theg <- ggroup(horizontal = TRUE, container = main_win)
   
   left <- ggroup(horizontal = FALSE, container = theg)
-  #addSpring(left)
-  gimage(system.file("img/vms_300_spada.png", package = "vmsbase"), container = left)
-  #addSpring(left)
+  gimage(system.file("img/vms_300_spada_ais.png", package = "vmsbase"), container = left)
   gseparator(container = left)
   
   addSpring(left)
@@ -32,16 +40,13 @@ gui_main <- function ()
            vms_db_file <<- gfile(text = "Select VMS DataBase file",
                                  type = "open",
                                  filter = list("VMS DB file" = list(patterns = c("*.vms.sqlite"))))
-           #            svalue(sel_vms_f) <- strsplit(vms_db_file, "/")[[1]][length(strsplit(vms_db_file, "/")[[1]])]
            svalue(sel_vms_f) <- ifelse(.Platform$OS.type == "windows", strsplit(vms_db_file, "\\\\")[[1]][length(strsplit(vms_db_file, "\\\\")[[1]])],strsplit(vms_db_file, "/")[[1]][length(strsplit(vms_db_file, "/")[[1]])])
-           
          })
   gimage(system.file("ico/application-exit-5.png", package="vmsbase"), container = vms_db_f,
          handler = function(h,...){
            vms_db_file <<- ""
            svalue(sel_vms_f) <- "Select VMS DB file"
          })
-  #addSpring(left)
   
   ##LB DataBase file
   lb_db_f <- gframe(text = "LogBook DB file", horizontal = TRUE, container = wo_sp_fr)
@@ -53,7 +58,6 @@ gui_main <- function ()
            lb_db_file <<- gfile(text = "Select LB DataBase file",
                                 type = "open",
                                 filter = list("LB DB file" = list(patterns = c("*.lb.sqlite"))))
-           #            svalue(sel_lb_f) <- strsplit(lb_db_file, "/")[[1]][length(strsplit(lb_db_file, "/")[[1]])]
            svalue(sel_lb_f) <- ifelse(.Platform$OS.type == "windows", strsplit(lb_db_file, "\\\\")[[1]][length(strsplit(lb_db_file, "\\\\")[[1]])],strsplit(lb_db_file, "/")[[1]][length(strsplit(lb_db_file, "/")[[1]])])
          })
   gimage(system.file("ico/application-exit-5.png", package="vmsbase"), container = lb_db_f,
@@ -61,8 +65,6 @@ gui_main <- function ()
            lb_db_file <<- ""
            svalue(sel_lb_f) <- "Select LB DB file"
          })
-  
-  #addSpring(left)
   
   ##Land file
   cus_map_g <- gframe(text = "Land Shape File", horizontal = TRUE, container = wo_sp_fr)
@@ -74,15 +76,12 @@ gui_main <- function ()
            themap_file <<- gfile(text = "Select Land ShapePoly map",
                                  type = "open",
                                  filter = list("shp data" = list(patterns = c("*.shp"))))
-           #            svalue(cus_map_lab) <- strsplit(themap_file, "/")[[1]][length(strsplit(themap_file, "/")[[1]])]
            svalue(cus_map_lab) <- paste("Land: ", ifelse(.Platform$OS.type == "windows", strsplit(themap_file, "\\\\")[[1]][length(strsplit(themap_file, "\\\\")[[1]])],strsplit(themap_file, "/")[[1]][length(strsplit(themap_file, "/")[[1]])]), sep = "")         })
   gimage(system.file("ico/application-exit-5.png", package="vmsbase"), container = cus_map_g,
          handler = function(h,...){
            themap_file <<- ""
            svalue(cus_map_lab) <- "Select Land Shape File"
          })
-  
-  #addSpring(left)
   
   ##Harbours file
   cus_har_g <- gframe(text = "Harbours Shape File", horizontal = TRUE, container = wo_sp_fr)
@@ -94,15 +93,12 @@ gui_main <- function ()
            harb_file <<- gfile(text = "Select ShapePoints map",
                                type = "open",
                                filter = list("shp data" = list(patterns = c("*.shp"))))
-           #            svalue(cus_har_lab) <- strsplit(harb_file, "/")[[1]][length(strsplit(harb_file, "/")[[1]])]
            svalue(cus_har_lab) <- paste("Harbour: ", ifelse(.Platform$OS.type == "windows", strsplit(harb_file, "\\\\")[[1]][length(strsplit(harb_file, "\\\\")[[1]])],strsplit(harb_file, "/")[[1]][length(strsplit(harb_file, "/")[[1]])]), sep = "")          })
   gimage(system.file("ico/application-exit-5.png", package="vmsbase"), container = cus_har_g,
          handler = function(h,...){
            harb_file <<- ""
            svalue(cus_har_lab) <- "Select Harbours Shape File"
          })
-  
-  #addSpring(left)
   
   ##Depth file
   cus_dep_g <- gframe(text = "Bathymetry File", horizontal = TRUE, container = wo_sp_fr)
@@ -114,8 +110,6 @@ gui_main <- function ()
            bathy_file <<- gfile(text = "Select Bathymetry File",
                                 type = "open",
                                 filter = list("bathy data" = list(patterns = c("*sqlitebathy.rData"))))
-           #            svalue(cus_dep_lab) <- strsplit(bathy_file, "/")[[1]][length(strsplit(bathy_file, "/")[[1]])]
-           #            svalue(cus_dep_lab) <- ifelse(.Platform$OS.type == "windows", strsplit(bathy_file, "\\\\")[[1]][length(strsplit(bathy_file, "\\\\")[[1]])],strsplit(bathy_file, "/")[[1]][length(strsplit(bathy_file, "/")[[1]])])
            svalue(cus_dep_lab) <- paste("Depth: ", ifelse(.Platform$OS.type == "windows", strsplit(bathy_file, "\\\\")[[1]][length(strsplit(bathy_file, "\\\\")[[1]])],strsplit(bathy_file, "/")[[1]][length(strsplit(bathy_file, "/")[[1]])]), sep = "")
          })
   gimage(system.file("ico/application-exit-5.png", package="vmsbase"), container = cus_dep_g,
@@ -162,7 +156,6 @@ gui_main <- function ()
       ifelse(lb_db_file != "", svalue(sel_lb_f) <- ifelse(.Platform$OS.type == "windows", strsplit(lb_db_file, "\\\\")[[1]][length(strsplit(lb_db_file, "\\\\")[[1]])],strsplit(lb_db_file, "/")[[1]][length(strsplit(lb_db_file, "/")[[1]])]), svalue(sel_lb_f) <- "Select LB DB file")
       ifelse(vms_db_file != "", svalue(sel_vms_f) <- ifelse(.Platform$OS.type == "windows", strsplit(vms_db_file, "\\\\")[[1]][length(strsplit(vms_db_file, "\\\\")[[1]])],strsplit(vms_db_file, "/")[[1]][length(strsplit(vms_db_file, "/")[[1]])]), svalue(sel_vms_f) <- "Select VMS DB file")
       
-      
       gmessage(paste("WorkSpace Loaded!\n\nFile: ", ws_file, sep = ""), title="WorkSpace Loaded",
                icon = "info") 
     }else{
@@ -171,7 +164,6 @@ gui_main <- function ()
     }
   })
   addSpring(sa_lo_ws_g)
-  #addSpring(left)
   
   addSpace(theg, 20)
   right <- ggroup(horizontal = TRUE, container = theg)
@@ -197,6 +189,13 @@ gui_main <- function ()
   gbutton("   Create\nDataBase", container = vms_db, handler = function(h,...)
   {gui_vms_db_create()})
   addSpring(top_tl)
+  
+  vms_db <- ggroup(horizontal = FALSE, container = top_tl, spacing = 0)
+  gimage(system.file("ico/db_mix_sou.ico", package="vmsbase"), container = vms_db)
+  gbutton("   Merge\nSources", container = vms_db, handler = function(h,...)
+  {gui_vmsdb_mixsou()})
+  addSpring(top_tl)
+  
   data_vie <- ggroup(horizontal = FALSE, container = top_tl, spacing = 0)
   gimage(system.file("ico/folder-saved-search.png", package="vmsbase"), container = data_vie)
   gbutton("VMS Data\n   Viewer", container = data_vie, handler = function(h,...)
@@ -241,10 +240,11 @@ gui_main <- function ()
   addSpring(bot_tl)
   
   ####
+  addSpring(top)
+  
   # VMS VIEWER
   mid_left <- gframe(text = "VMS Data Visualization", horizontal = FALSE, container = top)
   top_ml <- ggroup(horizontal = TRUE, container = mid_left)
-  bot_ml <- ggroup(horizontal = TRUE, container = mid_left)
   
   addSpring(top_ml)
   vms_viz_ping <- ggroup(horizontal = FALSE, container = top_ml, spacing = 0)
@@ -262,17 +262,17 @@ gui_main <- function ()
   gbutton("Interpolation\n      Viewer", container = vms_viz_ntr, handler = function(h,...)
   {gui_vms_view_intrp(vms_db_name = vms_db_file, bathy_file_name = bathy_file)})
   addSpring(top_ml)
-  addSpring(bot_ml)
-  vms_viz_adv <- ggroup(horizontal = FALSE, container = bot_ml, spacing = 0)
-  gimage(system.file("ico/google_maps.png", package="vmsbase"), container = vms_viz_adv)
+  
+  vms_viz_adv <- ggroup(horizontal = FALSE, container = top_ml, spacing = 0)
+  gimage(system.file("ico/adva-vie.png", package="vmsbase"), container = vms_viz_adv)
   vms_viz_adv <- gbutton("Google\nViewer", container = vms_viz_adv, handler = function(h,...)
   {gui_vms_viz_adv(vms_db_name = vms_db_file)})
-  addSpring(bot_ml)
+  addSpring(top_ml)
   
+  addSpring(top)
   
   ### LOGBOOK
   top2 <- ggroup(horizontal = FALSE, container = right)
-  
   
   # LB DATA MANAGER
   top_rig <- gframe(text = "LogBook Data Management", horizontal = TRUE, container = top2)
@@ -291,12 +291,7 @@ gui_main <- function ()
   gimage(system.file("ico/folder-saved-search.png", package="vmsbase"), container = lb_data_vie)
   gbutton("LogBook Data\n   Viewer", container = lb_data_vie, handler = function(h,...)
   {gui_lb_db_stat(lb_db_name = lb_db_file)})
-  #   lb_clean <- ggroup(horizontal = FALSE, container = top_rig, spacing = 0)
-  #   gimage(system.file("ico/configure-2.png", package="vmsbase"), container = lb_clean)
-  #   gbutton("Edit DB\n   Data", container = lb_clean, handler = function(h,...)
-  #   {
-  #     #gui_lb_db_edit(lb_db_name = lb_db_file)
-  #     })
+
   addSpring(top_rig)
   
   #LB EDIT
@@ -363,22 +358,21 @@ gui_main <- function ()
   ### About
   addSpring(top2)
   gseparator(container = top2)
-  #   abut_g <- ggroup(horizontal = TRUE, container = top2)
-  #   addSpring(abut_g)
   left_b <- ggroup(horizontal = FALSE, container = top2)
   torver_logo <- gimage(system.file("img/torvergata.png", package = "vmsbase"))
   add(left_b, torver_logo)
   addHandlerClicked(torver_logo, handler = function(h,...){
-    browseURL(url = "http://web.uniroma2.it/home-en.php", browser = getOption("browser"))
+    browseURL(url = "http://web.uniroma2.it", browser = getOption("browser"))
   }) 
   addSpring(left_b)
   gbutton("About...", container = left_b, handler = function(h,...)
   {
     ab_di <- gbasicdialog(title="VMSBASE About...", do.buttons=FALSE)
+    size(ab_di) <- c(750, 400)
     ab_lab <- gtext("
-                                                                                                 ---    VMSbase 1.0    ---
+                                                                               ---    VMSbase  2.1    ---
                     
-                                                                                                      List of Authors 
+                                                                                      List of Authors 
                            =====================================================================
                     
                     VMS BASE represents the implementation of several R routines which have been developed
@@ -429,7 +423,7 @@ gui_main <- function ()
 
                              Thanks to the \"Open Icon Library Project\" for the icons used in the VMSbase GUIs
                                                                        http://openiconlibrary.sourceforge.net/
-                    ", width = 800, height = 800,
+                    ",
                     container = ab_di)
     enabled(ab_lab) <- FALSE
     visible(ab_di, set = TRUE)

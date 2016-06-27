@@ -115,7 +115,7 @@ StandardizeByCol <- function(xdata){
 
 Join2shp <- function(shpfile, datavector, dirdest)
 {
-	sys_typ <- ifelse(.Platform$OS.type == "windows", "\\\\" , "/")
+  sys_typ <- ifelse(.Platform$OS.type == "windows", "\\\\" , "/")
   diror <- paste(unlist(strsplit(shpfile, sys_typ))[1:length(unlist(strsplit(shpfile, sys_typ)))-1], collapse = sys_typ)
   if(diror == dirdest)
   {
@@ -132,7 +132,7 @@ Join2shp <- function(shpfile, datavector, dirdest)
   for(iff in 1:length(otherfiles))
   {
     file.copy(from = paste(diror, sys_typ, otherfiles[iff], sep = "", collapse = ""), 
-             to = paste(dirdest, sys_typ, new_name, ".", unlist(strsplit(otherfiles[iff], "[.]"))[length(unlist(strsplit(otherfiles[iff], "[.]")))], sep = "", collapse = ""))      
+              to = paste(dirdest, sys_typ, new_name, ".", unlist(strsplit(otherfiles[iff], "[.]"))[length(unlist(strsplit(otherfiles[iff], "[.]")))], sep = "", collapse = ""))      
   }    
   dbfdata <- read.dbf(paste(diror, sys_typ,file_anm, ".dbf", sep = ""), as.is = TRUE)
   
@@ -152,6 +152,11 @@ dH1 = function(x) return(-6*x^2 + 6*x)
 dH2 = function(x) return(3*x^2 - 4*x + 1)
 dH3 = function(x) return(3*x^2 - 2*x)
 
+# by Josh O'Brien on http://stackoverflow.com/questions/9186496/determining-utm-zone-to-convert-from-longitude-latitude
+long2UTM <- function(long) {
+  (floor((long + 180)/6) %% 60) + 1
+}
+
 # # Original spline basis
 # H0 = function(x) return((2*x^3)-(3*x^2)+1)
 # H1 = function(x) return(-(2*x^3)+(3*x^2)
@@ -167,87 +172,10 @@ dH3 = function(x) return(3*x^2 - 2*x)
 
 recu_dep <- function(xmin, xmax, ymin, ymax, resolut = 2, the_db = "")
 {
-	if(the_db != "")
-	{
-	
-  co_ce <- fn$sqldf("select count(*) from intrp where LON > `xmin` and LON < `xmax` and LAT > `ymin` and LAT < `ymax`", dbname = the_db)
-  
-  if(co_ce[1,1] == 0)
-  {
-    cat("\n   -     Skipped block: x(", xmin, ",",xmax, ")*y(",ymin,",",ymax,")     -\n", sep = "")
-  }else{
-    xrange = c(xmin, xmax)
-    yrange = c(ymin, ymax)
-    # 	map("worldHires", xlim = xrange, ylim = yrange, bg = "darkorange2", col = "black", fill = T)
-    # 	map.axes()
-    l_x <- xmax - xmin
-    l_y <- ymax - ymin
-    if(l_x <= 0.25 | l_y <= 0.25)
-    {
-      cat("\n   -     New valid block: x(", xmin, ",",xmax, ")*y(",ymin,",",ymax,")     -\n", sep = "")
-      deppoi <- fn$sqldf("select ROWID, * from intrp where LON > `xmin` and LON < `xmax` and LAT > `ymin` and LAT < `ymax`", dbname = the_db)
-      
-      cat("\n   -     Analyzing ", nrow(deppoi), " points     -\n\n", sep = "")
-      
-      bat_blo <- getmarmap.bathy(xmin-0.1,
-                               xmax+0.1,
-                               ymin-0.1,
-                               ymax+0.1, resolution = resolut)
-      plot(bat_blo, image = T)
-      points(deppoi[,"LON"], deppoi[,"LAT"], pch = 20, col = "firebrick")
-      
-      xlon <- rep(as.numeric(rownames(bat_blo)),length(as.numeric(colnames(bat_blo))))
-      ylat <- rep(as.numeric(colnames(bat_blo)),each=length(as.numeric(rownames(bat_blo))))
-      zdep <- as.numeric(bat_blo)
-      cat("\n   -     Calculating Spline...     -", sep = "")
-      SplineD <- o_Tps(cbind(xlon, ylat), zdep, lon.lat=TRUE)
-      rm(bat_blo, zdep, xlon, ylat)
-      cat("\n   -     Predicting depth", sep = "")
-      if(nrow(deppoi)<= 10000){
-        cat(" ", sep = "")
-        dept <- as.numeric(predict(SplineD, deppoi[,c("LON","LAT")]))
-        dep_v <- as.data.frame(cbind(deppoi[,"rowid"], deppoi[,"I_NCEE"], dept))
-        sqldf("insert into p_depth select * from `dep_v`", dbname = the_db)
-        rm(dept, dep_v)
-        gc()
-      }else{
-        nPin <- ceiling(nrow(deppoi)/10000)
-        for(pi in 1:nPin)
-        {
-          cat(".", sep = "")
-          r1 <- 10000*(pi-1)+1
-          r2 <- min(nrow(deppoi),r1+10000-1)
-          dept <- as.numeric(predict(SplineD, deppoi[r1:r2,c("LON","LAT")]))
-          dep_v <- as.data.frame(cbind(deppoi[r1:r2,"rowid"], deppoi[r1:r2,"I_NCEE"], dept))
-          sqldf("insert into p_depth select * from `dep_v`", dbname = the_db)
-          rm(dept, dep_v)
-          gc()
-        }            
-      }
-      cat(" - Completed!     -\n", sep = "")
-      rm(SplineD)
-      gc()
-    }else{
-      xmin_2 <- xmin+((xmax-xmin)/2)
-      ymin_2 <- ymin+((ymax-ymin)/2)
-      cat("\n   -     Splitting block...     -\n", sep = "")
-      recu_dep(xmin, xmin_2, ymin, ymin_2, resolut = resolut, the_db)
-      recu_dep(xmin_2, xmax, ymin, ymin_2, resolut = resolut, the_db)
-      recu_dep(xmin, xmin_2, ymin_2, ymax, resolut = resolut, the_db)
-      recu_dep(xmin_2, xmax, ymin_2, ymax, resolut = resolut, the_db)
-    }
-  }
-  } else {
-  cat("\n\n   -     Error! Bad Database File      -\n", sep = "")
-  }
-}
-
-recu_dep_RDS <- function(bat_all, xmin, xmax, ymin, ymax, the_db = "", max_siz = 0.25, the_bbo)
-{
   if(the_db != "")
   {
     
-    co_ce <- fn$sqldf("select count(*) from intrp where LON >= `xmin` and LON <= `xmax` and LAT >= `ymin` and LAT <= `ymax`", dbname = the_db)
+    co_ce <- fn$sqldf("select count(*) from intrp where LON > `xmin` and LON < `xmax` and LAT > `ymin` and LAT < `ymax`", dbname = the_db)
     
     if(co_ce[1,1] == 0)
     {
@@ -255,34 +183,33 @@ recu_dep_RDS <- function(bat_all, xmin, xmax, ymin, ymax, the_db = "", max_siz =
     }else{
       xrange = c(xmin, xmax)
       yrange = c(ymin, ymax)
+      # 	map("worldHires", xlim = xrange, ylim = yrange, bg = "darkorange2", col = "black", fill = T)
+      # 	map.axes()
       l_x <- xmax - xmin
       l_y <- ymax - ymin
-      if(l_x <= max_siz | l_y <= max_siz)
+      if(l_x <= 0.25 | l_y <= 0.25)
       {
-        cat("\n   -     New valid block", sep = "")
+        cat("\n   -     New valid block: x(", xmin, ",",xmax, ")*y(",ymin,",",ymax,")     -\n", sep = "")
+        deppoi <- fn$sqldf("select ROWID, * from intrp where LON > `xmin` and LON < `xmax` and LAT > `ymin` and LAT < `ymax`", dbname = the_db)
         
-        deppoi <- fn$sqldf("select ROWID, * from intrp where LON >= `xmin` and LON <= `xmax` and LAT >= `ymin` and LAT <= `ymax`", dbname = the_db)
+        cat("\n   -     Analyzing ", nrow(deppoi), " points     -\n\n", sep = "")
         
-        cat(" with ", nrow(deppoi), " points\t", sep = "")
-        
-        cur_rows <- which(as.numeric(rownames(bat_all)) >= xmin-0.1 & as.numeric(rownames(bat_all)) <= xmax+0.1)
-        cur_cols <- which(as.numeric(colnames(bat_all)) >= ymin-0.1 & as.numeric(colnames(bat_all)) <= ymax+0.1)
-        
-        bat_blo <- bat_all[cur_rows, cur_cols]
+        bat_blo <- getNOAA.bathy(xmin-0.1,
+                                 xmax+0.1,
+                                 ymin-0.1,
+                                 ymax+0.1, resolution = resolut)
+        plot(bat_blo, image = T)
+        points(deppoi[,"LON"], deppoi[,"LAT"], pch = 20, col = "firebrick")
         
         xlon <- rep(as.numeric(rownames(bat_blo)),length(as.numeric(colnames(bat_blo))))
         ylat <- rep(as.numeric(colnames(bat_blo)),each=length(as.numeric(rownames(bat_blo))))
         zdep <- as.numeric(bat_blo)
-        
-        plot(as.bathy(cbind(xlon, ylat, zdep)), image = T)
-        points(deppoi[,"LON"], deppoi[,"LAT"], pch = 20, col = "firebrick")
-        
-        cat("   -   Calculating Spline...   ", sep = "")
+        cat("\n   -     Calculating Spline...     -", sep = "")
         SplineD <- o_Tps(cbind(xlon, ylat), zdep, lon.lat=TRUE)
         rm(bat_blo, zdep, xlon, ylat)
-        
-        cat("Predicting depth...", sep = "")
+        cat("\n   -     Predicting depth", sep = "")
         if(nrow(deppoi)<= 10000){
+          cat(" ", sep = "")
           dept <- as.numeric(predict(SplineD, deppoi[,c("LON","LAT")]))
           dep_v <- as.data.frame(cbind(deppoi[,"rowid"], deppoi[,"I_NCEE"], dept))
           sqldf("insert into p_depth select * from `dep_v`", dbname = the_db)
@@ -303,27 +230,124 @@ recu_dep_RDS <- function(bat_all, xmin, xmax, ymin, ymax, the_db = "", max_siz =
           }            
         }
         cat(" - Completed!     -\n", sep = "")
-        map("worldHires", xlim = the_bbo[2:1], ylim = the_bbo[4:3], bg = "darkorange2", col = "black", fill = T)
-        map.axes()
-        
-        xmin_2 <- xmin+((xmax-xmin)/2)
-        abline(v = xmin_2, col = "firebrick")
-        ymin_2 <- ymin+((ymax-ymin)/2)
-        abline(h = ymin_2, col = "firebrick")
-        
-        rect(xmin, ymin, xmin_2, ymin_2, border = "firebrick")
-        rect(xmin_2, ymin, xmax, ymin_2, border = "firebrick")
-        rect(xmin, ymin_2, xmin_2, ymax, border = "firebrick")
-        rect(xmin_2, ymin_2, xmax, ymax, border = "firebrick")
-        
         rm(SplineD)
         gc()
       }else{
+        xmin_2 <- xmin+((xmax-xmin)/2)
+        ymin_2 <- ymin+((ymax-ymin)/2)
+        cat("\n   -     Splitting block...     -\n", sep = "")
+        recu_dep(xmin, xmin_2, ymin, ymin_2, resolut = resolut, the_db)
+        recu_dep(xmin_2, xmax, ymin, ymin_2, resolut = resolut, the_db)
+        recu_dep(xmin, xmin_2, ymin_2, ymax, resolut = resolut, the_db)
+        recu_dep(xmin_2, xmax, ymin_2, ymax, resolut = resolut, the_db)
+      }
+    }
+  } else {
+    cat("\n\n   -     Error! Bad Database File      -\n", sep = "")
+  }
+}
+
+recu_dep_RDS <- function(bat_all, xmin, xmax, ymin, ymax, the_db = "", max_siz = 0.5, the_bbo)
+{
+  if(the_db != "")
+  {
+    
+    co_ce <- fn$sqldf("select count(*) from intrp where LON >= `xmin` and LON <= `xmax` and LAT >= `ymin` and LAT <= `ymax`", dbname = the_db)
+    
+    if(co_ce[1,1] == 0)
+    {
+      cat("\n  -  Skipped block: x(", xmin, ",",xmax, ")*y(",ymin,",",ymax,")  -\n", sep = "")
+    }else{
+      xrange = c(xmin, xmax)
+      yrange = c(ymin, ymax)
+      l_x <- xmax - xmin
+      l_y <- ymax - ymin
+      if(l_x <= max_siz | l_y <= max_siz)
+      {
+        cat("\n  -  New valid block", sep = "")
         
-        map("worldHires", xlim = the_bbo[2:1], ylim = the_bbo[4:3], bg = "darkorange2", col = "black", fill = T)
+        deppoi <- fn$sqldf("select ROWID, * from intrp where LON >= `xmin` and LON <= `xmax` and LAT >= `ymin` and LAT <= `ymax`", dbname = the_db)
+        
+        cat(" with ", nrow(deppoi), " points", sep = "")
+        
+        cur_rows <- which(as.numeric(rownames(bat_all)) >= xmin-0.1 & as.numeric(rownames(bat_all)) <= xmax+0.1)
+        cur_cols <- which(as.numeric(colnames(bat_all)) >= ymin-0.1 & as.numeric(colnames(bat_all)) <= ymax+0.1)
+        
+        if(length(cur_rows) > 1 & length(cur_cols) > 1){
+          
+          # cat("\n rows: ", length(cur_rows), " - cols:", length(cur_cols), "\n", sep = "")
+          
+          bat_blo <- bat_all[cur_rows, cur_cols]
+          
+          xlon <- rep(as.numeric(rownames(bat_blo)),length(as.numeric(colnames(bat_blo))))
+          ylat <- rep(as.numeric(colnames(bat_blo)),each=length(as.numeric(rownames(bat_blo))))
+          zdep <- as.numeric(bat_blo)
+#           
+#           cat("\n xlon: ", xlon, "\n\n xlat: ", ylat, "\n\n zdep: ", zdep, "\n\n", sep = " ")
+#           
+          ##########
+          blues<-c("lightsteelblue4","lightsteelblue3","lightsteelblue2","lightsteelblue1")
+          ba_bl <- as.bathy(cbind(xlon, ylat, zdep))
+          par(mar = c(1,1,1,1))
+          plot(ba_bl,image=TRUE,land=TRUE,lwd=0.1,bpal=list(c(0,max(zdep),"grey"),c(min(zdep),0,blues)))
+          plot(ba_bl,deep=0,shallow=0,step=0,lwd=0.4,add=TRUE)
+          ##########
+          
+          #         plot(as.bathy(cbind(xlon, ylat, zdep)), image = T)
+          
+          points(deppoi[,"LON"], deppoi[,"LAT"], pch = 20, cex = 0.6, col = "firebrick")
+          
+          cat("  -  Calculating Spline...", sep = "")
+          SplineD <- o_Tps(cbind(xlon, ylat), zdep, lon.lat=TRUE)
+          #         cat(class(SplineD), "\n")
+          rm(bat_blo, zdep, xlon, ylat)
+          
+          cat(" Predicting depth...", sep = "")
+          if(nrow(deppoi)<= 10000){
+            dept <- as.numeric(predict(SplineD, deppoi[,c("LON","LAT")]))
+            dep_v <- as.data.frame(cbind(deppoi[,"rowid"], deppoi[,"I_NCEE"], dept))
+            sqldf("insert into p_depth select * from `dep_v`", dbname = the_db)
+            rm(dept, dep_v)
+            gc()
+          }else{
+            nPin <- ceiling(nrow(deppoi)/10000)
+            for(pi in 1:nPin)
+            {
+              cat(".", sep = "")
+              r1 <- 10000*(pi-1)+1
+              r2 <- min(nrow(deppoi),r1+10000-1)
+              dept <- as.numeric(predict(SplineD, deppoi[r1:r2,c("LON","LAT")]))
+              dep_v <- as.data.frame(cbind(deppoi[r1:r2,"rowid"], deppoi[r1:r2,"I_NCEE"], dept))
+              sqldf("insert into p_depth select * from `dep_v`", dbname = the_db)
+              rm(dept, dep_v)
+              gc()
+            }            
+          }
+          cat(" - Completed!  -\n", sep = "")
+          map("world", xlim = the_bbo[2:1], ylim = the_bbo[4:3], col="honeydew3",bg="lightsteelblue1", fill = T)
+          map.axes()
+          
+          xmin_2 <- xmin+((xmax-xmin)/2)
+          abline(v = xmin_2, col = "firebrick")
+          ymin_2 <- ymin+((ymax-ymin)/2)
+          abline(h = ymin_2, col = "firebrick")
+          
+          rect(xmin, ymin, xmin_2, ymin_2, border = "firebrick")
+          rect(xmin_2, ymin, xmax, ymin_2, border = "firebrick")
+          rect(xmin, ymin_2, xmin_2, ymax, border = "firebrick")
+          rect(xmin_2, ymin_2, xmax, ymax, border = "firebrick")
+          
+          rm(SplineD)
+          gc()
+        }else{
+          cat(" outside downloaded bathymetry  -\n", sep = "")
+        }
+      }else{
+        
+        map("world", xlim = the_bbo[2:1], ylim = the_bbo[4:3], col="honeydew3",bg="lightsteelblue1", fill = T)
         map.axes()
         
-        title("Splitting Block...")
+        title("\n  -  Splitting Block...")
         
         xmin_2 <- xmin+((xmax-xmin)/2)
         abline(v = xmin_2, col = "firebrick")
@@ -373,6 +397,79 @@ Assign_Area = function(evnt, box){
   Area <- max(findPolys(as.EventData(data.frame(EID = 1, X = mean(evnt[,1]), Y = mean(evnt[,2])), projection="LL"), box)[,2])
   if(length(Area) == 0) Area <- NA
   return(Area)
+}
+
+
+
+merge_source <- function(data_source1, data_source2, rnd_level, minover){
+  
+  #Inspect sources
+  uS1 <- unique(data_source1[,1])
+  nuS1 <- length(uS1)
+  uS2 <- unique(data_source2[,1])
+  nuS2 <- length(uS2)
+  
+  #   #Set parameters
+  #   npmin <- 30
+  #   minover <- 30
+  #   rnd_level <- 3
+  
+  #Select the sources with the highest number of vessels
+  if(nuS1 < nuS2){
+    main_source <- data_source1
+    secondary_source <- data_source2
+  }else{
+    main_source <- data_source2
+    secondary_source <- data_source1
+  }
+  
+  #Compute basic statistics
+  uS1 <- unique(main_source[,1])
+  nuS1 <- length(uS1)
+  uS2 <- unique(secondary_source[,1])
+  nuS2 <- length(uS2)
+  
+  matd <- matrix(data = Inf, nrow = nuS1, ncol = nuS2)
+  rownames(matd) <- uS1
+  colnames(matd) <- uS2
+  iter <- 0
+  
+  for(i in 1:nuS1){
+    block_s1 <- main_source[which(main_source[,1]== uS1[i]),] 
+    #Spatial Overlap
+    spat_data_source <- secondary_source[which((secondary_source$LON <= max(block_s1$LON))&
+                                                 (secondary_source$LON >= min(block_s1$LON))&
+                                                 (secondary_source$LAT <= max(block_s1$LAT))&
+                                                 (secondary_source$LAT >= min(block_s1$LAT))),]
+    candidate_ID <- unique(spat_data_source$I_NCEE)
+    nuC <- length(candidate_ID)
+    
+    for(j in 1:nuC){
+      block_s2 <- spat_data_source[which(spat_data_source[,1] == candidate_ID[j]),] 
+      
+      #Semisincronicity
+      overtimes_ss <- intersect(round(block_s1$DATE,rnd_level),
+                                round(block_s2$DATE,rnd_level)) 
+      if(length(overtimes_ss) > minover){
+        block_s1 <- block_s1[order(round(block_s1$DATE,rnd_level)),]
+        block_s2 <- block_s2[order(round(block_s2$DATE,rnd_level)),]
+        sub_block_s1 <- block_s1[which(round(block_s1$DATE,rnd_level) %in% overtimes_ss),]
+        sub_block_s2 <- block_s2[which(round(block_s2$DATE,rnd_level) %in% overtimes_ss),] 
+        if(length(which(duplicated(round(sub_block_s1$DATE,rnd_level))==TRUE))>0)
+          sub_block_s1 <- sub_block_s1[-which(duplicated(round(sub_block_s1$DATE,rnd_level))==TRUE),]
+        if(length(which(duplicated(round(sub_block_s2$DATE,rnd_level))==TRUE))>0)
+          sub_block_s2 <- sub_block_s2[-which(duplicated(round(sub_block_s2$DATE,rnd_level))==TRUE),]    
+        inter_blocks_dists <- gmt::geodist(sub_block_s1[,c("LAT")],
+                                           sub_block_s1[,c("LON")],
+                                           sub_block_s2[,c("LAT")],
+                                           sub_block_s2[,c("LON")],units="km")
+        matd[which(uS1 == uS1[i]),which(uS2 == candidate_ID[j])] <- median(inter_blocks_dists)
+      }
+    }
+    iter <- iter + 1
+    cat(iter," of ",nuS1," ",nuC," candidates found","\n")
+  }
+  return(matd)
 }
 
 
@@ -447,7 +544,7 @@ CountMap = function(xy, GridPS){
     GridCount[as.numeric(names(idTable)),2] = as.numeric(idTable)
   }else{
     nPP <- ceiling(nrow(PP)/100000)
-#     GridCount = matrix(0,length(unique(GridPS$PID)),2) 
+    #     GridCount = matrix(0,length(unique(GridPS$PID)),2) 
     for(pi in 1:nPP){
       cat(".", sep = "")
       r1 <- 100000*(pi-1)+1

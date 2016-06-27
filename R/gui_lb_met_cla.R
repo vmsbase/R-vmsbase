@@ -18,8 +18,6 @@
 #' 
 #' @export gui_lb_met_cla
 #'
-#'
-#'@references free text reference Pointers to the literature related to this object.
 #'@seealso \code{\link{gui_lb_met_dis}}
 
 

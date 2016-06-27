@@ -15,9 +15,6 @@
 #' 
 #' @export gui_vms_editraw
 #'
-#'@references free text reference Pointers to the literature related to this object.
-
-
 
 gui_vms_editraw <- function()
 {

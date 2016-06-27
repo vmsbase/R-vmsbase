@@ -14,11 +14,6 @@
 #' 
 #' @export gui_lb_met_edi
 #'
-#'@references free text reference Pointers to the literature related to this object.
-
-
-
-
 
 gui_lb_met_edi <- function(){
   

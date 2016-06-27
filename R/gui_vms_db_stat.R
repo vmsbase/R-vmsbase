@@ -1,7 +1,6 @@
 
 #' VMS DataBase Status GUI
 #'  
-#' 
 #' The \code{gui_vms_db_stat} function implements the graphical user interface for the
 #'  VMS DataBase Status viewer.
 #' 
@@ -12,15 +11,10 @@
 #' 
 #' @return This function does not return a value. 
 #' 
-#' 
 #' @usage gui_vms_db_stat(vms_db_name = "")
 #' 
 #' @export gui_vms_db_stat
 #'
-#'
-#'@references free text reference Pointers to the literature related to this object.
-
-
 
 gui_vms_db_stat <- function(vms_db_name = "")
 {
@@ -260,7 +254,7 @@ gui_vms_db_stat <- function(vms_db_name = "")
            enabled(sel_vms) <- FALSE
            svalue(sel_vms_f) <- "Select VMS DB file"
          })
-  ################à
+  ################
   dat_ref <- gimage(system.file("ico/document-quick_restart.png", package="vmsbase"))
   add(vms_db_f, dat_ref)
   addHandlerClicked(dat_ref, handler = function(h,...)

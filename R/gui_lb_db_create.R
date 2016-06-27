@@ -13,7 +13,6 @@
 #' 
 #' @export gui_lb_db_create
 #'
-#'@references free text reference Pointers to the literature related to this object.
 #'@seealso \code{\link{gui_lb_editraw}}
 
 ### LogBook DataBase manager gui

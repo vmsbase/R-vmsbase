@@ -1,29 +1,21 @@
 
 #' VMS DataBase Select GUI
 #'  
-#' 
 #' The \code{gui_vms_db_sel} function implement the graphical user interface for the
 #'  VMS DataBase Select routine.
 #' 
 #' This function, with a VMS DataBase (see \code{\link{gui_vms_db_stat}}),
 #'  enables the user to perform queries on, and extract data from, the submitted VMS DataBase.
 #'  
-#'   
 #' @param vms_db_name The path of a VMS DataBase
 #' 
-#'
 #' @return This function does not return a value. 
-#' 
 #' 
 #' @usage gui_vms_db_sel(vms_db_name = "")
 #' 
 #' @export gui_vms_db_sel
 #'
-#'
-#'@references free text reference Pointers to the literature related to this object.
 #'@seealso \code{\link{gui_vms_db_stat}}
-
-
 
 gui_vms_db_sel <- function(vms_db_name = "")
 {

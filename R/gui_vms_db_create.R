@@ -15,10 +15,7 @@
 #' 
 #' @export gui_vms_db_create
 #'
-#'@references free text reference Pointers to the literature related to this object.
 #'@seealso \code{\link{gui_vms_editraw}}
-
-
 
 ### VMS DataBase manager gui
 

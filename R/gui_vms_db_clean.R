@@ -2,30 +2,22 @@
 
 #' VMS DB Clean GUI
 #'  
-#' 
 #' The \code{gui_vms_db_clean} function implements the graphical user interface for the
 #'  VMS DataBase Cleaning routine.
 #' 
 #' This function, with a VMS database and two shape files with land polygon and harbours points,
 #'  performs a filtered search over the whole db assigning warning status to the vms raw data.
 #'  
-#'   
 #' @param vms_db_name The path of a VMS DataBase
 #' @param map_file_name The path of a shape file with land polygon data
 #' @param harb_file_name The path of a shape file with harbours point data
 #' 
-#'
 #' @return This function does not return a value. 
-#' 
 #' 
 #' @usage gui_vms_db_clean(vms_db_name = "", map_file_name = "", harb_file_name = "")
 #' 
 #' @export gui_vms_db_clean
 #'
-#'
-#'@references free text reference Pointers to the literature related to this object.
-
-
 
 gui_vms_db_clean <- function(vms_db_name = "", map_file_name = "", harb_file_name = "")
 {

@@ -1,7 +1,6 @@
 
 #' VMS DB Save Bathymetry GUI
 #'  
-#' 
 #' The \code{gui_vms_save_bat} function implements the graphical user interface for the
 #'  VMS Save Bathymetry routine.
 #' 
@@ -10,19 +9,13 @@
 #'   
 #' @param vms_db_name The path of a VMS DataBase
 #' 
-#'   
 #' @return This function does not return a value. 
-#' 
 #' 
 #' @usage gui_vms_save_bat(vms_db_name = "")
 #' 
 #' @export gui_vms_save_bat
 #'
-#'
-#'@references free text reference Pointers to the literature related to this object.
 #'@seealso \code{\link{gui_vms_view_ping}} \code{\link{gui_vms_view_track}} \code{\link{gui_vms_view_intrp}}
-
-
 
 gui_vms_save_bat <- function(vms_db_name = "")
 {
@@ -63,7 +56,7 @@ gui_vms_save_bat <- function(vms_db_name = "")
            svalue(sel_vms_f) <- "Select VMS DB file"
          })
   addSpring(bat_g3)
-  ################à
+  ################
   
   res_g <- ggroup(horizontal = TRUE, container = bat_g3)
   addSpring(res_g)
@@ -97,10 +90,15 @@ gui_vms_save_bat <- function(vms_db_name = "")
     xrange = extendrange(c(xmax, xmin), f = 0.05)
     yrange = extendrange(c(ymax, ymin), f = 0.05)
     
-    bat_blo <- getNOAA.bathy(xmin-0.1,
-                             xmax+0.1,
-                             ymin-0.1,
-                             ymax+0.1, resolution = svalue(use_res))
+#     bat_blo <- getNOAA.bathy(xrange[1],
+#                              xrange[2],
+#                              yrange[1],
+#                              yrange[2], resolution = svalue(use_res))
+    
+    bat_blo <- getNOAA.bathy(xmin-0.5,
+                             xmax+0.5,
+                             ymin-0.5,
+                             ymax+0.5, resolution = svalue(use_res))
     
     isob <- c(-20, -50, -100,-200)
     lon <- unique(as.numeric(rownames(bat_blo)))
@@ -108,16 +106,21 @@ gui_vms_save_bat <- function(vms_db_name = "")
 
     icol <- rgb(0,0, seq(255,100, len = length(isob)), maxColorValue = 255)
 
-    plot(pings[,"LON"], pings[,"LAT"],
-         xlab = "Longitude",
-         ylab = "Latitude",
-         mar = c(1,1,0,0))
-    contour(lon, lat, bat_blo, add=TRUE,
-            lwd=0.3,
-            col=icol, 
-            levels = c(-20, -50, -100,-200),
-            drawlabel=FALSE,
-            xlab="a")
+    par(mar = c(1,1,1,1))
+    blues<-c("lightsteelblue4","lightsteelblue3","lightsteelblue2","lightsteelblue1")
+    plot(bat_blo,image=TRUE,land=TRUE,lwd=0.1,bpal=list(c(0,max(bat_blo),"grey"),c(min(bat_blo),0,blues)))
+    plot(bat_blo,deep=0,shallow=0,step=0,lwd=0.4,add=TRUE)
+    points(pings[,"LON"], pings[,"LAT"], col = "firebrick", cex = 0.1)
+#     plot(pings[,"LON"], pings[,"LAT"],
+#          xlab = "Longitude",
+#          ylab = "Latitude",
+#          mar = c(1,1,0,0))
+#     contour(lon, lat, bat_blo, add=TRUE,
+#             lwd=0.3,
+#             col=icol, 
+#             levels = c(-20, -50, -100,-200),
+#             drawlabel=FALSE,
+#             xlab="a")
 
     gconfirm("Bathymetry downloas Complete!\n\nSave current Bathymetry and Isobaths?",
              title="Confirm",

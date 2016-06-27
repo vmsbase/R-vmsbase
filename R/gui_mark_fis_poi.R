@@ -11,18 +11,12 @@
 #' @param vms_db_name The path of a VMS DataBase
 #' @param harb_file_name The path of a shape file with harbours point data
 #' 
-#'
 #' @return This function does not return a value. 
-#' 
 #' 
 #' @usage gui_mark_fis_poi(vms_db_name = "", harb_file_name = "")
 #' 
 #' @export gui_mark_fis_poi  
 #'
-#'
-#'@references free text reference Pointers to the literature related to this object.
-
-
 
 gui_mark_fis_poi <- function(vms_db_name = "", harb_file_name = "")
 {

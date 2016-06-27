@@ -1,7 +1,6 @@
 
 #' VMS DB View Track Data GUI
 #'  
-#' 
 #' The \code{gui_vms_view_track} function implements the graphical user interface for the
 #'  VMS DB routine to view vessel and track data with the Google Maps capabilities.
 #' 
@@ -12,16 +11,11 @@
 #'   
 #' @return This function does not return a value. 
 #' 
-#' 
 #' @usage gui_vms_viz_adv(vms_db_name = "")
 #' 
 #' @export gui_vms_viz_adv
 #'
-#'
-#'@references free text reference Pointers to the literature related to this object.
 #'@seealso \code{\link{gui_vms_view_ping}} \code{\link{gui_vms_view_track}} \code{\link{gui_vms_view_intrp}}
-
-
 
 gui_vms_viz_adv <- function (vms_db_name = "")
 {
@@ -75,7 +69,7 @@ gui_vms_viz_adv <- function (vms_db_name = "")
            svalue(sel_vms_f) <- "Select VMS DB file"
          })
   addSpring(chk_g3)
-  ################à
+  ################
   
   d_zoom <- gdroplist(2:20, selected = 8, container = g_lef, handler = function(h,...)
   {

@@ -15,16 +15,11 @@
 #'  result count vector as an r object (necessary for \code{\link{gui_dcf_ind}}),
 #'   or the annotated grid shape file.
 #'  
-#' 
 #' @usage gui_out_grid(vms_db_name = "")
 #' 
 #' @export gui_out_grid
 #'
-#'
-#'@references free text reference Pointers to the literature related to this object.
 #'@seealso \code{\link{gui_dcf_ind}}
-
-
 
 gui_out_grid <- function(vms_db_name = "")
 {
@@ -238,7 +233,7 @@ gui_out_grid <- function(vms_db_name = "")
       
       if(sum(count) != 0)
       {
-        plot(themap$data, lty = "blank", 
+        sp::plot(themap$data, lty = "blank", 
              col=s.cols[s.vals], add = T)
         
         map("worldHires", fill=T, col="springgreen4",
@@ -318,7 +313,7 @@ gui_out_grid <- function(vms_db_name = "")
                                ylim=c(themap$data@bbox[2,1]*0.98,themap$data@bbox[2,2])
                            )
                            
-                           plot(themap$data, lty= "blank", 
+                           sp::plot(themap$data, lty= "blank", 
                                 col=s.cols[s.vals], add = T)
                            
                            map("worldHires", fill=T, col="springgreen4",
@@ -396,7 +391,7 @@ gui_out_grid <- function(vms_db_name = "")
         ylim=c(themap$data@bbox[2,1]*0.98,themap$data@bbox[2,2])
     )
     
-    plot(themap$data, lty= "blank", 
+    sp::plot(themap$data, lty= "blank", 
          col=s.cols[s.vals], add = T)
     
     map("worldHires", fill=T, col="springgreen4",

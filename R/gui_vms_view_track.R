@@ -1,7 +1,6 @@
 
 #' VMS DB View Track Data GUI
 #'  
-#' 
 #' The \code{gui_vms_view_track} function implements the graphical user interface for the
 #'  VMS DB routine to view track data.
 #' 
@@ -13,16 +12,11 @@
 #'   
 #' @return This function does not return a value. 
 #' 
-#' 
 #' @usage gui_vms_view_track(vms_db_name = "", bathy_file_name = "")
 #' 
 #' @export gui_vms_view_track
 #'
-#'
-#'@references free text reference Pointers to the literature related to this object.
 #'@seealso \code{\link{gui_vms_view_ping}} \code{\link{gui_vms_save_bat}} \code{\link{gui_vms_view_intrp}}
-
-
 
 gui_vms_view_track <- function (vms_db_name = "", bathy_file_name = "")
 {
@@ -255,7 +249,11 @@ gui_vms_view_track <- function (vms_db_name = "", bathy_file_name = "")
       svalue(mi_lo) <- xrange[1]
       svalue(ma_lo) <- xrange[2]
       svalue(mi_la) <- yrange[1]
-      trackview(vessel, bathy, xrange, yrange)
+      if(nrow(vessel) > 1){
+        trackview(vessel, bathy, xrange, yrange)
+      }else{
+        pingview(vessel, bathy, xrange, yrange)
+      }
     }else{
       cat("\n\nSkipped! Not enough data!\n\n")
     }
@@ -272,7 +270,6 @@ gui_vms_view_track <- function (vms_db_name = "", bathy_file_name = "")
     enabled(selves) <- FALSE
     enabled(expo_gr) <- FALSE
     
-    #vnum <- svalue(selves)
     trackn <<- svalue(vestra)
     track  <- fn$sqldf("select * from track where I_NCEE = `vnum` and T_NUM = `trackn` order by DATE", dbname = vms_DB$db)      
     if(nrow(track) > 2)
@@ -315,19 +312,16 @@ gui_vms_view_track <- function (vms_db_name = "", bathy_file_name = "")
          })
   ###################
   right_g <- gframe(horizontal = F, container = big_g, expand = T)
-  theplot <- ggraphics(container = right_g, expand = T)
+  theplot <- ggraphics(container = right_g, width = 600, height = 450)
   visible(track_view_win) <- TRUE
-  map("world",fill=T,col="black", bg = "darkorange2", mar = c(6,6,0,0))
-  map.axes()
-  title(main = "VMSbase - Track Viewer", line = 0.3)
+  maps::map("world",col="black", bg = "lightsteelblue1", mar=c(6,6,0,0), fill = TRUE, interior = FALSE)
+  maps::map.axes()
+  title(main = "Track Viewer", line = 0.3)
   title(xlab = "Lon", ylab = "Lat", line = 2)  
   if(vms_DB$db != "")
   {
     enabled(track_view_win) <- FALSE
-    
-    #     svalue(sel_vms_f) <- strsplit(vms_DB$db, "/")[[1]][length(strsplit(vms_DB$db, "/")[[1]])]
     svalue(sel_vms_f) <- ifelse(.Platform$OS.type == "windows", strsplit(vms_DB$db, "\\\\")[[1]][length(strsplit(vms_DB$db, "\\\\")[[1]])],strsplit(vms_DB$db, "/")[[1]][length(strsplit(vms_DB$db, "/")[[1]])])
-    
     incee <- sqldf("select distinct I_NCEE from track order by I_NCEE", dbname = vms_DB$db)
     selves[] <- incee
     enabled(selves) <- TRUE
@@ -335,9 +329,7 @@ gui_vms_view_track <- function (vms_db_name = "", bathy_file_name = "")
   }
   if(bathy$path != "")
   {
-    #     svalue(cus_dep_lab) <- paste("File: ", strsplit(bathy$path, "/")[[1]][length(strsplit(bathy$path, "/")[[1]])], sep = "")
     svalue(cus_dep_lab) <- paste("File: ", ifelse(.Platform$OS.type == "windows", strsplit(bathy$path, "\\\\")[[1]][length(strsplit(bathy$path, "\\\\")[[1]])],strsplit(bathy$path, "/")[[1]][length(strsplit(bathy$path, "/")[[1]])]), sep = "")
-    
     bathy$data <- readRDS(bathy$path)
   }
 }

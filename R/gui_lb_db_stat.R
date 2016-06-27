@@ -12,14 +12,10 @@
 #' 
 #' @return This function does not return a value. 
 #' 
-#' 
 #' @usage gui_lb_db_stat(lb_db_name = "")
 #' 
 #' @export gui_lb_db_stat
 #'
-#'
-#'@references free text reference Pointers to the literature related to this object.
-
 
 gui_lb_db_stat <- function(lb_db_name = "")
 {
@@ -76,7 +72,7 @@ gui_lb_db_stat <- function(lb_db_name = "")
            add(log_g, log_sta)
            svalue(sel_lb_f) <- "Select LogBook DB file"
          })
-  ################à
+  ################
   dat_ref <- gimage(system.file("ico/document-quick_restart.png", package="vmsbase"))
   add(lb_db_f, dat_ref)
   addHandlerClicked(dat_ref, handler = function(h,...)

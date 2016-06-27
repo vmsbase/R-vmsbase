@@ -1,27 +1,20 @@
 
 #' VMS DB Area Assignment GUI
-#'  
 #' 
 #' The \code{gui_vms_db_are} function implements the graphical user interface for the
 #'  VMS Assign Area routine.
 #' 
 #' This function, with a VMS database,
 #'  assigns areas to VMS tracks according to median positions.
-#'   
+#' 
 #' @param vms_db_name The path of a VMS DataBase
 #' 
-#'   
 #' @return This function does not return a value. 
-#' 
 #' 
 #' @usage gui_vms_db_are(vms_db_name = "")
 #' 
 #' @export gui_vms_db_are
 #'
-#'
-#'@references free text reference Pointers to the literature related to this object.
-
-
 
 gui_vms_db_are <- function(vms_db_name = "")
 {
@@ -69,7 +62,7 @@ gui_vms_db_are <- function(vms_db_name = "")
            svalue(sel_vms_f) <- "Select VMS DB file"
          })
   addSpring(are_g3)
-  ################à
+  ################
   
   ##Land file
   cus_map_g <- gframe(text = "Land Shape File", horizontal = TRUE, container = are_g3)

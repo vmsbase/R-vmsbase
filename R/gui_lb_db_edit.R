@@ -1,4 +1,20 @@
-
+#' Logbook Editing GUI
+#' 
+#' The \code{gui_lb_db_edit} function implements the graphical user interface for the
+#'  editing of a LogBook Database
+#' 
+#' In this gui, with a LogBook Database, the user can automatically edit the logbook
+#' DB.
+#'
+#' @param lb_db_name The path of a Logbook DataBase
+#'
+#' @return This function does not return a value. 
+#' After the execution, the Logbook DB will be updated with the edited format.
+#' 
+#' @usage gui_lb_db_edit(lb_db_name = "")
+#' 
+#' @export gui_lb_db_edit
+#'
 
 gui_lb_db_edit <- function(lb_db_name = "")
 {

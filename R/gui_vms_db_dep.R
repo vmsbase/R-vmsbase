@@ -1,7 +1,6 @@
 
 #' VMS DB Depth Assignment GUI
 #'  
-#' 
 #' The \code{gui_vms_db_dep} function implements the graphical user interface for the
 #'  VMS Assign Depth routine.
 #' 
@@ -11,19 +10,12 @@
 #'   
 #' @param vms_db_name The path of a VMS DataBase
 #' 
-#'   
 #' @return This function does not return a value. 
-#' 
 #' 
 #' @usage gui_vms_db_dep(vms_db_name = "")
 #' 
 #' @export gui_vms_db_dep
 #'
-#'
-#'@references free text reference Pointers to the literature related to this object.
-
-
-
 
 gui_vms_db_dep <- function(vms_db_name = "")
 {
@@ -59,6 +51,14 @@ gui_vms_db_dep <- function(vms_db_name = "")
            svalue(sel_vms_f) <- ifelse(.Platform$OS.type == "windows", strsplit(vms_DB$db, "\\\\")[[1]][length(strsplit(vms_DB$db, "\\\\")[[1]])],strsplit(vms_DB$db, "/")[[1]][length(strsplit(vms_DB$db, "/")[[1]])])
            thebo <<- as.numeric(sqldf("select max(LON), min(LON), max(LAT), min(LAT) from intrp", dbname = vms_DB$db))
            
+           maps::map("world", xlim = extendrange(thebo[2:1], f = 0.1), ylim = extendrange(thebo[4:3], f = 0.1), col="honeydew3",bg="lightsteelblue1", fill = T)
+           maps::map.axes()
+           
+           abline(v = thebo[1], col = "firebrick")
+           abline(v = thebo[2], col = "firebrick")
+           abline(h = thebo[3], col = "firebrick")
+           abline(h = thebo[4], col = "firebrick")
+                      
            enabled(start_b) <- TRUE
            enabled(start_off) <- TRUE
            enabled(set_g) <- TRUE
@@ -72,7 +72,7 @@ gui_vms_db_dep <- function(vms_db_name = "")
            svalue(sel_vms_f) <- "Select VMS DB file"
          })
   addSpring(dep_g3)
-  ################à
+  ################
   
   res_g <- ggroup(horizontal = TRUE, container = dep_g3)
   addSpring(res_g)
@@ -90,7 +90,7 @@ gui_vms_db_dep <- function(vms_db_name = "")
   
   bbox_bu <- gbutton(text = "Custom B-Box", container = set_g, handler = function(h,...){
     
-    g_bd <- gwindow(title = "Custom Bounding Box Editor", height = 200, width = 500)
+    g_bd <- gwindow(title = "Custom Bounding Box Editor", height = 250, width = 450)
     
     bbox_exp <- ggroup(container = g_bd, horizontal = TRUE)
     addSpring(bbox_exp)
@@ -99,7 +99,7 @@ gui_vms_db_dep <- function(vms_db_name = "")
     bbox_lay[1,2] <- ggroup(horizontal = FALSE)
     glabel("Max Lat", container = bbox_lay[1,2])
     ma_la <- gspinbutton(from = -90, to = 90, by = 0.5, value = thebo[3], container = bbox_lay[1,2], handler = function(h,...){
-      map(ifelse(((svalue(ma_lo) - svalue(mi_lo)) < 15) | ((svalue(ma_la) - svalue(mi_la)) < 15), "worldHires", "world"),fill=T,col="black", bg = "darkorange2", mar = c(6,6,0,0),
+      map(ifelse(((svalue(ma_lo) - svalue(mi_lo)) < 15) | ((svalue(ma_la) - svalue(mi_la)) < 15), "worldHires", "world"),fill=T, col="honeydew3",bg="lightsteelblue1", mar = c(6,6,0,0),
           xlim = extendrange(c(svalue(mi_lo), svalue(ma_lo)), f = 0.05),
           ylim = extendrange(c(svalue(mi_la), svalue(ma_la)), f = 0.05))
       map.axes()
@@ -110,7 +110,7 @@ gui_vms_db_dep <- function(vms_db_name = "")
     bbox_lay[2,1] <- ggroup(horizontal = FALSE)
     glabel("Min Lon", container = bbox_lay[2,1])
     mi_lo <- gspinbutton(from = -180, to = 180, by = 0.5, value = thebo[2], container = bbox_lay[2,1], handler = function(h,...){
-      map(ifelse(((svalue(ma_lo) - svalue(mi_lo)) < 15) | ((svalue(ma_la) - svalue(mi_la)) < 15), "worldHires", "world"),fill=T,col="black", bg = "darkorange2", mar = c(6,6,0,0),
+      map(ifelse(((svalue(ma_lo) - svalue(mi_lo)) < 15) | ((svalue(ma_la) - svalue(mi_la)) < 15), "worldHires", "world"),fill=T, col="honeydew3",bg="lightsteelblue1", mar = c(6,6,0,0),
           xlim = extendrange(c(svalue(mi_lo), svalue(ma_lo)), f = 0.05),
           ylim = extendrange(c(svalue(mi_la), svalue(ma_la)), f = 0.05))
       map.axes()
@@ -120,7 +120,7 @@ gui_vms_db_dep <- function(vms_db_name = "")
     bbox_lay[2,3] <- ggroup(horizontal = FALSE)
     glabel("Max Lon", container = bbox_lay[2,3])
     ma_lo <- gspinbutton(from = -180, to = 180, by = 0.5, value = thebo[1], container = bbox_lay[2,3], handler = function(h,...){
-      map(ifelse(((svalue(ma_lo) - svalue(mi_lo)) < 15) | ((svalue(ma_la) - svalue(mi_la)) < 15), "worldHires", "world"),fill=T,col="black", bg = "darkorange2", mar = c(6,6,0,0),
+      map(ifelse(((svalue(ma_lo) - svalue(mi_lo)) < 15) | ((svalue(ma_la) - svalue(mi_la)) < 15), "worldHires", "world"),fill=T, col="honeydew3",bg="lightsteelblue1", mar = c(6,6,0,0),
           xlim = extendrange(c(svalue(mi_lo), svalue(ma_lo)), f = 0.05),
           ylim = extendrange(c(svalue(mi_la), svalue(ma_la)), f = 0.05))
       map.axes()
@@ -130,23 +130,14 @@ gui_vms_db_dep <- function(vms_db_name = "")
     bbox_lay[3,2] <- ggroup(horizontal = FALSE)
     glabel("Min Lat", container = bbox_lay[3,2])
     mi_la <- gspinbutton(from = -90, to = 90, by = 0.5, value = thebo[4], container = bbox_lay[3,2], handler = function(h,...){
-      map(ifelse(((svalue(ma_lo) - svalue(mi_lo)) < 15) | ((svalue(ma_la) - svalue(mi_la)) < 15), "worldHires", "world"),fill=T,col="black", bg = "darkorange2", mar = c(6,6,0,0),
+      map(ifelse(((svalue(ma_lo) - svalue(mi_lo)) < 15) | ((svalue(ma_la) - svalue(mi_la)) < 15), "worldHires", "world"),fill=T, col="honeydew3",bg="lightsteelblue1", mar = c(6,6,0,0),
           xlim = extendrange(c(svalue(mi_lo), svalue(ma_lo)), f = 0.05),
           ylim = extendrange(c(svalue(mi_la), svalue(ma_la)), f = 0.05))
       map.axes()
       title(main = "VMSbase - BBox Viewer", line = 0.3)
       title(xlab = "Lon", ylab = "Lat", line = 2)
       rect(svalue(mi_lo), svalue(mi_la), svalue(ma_lo), svalue(ma_la), border = "cornflowerblue", lwd = 2, lty = "dashed")    })
-    addSpring(bbox_exp)
-    theplot <- ggraphics(container = bbox_exp, expand = T)
     
-    map(ifelse(((svalue(ma_lo) - svalue(mi_lo)) < 15) | ((svalue(ma_la) - svalue(mi_la)) < 15), "worldHires", "world"),fill=T,col="black", bg = "darkorange2", mar = c(6,6,0,0),
-        xlim = extendrange(c(svalue(mi_lo), svalue(ma_lo)), f = 0.05),
-        ylim = extendrange(c(svalue(mi_la), svalue(ma_la)), f = 0.05))
-    map.axes()
-    title(main = "VMSbase - BBox Viewer", line = 0.3)
-    title(xlab = "Lon", ylab = "Lat", line = 2)
-    rect(svalue(mi_lo), svalue(mi_la), svalue(ma_lo), svalue(ma_la), border = "cornflowerblue", lwd = 2, lty = "dashed")    
     addSpring(bbo_input)
     gbutton(text = "\nAccept\n", container = bbo_input, handler = function(h,...){
       
@@ -158,6 +149,20 @@ gui_vms_db_dep <- function(vms_db_name = "")
       dispose(g_bd)
       
     })
+    
+    addSpring(bbox_exp)
+    
+    theplot <- ggraphics(container = bbox_exp, width = 350, height = 200)
+    
+    map(ifelse(((svalue(ma_lo) - svalue(mi_lo)) < 15) | ((svalue(ma_la) - svalue(mi_la)) < 15), "worldHires", "world"),fill=T, col="honeydew3",bg="lightsteelblue1", mar = c(6,6,0,0),
+        xlim = extendrange(c(svalue(mi_lo), svalue(ma_lo)), f = 0.05),
+        ylim = extendrange(c(svalue(mi_la), svalue(ma_la)), f = 0.05))
+    map.axes()
+    
+    title(main = "VMSbase - BBox Viewer", line = 0.3)
+    title(xlab = "Lon", ylab = "Lat", line = 2)
+    rect(svalue(mi_lo), svalue(mi_la), svalue(ma_lo), svalue(ma_la), border = "cornflowerblue", lwd = 2, lty = "dashed")    
+    
   })
   addSpring(set_g)
   enabled(set_g) <- FALSE
@@ -166,7 +171,7 @@ gui_vms_db_dep <- function(vms_db_name = "")
   infolab_dep <- glabel("\n" , container = dep_g)
   addSpring(dep_g)
   
-  theplot <- ggraphics(container = dep_g, width = 350, height = 350)
+  theplot <- ggraphics(container = dep_g, width = 450, height = 350)
   
   addSpring(dep_g)
   
@@ -238,7 +243,15 @@ gui_vms_db_dep <- function(vms_db_name = "")
                                        new_xmax+0.1,
                                        new_ymin-0.1,
                                        new_ymax+0.1, resolution = svalue(use_res))
-            plot(bat_blo, image = T)
+            
+            ##########
+            blues<-c("lightsteelblue4","lightsteelblue3","lightsteelblue2","lightsteelblue1")
+            plot(bat_blo,image=TRUE,land=TRUE,lwd=0.1,bpal=list(c(0,max(bat_blo),"grey"),c(min(bat_blo),0,blues)))
+            plot(bat_blo,deep=0,shallow=0,step=0,lwd=0.4,add=TRUE)
+            ##########
+            
+#             plot(bat_blo, image = T)
+            
             points(pings[,"LON"], pings[,"LAT"], pch = 20, col = "firebrick")
             
             xlon <- rep(as.numeric(rownames(bat_blo)),length(as.numeric(colnames(bat_blo))))

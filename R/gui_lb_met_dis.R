@@ -11,7 +11,6 @@
 #'   
 #' @param lb_db_name The path of a LogBook DataBase
 #' 
-#'
 #' @return This function does not return a value. 
 #' After the execution the user is asked where to save the result file.
 #' 
@@ -19,11 +18,6 @@
 #' 
 #' @export gui_lb_met_dis  
 #'
-#'
-#'@references free text reference Pointers to the literature related to this object.
-
-
-
 
 gui_lb_met_dis <- function(lb_db_name = "")
 {
@@ -46,7 +40,6 @@ gui_lb_met_dis <- function(lb_db_name = "")
            lb_DB$db <<- gfile(text = "Select LB DataBase file",
                               type = "open",
                               filter = list("LB DB file" = list(patterns = c("*.lb.sqlite"))))
-#            svalue(sel_lb_f) <- strsplit(lb_DB$db, "/")[[1]][length(strsplit(lb_DB$db, "/")[[1]])]
            svalue(sel_lb_f) <- ifelse(.Platform$OS.type == "windows", strsplit(lb_DB$db, "\\\\")[[1]][length(strsplit(lb_DB$db, "\\\\")[[1]])],strsplit(lb_DB$db, "/")[[1]][length(strsplit(lb_DB$db, "/")[[1]])])
            enabled(start_b) <- TRUE
            enabled(g_sup) <- TRUE
@@ -64,7 +57,6 @@ gui_lb_met_dis <- function(lb_db_name = "")
   addSpring(g_sup)
   
   g_s_b <- gframe("Dataset Cleaning", horizontal = F, container = g_sup)
-  #cle_spe <- gcheckboxgroup(c("Exotics", "f < 1%", "outliers"), checked = TRUE, container = g_s_b)
   cles_ex <- gcheckbox("Remove Exotics", checked = TRUE, container = g_s_b)
   
   cles_ef_g <- ggroup(horizontal = TRUE, container = g_s_b)
@@ -75,11 +67,6 @@ gui_lb_met_dis <- function(lb_db_name = "")
   cles_oul <- gcheckbox("Logs Outliers", checked = TRUE, container = g_s_b)
   cles_lo <- gcheckbox("logarithm", checked = FALSE, container = g_s_b)
   cles_st <- gcheckbox("Stand by time", checked = FALSE, container = g_s_b)
-  
-#   cles_ca_g <- ggroup(horizontal = TRUE, container = g_s_b)
-#   cles_ca <- gcheckbox("Catch <", checked = TRUE, handler = function(h,...){enabled(cles_ca_q) <- !enabled(cles_ca_q)}, container = cles_ca_g)
-#   cles_ca_q <- gspinbutton (from = 0, to = 5, by = 0.1, digits = 3, value = 0, container = cles_ca_g)
-#   
   
   g_s_c <- gframe("Clustering", horizontal = F, container = g_sup)
   g_k_ran <- ggroup(horizontal = T, container = g_s_c)
@@ -107,7 +94,7 @@ gui_lb_met_dis <- function(lb_db_name = "")
                         horizontal = TRUE, container = g_size)
   
   g_metr <- gframe("Metric:", horizontal = FALSE, container = g_sup)
-  s_metr <- gradio(c("euclidean", "manhattan", "Bray-Curtis"), selected = 3,
+  s_metr <- gradio(c("euclidean", "manhattan"), selected = 2,
                    container = g_metr)
   g_subs <- gframe("Sub-Sampling:", horizontal = FALSE, container = g_sup)
   s_subs <- gcheckbox("N. SubSample", checked = TRUE, handler = function(h,...){enabled(subs_q) <- !enabled(subs_q)}, container = g_subs)
@@ -127,8 +114,8 @@ gui_lb_met_dis <- function(lb_db_name = "")
     
     if(svalue(cles_st) == TRUE)
     {
-      cat("\nStandardazing by time...")
-      svalue(sb) <- "Standardazing by time..."
+      cat("\nStandardizing by time...")
+      svalue(sb) <- "Standardizing by time..."
       tms=ceiling(x[,3]-x[,2])
       tms.0 = which(tms==0)
       
@@ -168,7 +155,7 @@ gui_lb_met_dis <- function(lb_db_name = "")
       } 
     }
     
-    #Elimina le specie presenti in non più dell'1% dei logbook
+    #Elimina le specie con f < 1x100
     if(svalue(cles_ef) == TRUE)
     {
       cat("\nExcluding species with f < ", svalue(cles_ef_q), sep = "")
@@ -257,7 +244,7 @@ gui_lb_met_dis <- function(lb_db_name = "")
       S2=Sys.time()
       i=i+1
 
-      xclara <- claraBC(x,
+      xclara <- clara(x,
                         k,
                         metric = svalue(s_metr),
                         stand = tonorm,
@@ -330,7 +317,6 @@ gui_lb_met_dis <- function(lb_db_name = "")
   
   if(lb_DB$db != "")
   {
-#     svalue(sel_lb_f) <- strsplit(lb_DB$db, "/")[[1]][length(strsplit(lb_DB$db, "/")[[1]])]
     svalue(sel_lb_f) <- ifelse(.Platform$OS.type == "windows", strsplit(lb_DB$db, "\\\\")[[1]][length(strsplit(lb_DB$db, "\\\\")[[1]])],strsplit(lb_DB$db, "/")[[1]][length(strsplit(lb_DB$db, "/")[[1]])])
     enabled(start_b) <- TRUE
     enabled(g_sup) <- TRUE

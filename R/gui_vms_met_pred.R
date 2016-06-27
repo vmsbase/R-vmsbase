@@ -1,7 +1,6 @@
 
 #' Predict Metier GUI
 #'  
-#' 
 #' The \code{gui_vms_met_pred} function implements the graphical user interface for the
 #'  Metier Prediction
 #' 
@@ -11,18 +10,15 @@
 #'   
 #' @param vms_db_name The path of a VMS DataBase
 #' 
-#'
 #' @return This function does not return a value. 
-#' 
 #' 
 #' @usage gui_vms_met_pred(vms_db_name = "")
 #' 
 #' @export gui_vms_met_pred  
 #'
-#'
-#'@references free text reference Pointers to the literature related to this object.
-
-
+#' @references 
+#' Russo, T., Parisi, A., Prorgi, M., Boccoli, F., Cignini, I., Tordoni, M. and Cataudella, S. (2011) When behaviour reveals activity: Assigning fishing effort to metiers based on VMS data using artificial neural networks. \emph{Fisheries Research}, \bold{111(1)}, 53--64.
+#' \url{http://www.sciencedirect.com/science/article/pii/S0165783611002281}
 
 gui_vms_met_pred <- function(vms_db_name = "")
 {
@@ -65,9 +61,6 @@ gui_vms_met_pred <- function(vms_db_name = "")
                enabled(start_ba) <- TRUE
                enabled(two_b_g) <- TRUE
                
-               #                svalue(bg21[1,4]) <<- as.numeric(sqldf("select max(SPE) from track", dbname = vms_DB$db)[1,1])
-               #                svalue(bg21[2,4]) <<- as.numeric(sqldf("select min(DEPTH) from p_depth", dbname = vms_DB$db)[1,1])
-               
                nn_tab <- as.numeric(sqldf("SELECT count(*) FROM sqlite_master WHERE type='table' AND name='pre_nn'", dbname = vms_DB$db))
                if(nn_tab == 1)
                {
@@ -96,7 +89,6 @@ gui_vms_met_pred <- function(vms_db_name = "")
   n_trck <- glabel(" N. of Tracks:   ---", container = two_g)
   n_matc <- glabel(" VMS-LB match:   ---", container = two_g)
   n_ping <- glabel("  N. of Pings:   ---", container = two_g)
-  #addSpring(rigth_g)
   
   two_b_g <- gframe("Classes", horizontal = FALSE, container = rigth_g)
   addSpring(two_b_g)
@@ -144,7 +136,6 @@ gui_vms_met_pred <- function(vms_db_name = "")
            enabled(start_ba) <- FALSE
            clas_file <<- gfile(text = "Select Custom Class file",
                                type = "open")
-           #            svalue(cus_cla_lab) <- paste(strsplit(clas_file, "/")[[1]][length(strsplit(clas_file, "/")[[1]])])
            svalue(cus_cla_lab) <- ifelse(.Platform$OS.type == "windows", strsplit(clas_file, "\\\\")[[1]][length(strsplit(clas_file, "\\\\")[[1]])],strsplit(clas_file, "/")[[1]][length(strsplit(clas_file, "/")[[1]])])
            if(vms_DB$db != "")
            {
@@ -154,28 +145,6 @@ gui_vms_met_pred <- function(vms_db_name = "")
   enabled(cust_clas) <- FALSE
   
   addSpring(par_bg22)
-  
-  
-  
-  #   bg21 <- ggroup(horizontal = TRUE, container = two_b_g)
-  #   addSpring(bg21)
-  #   n_clas_s <- glabel("Speed", container = bg21)
-  #   addSpring(bg21)
-  #   spe_sel <- gspinbutton(from = 2, to = 30, by = 1, value = 2, container = bg21)
-  #   spe_cla_M <- gspinbutton(from = 0, to = 60, by = 1, value = 30, container = bg21)
-  #   bg22 <- ggroup(horizontal = TRUE, container = two_b_g)
-  #   addSpring(bg22)
-  #   n_clas_d <- glabel("Depth", container = bg22)
-  #   addSpring(bg22)
-  #   dep_sel <- gspinbutton(from = 2, to = 30, by = 1, value = 2, container = bg22)
-  #   dep_cla_M <- gspinbutton(from = 0, to = -11000, by = 1, value = -5000, container = bg22)
-  #   bg23 <- ggroup(horizontal = TRUE, container = two_b_g)
-  #   addSpring(bg23)
-  #   n_clas_h <- glabel("Heading", container = bg23)
-  #   addSpring(bg23)
-  #   hea_sel <- gspinbutton(from = 2, to = 30, by = 1, value = 2, container = bg23)
-  
-  
   
   start_ba <- gbutton(text = "\nClassify Data\n", container = two_b_g, handler = function(h,...)
   {
@@ -188,10 +157,6 @@ gui_vms_met_pred <- function(vms_db_name = "")
     cat("\n\n   ---   Start Data Classification   ---\n\n", sep = "")
     cat("\n   -     Configuration...     \n", sep = "")
     svalue(sup_rep) <- "Parameters\nConfiguration..."
-    #     spe_data <- sqldf("select max(SPE), min(SPE) from track", dbname = vms_DB$db)
-    #     dep_data <- sqldf("select max(DEPTH), min(DEPTH) from p_depth", dbname = vms_DB$db)
-    #     max_spe <- as.numeric(ceiling(spe_data[1]))
-    #     min_dep <- as.numeric(floor(dep_data[2]))
     
     if(svalue(sta_cla_sel) == "No")
     {
@@ -398,7 +363,6 @@ gui_vms_met_pred <- function(vms_db_name = "")
   addSpring(rigth_g)
   
   g_go <- ggroup(horizontal = TRUE, container = rigth_g)
-  #   g_go_up <- ggroup(horizontal = TRUE, container = g_go)
   addSpring(g_go)
   pred_f_net <- gbutton(text = "\nPredict from Saved\n", container = g_go, handler = function(h,...)
   {
@@ -621,15 +585,10 @@ gui_vms_met_pred <- function(vms_db_name = "")
   })
   addSpring(g_go)
   
-  #   g_go_down <- ggroup(horizontal = TRUE, container = g_go)
-  #   addSpring(g_go_down)
-  #   addSpring(g_go_down)  
-  
   enabled(g_go) <- FALSE
   enabled(two_b_g) <- FALSE
   enabled(two_c_g) <- FALSE
   
-  #   addSpace(rigth_g, 30, horizontal = FALSE)
   addSpring(rigth_g)
   addSpring(left_g)
   theplot <- ggraphics(width = 600, height = 400, container = left_g)
@@ -638,7 +597,6 @@ gui_vms_met_pred <- function(vms_db_name = "")
   
   if(vms_DB$db != "")
   {
-    #    svalue(sel_vms_f) <- strsplit(vms_DB$db, "/")[[1]][length(strsplit(vms_DB$db, "/")[[1]])]
     svalue(sel_vms_f) <- ifelse(.Platform$OS.type == "windows", strsplit(vms_DB$db, "\\\\")[[1]][length(strsplit(vms_DB$db, "\\\\")[[1]])],strsplit(vms_DB$db, "/")[[1]][length(strsplit(vms_DB$db, "/")[[1]])])
     
     n_ntr <- as.numeric(sqldf("select count(*) from intrp", dbname = vms_DB$db))

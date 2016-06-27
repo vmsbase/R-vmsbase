@@ -4,7 +4,7 @@
 
     ------------------------------------------------------------------
 
-                           -- VMSbase 1.0 --
+                          -- VMSbase 2.0 --
 
                VMSbase comes with ABSOLUTELY NO WARRANTY
 
@@ -21,12 +21,12 @@
 
 ")
 }
-
-
-.onUnload <- function(libpath)
-{
-    library.dynam.unload("vmsbase", libpath)
-}
-
-## no S4 methodology here; speedup :
-.noGenerics <- TRUE
+# 
+# 
+# .onUnload <- function(libpath)
+# {
+#     library.dynam.unload("vmsbase", libpath)
+# }
+# 
+# ## no S4 methodology here; speedup :
+# .noGenerics <- TRUE

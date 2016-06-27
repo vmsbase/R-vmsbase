@@ -1,7 +1,6 @@
 
 #' VMS DB View Raw Ping Data GUI
 #'  
-#' 
 #' The \code{gui_vms_view_ping} function implements the graphical user interface for the
 #'  VMS DB routine to view raw ping data.
 #' 
@@ -13,16 +12,11 @@
 #'   
 #' @return This function does not return a value. 
 #' 
-#' 
 #' @usage gui_vms_view_ping(vms_db_name = "", bathy_file_name = "")
 #' 
 #' @export gui_vms_view_ping
 #'
-#'
-#'@references free text reference Pointers to the literature related to this object.
 #'@seealso \code{\link{gui_vms_save_bat}} \code{\link{gui_vms_view_track}} \code{\link{gui_vms_view_intrp}}
-
-
 
 gui_vms_view_ping <- function (vms_db_name = "", bathy_file_name = "")
 {
@@ -90,7 +84,7 @@ gui_vms_view_ping <- function (vms_db_name = "", bathy_file_name = "")
          quality = 100, bg = "aliceblue", pointsize = 80)
     par(lwd = 10)
     vnum <- svalue(selves)
-    vessel <- fn$sqldf("select * from ping where I_NCEE = `vnum` order by DATE", dbname = vms_DB$db)
+    vessel <- fn$sqldf("select * from ping where I_NCEE = `vnum`", dbname = vms_DB$db)
     if(nrow(vessel) != 0)
     {
       xrange <- c(svalue(mi_lo), svalue(ma_lo))
@@ -146,7 +140,7 @@ gui_vms_view_ping <- function (vms_db_name = "", bathy_file_name = "")
   re_plot <- gbutton(text = "Custom Plot", container = bbox_exp, handler = function(h,...){
     
     vnum <- svalue(selves)
-    vessel <- fn$sqldf("select * from ping where I_NCEE = `vnum` order by DATE", dbname = vms_DB$db)
+    vessel <- fn$sqldf("select * from ping where I_NCEE = `vnum`", dbname = vms_DB$db)
     
     xrange <- c(svalue(mi_lo), svalue(ma_lo))
     yrange <- c(svalue(mi_la), svalue(ma_la))
@@ -163,7 +157,7 @@ gui_vms_view_ping <- function (vms_db_name = "", bathy_file_name = "")
     enabled(expo_gr) <- FALSE
     
     vnum <- svalue(selves)
-    vessel <- fn$sqldf("select * from ping where I_NCEE = `vnum` order by DATE", dbname = vms_DB$db)
+    vessel <- fn$sqldf("select * from ping where I_NCEE = `vnum`", dbname = vms_DB$db)
     if(nrow(vessel) != 0)
     {
       span <- 0.25
@@ -204,11 +198,11 @@ gui_vms_view_ping <- function (vms_db_name = "", bathy_file_name = "")
          })
   ###################
   right_g <- gframe(horizontal = F, container = big_g, expand = T) 
-  theplot <- ggraphics(container = right_g, expand = T)
+  theplot <- ggraphics(container = right_g, width = 600, height = 450)
   visible(ping_view_win) <- TRUE
-  map("world",fill=T,col="black", bg = "darkorange2", mar = c(6,6,0,0))
-  map.axes()
-  title(main = "VMSbase - Ping Viewer", line = 0.3)
+  maps::map("world",col="black", bg = "lightsteelblue1", mar=c(6,6,0,0), fill = TRUE, interior = FALSE)
+  maps::map.axes()
+  title(main = "Ping Viewer", line = 0.3)
   title(xlab = "Lon", ylab = "Lat", line = 2)
   if(vms_DB$db != "")
   {
@@ -220,8 +214,8 @@ gui_vms_view_ping <- function (vms_db_name = "", bathy_file_name = "")
     incee <- sqldf("select distinct I_NCEE from ping order by I_NCEE", dbname = vms_DB$db)
     selves[] <- incee
     enabled(ping_view_win) <- TRUE
-    enabled(selves) <- TRUE
-    enabled(bbox_exp) <- TRUE
+#     enabled(selves) <- TRUE
+#     enabled(bbox_exp) <- TRUE
   }
   if(bathy$path != "")
   {

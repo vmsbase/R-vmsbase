@@ -19,13 +19,11 @@
 
 lonsex2dec <- function (degree, minute, second, direction)
 {
-  
-  declon <- ifelse(
-         (direction == "E"),
-          degree+(minute/60)+(second/3600),
-        -(degree+(minute/60)+(second/3600))
-  )
-  
+  if(direction == "E")
+  {
+    declon <- degree+(minute/60)+(second/3600)
+  }else{
+    declon <- -(degree+(minute/60)+(second/3600))
+  }
   return(declon)
-  
 }
