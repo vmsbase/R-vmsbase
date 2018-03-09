@@ -20,4 +20,3 @@ This function, with a VMS database,
  assigns depths to VMS interpolated points according to positions on the 3D spline 
  of XYZ bathymetry data downloaded from NOAA servers.
 }
-

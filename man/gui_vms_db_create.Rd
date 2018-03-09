@@ -21,4 +21,3 @@ This function, with an edited vms dataset (see \code{\link{gui_vms_editraw}}),
 \seealso{
 \code{\link{gui_vms_editraw}}
 }
-

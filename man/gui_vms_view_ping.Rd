@@ -24,4 +24,3 @@ This function, with a VMS database,
 \seealso{
 \code{\link{gui_vms_save_bat}} \code{\link{gui_vms_view_track}} \code{\link{gui_vms_view_intrp}}
 }
-

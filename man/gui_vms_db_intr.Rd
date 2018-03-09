@@ -26,4 +26,3 @@ Russo, T., Parisi, A. and Cataudella, S. (2011) New insights in interpolating fi
 \seealso{
 \code{\link{gui_vms_db_cut}} \code{\link{gui_vms_db_clean}}
 }
-

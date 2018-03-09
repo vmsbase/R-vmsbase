@@ -29,4 +29,3 @@ free text reference Pointers to the literature related to this object.
 \seealso{
 \code{\link{gui_out_grid}}
 }
-

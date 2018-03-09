@@ -25,4 +25,3 @@ This function, with both VMS and LogBook databases,
 \references{
 free text reference Pointers to the literature related to this object.
 }
-

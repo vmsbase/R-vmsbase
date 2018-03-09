@@ -18,4 +18,3 @@ The \code{gui_lb_met_edi} function implements the graphical user interface for t
 In this gui, with a LogBook Metier file, the user can change the simple discovery
  ordering of the clusters to a corresponding international metier code.
 }
-

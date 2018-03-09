@@ -27,4 +27,3 @@ This function, with a VMS DB and a Grid Sea Area Map shape file, computes the to
 \seealso{
 \code{\link{gui_dcf_ind}}
 }
-

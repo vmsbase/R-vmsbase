@@ -26,4 +26,3 @@ This function, with a LogBook DB and a Metier Discovery object
 \seealso{
 \code{\link{gui_lb_met_dis}}
 }
-

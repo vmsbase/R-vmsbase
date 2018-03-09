@@ -19,4 +19,3 @@ This function, with an edited logbook dataset (see \code{\link{gui_lb_editraw}})
 \seealso{
 \code{\link{gui_lb_editraw}}
 }
-

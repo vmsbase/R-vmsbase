@@ -22,4 +22,3 @@ This function,  with a logbook database, performs a clustering over the whole
  db calculating the distance or dissimilarity between every observation
   in the sample.
 }
-

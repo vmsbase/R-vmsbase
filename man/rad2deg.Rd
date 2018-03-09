@@ -15,4 +15,3 @@ The function returns the heading value converted in degrees
 \description{
 \code{rad2deg} converts radian heading data to degree values.
 }
-

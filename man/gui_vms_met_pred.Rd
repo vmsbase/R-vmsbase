@@ -24,4 +24,3 @@ This function,  with a VMS database and a shape file with harbours points, perfo
 Russo, T., Parisi, A., Prorgi, M., Boccoli, F., Cignini, I., Tordoni, M. and Cataudella, S. (2011) When behaviour reveals activity: Assigning fishing effort to metiers based on VMS data using artificial neural networks. \emph{Fisheries Research}, \bold{111(1)}, 53--64.
 \url{http://www.sciencedirect.com/science/article/pii/S0165783611002281}
 }
-

@@ -7,7 +7,7 @@
 The \code{gui_vms_db_clean} function implements the graphical user interface for the
  VMS DataBase Cleaning routine.}
 \usage{
-gui_vms_db_clean(vms_db_name = "", map_file_name = "", harb_file_name = "")
+gui_vms_db_clean(vms_db_name = "", map_file_name = "", harb_file_name = "", inHarbBuff = 2)
 }
 \arguments{
 \item{vms_db_name}{The path of a VMS DataBase}
@@ -15,6 +15,8 @@ gui_vms_db_clean(vms_db_name = "", map_file_name = "", harb_file_name = "")
 \item{map_file_name}{The path of a shape file with land polygon data}
 
 \item{harb_file_name}{The path of a shape file with harbours point data}
+
+\item{inHarbBuff}{Numeric, buffer radius in kilometers to flag 'in harbour' pings. Default to 2 Km.}
 }
 \value{
 This function does not return a value.
@@ -23,4 +25,3 @@ This function does not return a value.
 This function, with a VMS database and two shape files with land polygon and harbours points,
  performs a filtered search over the whole db assigning warning status to the vms raw data.
 }
-

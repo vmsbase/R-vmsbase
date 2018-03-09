@@ -20,4 +20,3 @@ The \code{gui_lb_db_stat} function implements the graphical user interface for t
 This function, with a LogBook database,
  shows the current LogBook DB status.
 }
-

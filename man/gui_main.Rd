@@ -16,4 +16,3 @@ The \code{gui_main} function implements the main graphical user interface of the
 \details{
 With this gui the user can access all the functionalities of VMSbase
 }
-

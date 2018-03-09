@@ -22,4 +22,3 @@ This function, with a VMS cleaned database (see \code{\link{gui_vms_db_clean}}),
 \seealso{
 \code{\link{gui_vms_db_clean}}
 }
-

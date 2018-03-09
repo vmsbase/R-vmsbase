@@ -29,4 +29,3 @@ corresponding functions.
 Russo, T., D'Andrea, L., Parisi, A. and Cataudella, S. (2014) VMSbase: An R-Package for VMS and Logbook Data Management and Analysis in Fisheries Ecology. \emph{PloS one}, \bold{9(6)}, e100195.
 \url{http://journals.plos.org/plosone/article?id=10.1371/journal.pone.0100195}
 }
-

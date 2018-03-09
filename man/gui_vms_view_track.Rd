@@ -24,4 +24,3 @@ This function, with a VMS database,
 \seealso{
 \code{\link{gui_vms_view_ping}} \code{\link{gui_vms_save_bat}} \code{\link{gui_vms_view_intrp}}
 }
-

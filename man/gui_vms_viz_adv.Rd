@@ -22,4 +22,3 @@ This function, with a VMS database,
 \seealso{
 \code{\link{gui_vms_view_ping}} \code{\link{gui_vms_view_track}} \code{\link{gui_vms_view_intrp}}
 }
-

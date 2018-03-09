@@ -21,4 +21,3 @@ The \code{gui_lb_db_edit} function implements the graphical user interface for t
 In this gui, with a LogBook Database, the user can automatically edit the logbook
 DB.
 }
-

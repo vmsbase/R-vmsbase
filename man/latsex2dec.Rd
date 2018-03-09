@@ -21,4 +21,3 @@ The function returns the latitude value converted in the decimal numeral system
 \description{
 \code{latsex2dec} converts sexagesimal latitude data to decimal latitude values.
 }
-

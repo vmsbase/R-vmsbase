@@ -22,4 +22,3 @@ The \code{gui_mark_fis_poi} function implements the graphical user interface for
 This function, with a VMS database and a shape file with harbours points, performs a filtered search over the whole
  db assigning fishing status to the vms interpolated data.
 }
-

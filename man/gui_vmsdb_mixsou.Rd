@@ -21,4 +21,3 @@ creates a new VMS DataBase.
 \seealso{
 \code{\link{gui_vms_editraw}}
 }
-

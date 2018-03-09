@@ -22,4 +22,3 @@ This function, with a VMS DataBase (see \code{\link{gui_vms_db_stat}}),
 \seealso{
 \code{\link{gui_vms_db_stat}}
 }
-

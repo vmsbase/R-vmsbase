@@ -24,4 +24,3 @@ Russo, T., Parisi, A., & Cataudella, S. (2013). Spatial indicators of fishing pr
 \seealso{
 \code{\link{gui_out_grid}}
 }
-

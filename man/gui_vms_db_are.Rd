@@ -20,4 +20,3 @@ The \code{gui_vms_db_are} function implements the graphical user interface for t
 This function, with a VMS database,
  assigns areas to VMS tracks according to median positions.
 }
-

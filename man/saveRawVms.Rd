@@ -21,4 +21,3 @@ The function returns the standardized VMS data.
 \seealso{
 \code{\link{gui_vms_editraw}}
 }
-

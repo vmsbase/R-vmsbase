@@ -19,4 +19,3 @@ This function, with a raw vms dataset, produces an edited version of it.
 The user must select, for each mandatory field, the column name where the data is 
 stored.
 }
-

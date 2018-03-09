@@ -19,4 +19,3 @@ This function does not return a value.
 This function, with a VMS DataBase,
  shows the current VMS DataBase status.
 }
-
