@@ -82,8 +82,7 @@ gui_vms_view_intrp <- function (vms_db_name = "", bathy_file_name = "")
       if(trackn == 0)
       {
         vessel <- fn$sqldf("select * from intrp where I_NCEE = `vnum` order by DATE", dbname = vms_DB$db)
-        if(nrow(vessel) != 0)
-        {
+        if(nrow(vessel) != 0){
           xrange <- c(svalue(mi_lo), svalue(ma_lo))
           yrange <- c(svalue(mi_la), svalue(ma_la))
           trackview(vessel, bathy, xrange, yrange)
@@ -101,11 +100,13 @@ gui_vms_view_intrp <- function (vms_db_name = "", bathy_file_name = "")
             fishi <- 0
           }
         }
-        if(nrow(track) > 2)
-        {
-          xrange <- c(svalue(mi_lo), svalue(ma_lo))
-          yrange <- c(svalue(mi_la), svalue(ma_la))
+        xrange <- c(svalue(mi_lo), svalue(ma_lo))
+        yrange <- c(svalue(mi_la), svalue(ma_la))
+        if(nrow(track) > 3){
           intrpview2(track, trackn, bathy, fishi = ifelse((svalue(sho_fis) == "Yes" & fishi != 0), TRUE, FALSE), xrange, yrange)
+        }else{
+          pingview(vessel = track, bathy, xrange, yrange)
+          cat("\nNot enough data for track ", trackn, ", showing points only", sep = "")
         }
       }
       dev.off()
@@ -157,8 +158,6 @@ gui_vms_view_intrp <- function (vms_db_name = "", bathy_file_name = "")
                       dec = ".",
                       row.names = FALSE,
                       col.names = TRUE)
-          
-          
         }else{
           track  <- fn$sqldf("select * from intrp, p_fish where I_NCEE = `vnum` and T_NUM = `trackn` and intrp.rowid = i_id order by DATE", dbname = vms_DB$db)
           if(nrow(track) == 0)
@@ -180,14 +179,11 @@ gui_vms_view_intrp <- function (vms_db_name = "", bathy_file_name = "")
                       row.names = FALSE,
                       col.names = TRUE)
         }
-        
       }
-      
       turn_wdgt_on(c(left_g1, selves, vestra, save_ves_jpeg, cus_dep_g, vms_db_f, bbox_exp, expo_gr))
     }
   })
-  
-  
+
   addSpring(expo_gr)
   enabled(expo_gr) <- FALSE
   
@@ -239,16 +235,16 @@ gui_vms_view_intrp <- function (vms_db_name = "", bathy_file_name = "")
           fishi <- 0
         }
       }
-      if(nrow(track) > 2)
-      {
-        xrange <- c(svalue(mi_lo), svalue(ma_lo))
-        yrange <- c(svalue(mi_la), svalue(ma_la))
-        
+      xrange <- c(svalue(mi_lo), svalue(ma_lo))
+      yrange <- c(svalue(mi_la), svalue(ma_la))
+      if(nrow(track) > 3){
         intrpview2(track, trackn, bathy, fishi = ifelse((svalue(sho_fis) == "Yes" & fishi != 0), TRUE, FALSE), xrange, yrange)
+      }else{
+        pingview(vessel = track, bathy, xrange, yrange)
+        cat("\nNot enough data for track ", trackn, ", showing points only", sep = "")
       }
     }
     turn_wdgt_on(c(left_g1, selves, vestra, save_ves_jpeg, cus_dep_g, vms_db_f, bbox_exp, expo_gr))
-    
   })
   enabled(bbox_exp) <- FALSE
   #################
@@ -299,16 +295,18 @@ gui_vms_view_intrp <- function (vms_db_name = "", bathy_file_name = "")
         fishi <- 0
       }
     }
-    if(nrow(track) > 2)
-    {
-      span <- 0.25
-      xrange <- extendrange(x = track["LON"], f = span)
-      yrange <- extendrange(x = track["LAT"], f = span)
-      svalue(ma_la) <- yrange[2]
-      svalue(mi_lo) <- xrange[1]
-      svalue(ma_lo) <- xrange[2]
-      svalue(mi_la) <- yrange[1]
+    span <- 0.25
+    xrange <- extendrange(x = track["LON"], f = span)
+    yrange <- extendrange(x = track["LAT"], f = span)
+    svalue(ma_la) <- yrange[2]
+    svalue(mi_lo) <- xrange[1]
+    svalue(ma_lo) <- xrange[2]
+    svalue(mi_la) <- yrange[1]
+    if(nrow(track) > 3){
       intrpview2(track, trackn, bathy, fishi = ifelse((svalue(sho_fis) == "Yes" & fishi != 0), TRUE, FALSE), xrange, yrange)
+    }else{
+      pingview(vessel = track, bathy, xrange, yrange)
+      cat("\nNot enough data for track ", trackn, ", showing points only", sep = "")
     }
     turn_wdgt_on(c(left_g1, selves, vestra, save_ves_jpeg, cus_dep_g, vms_db_f, bbox_exp, expo_gr))
   })
@@ -339,8 +337,7 @@ gui_vms_view_intrp <- function (vms_db_name = "", bathy_file_name = "")
   maps::map.axes()
   title(main = "Interpolation Viewer", line = 0.3)
   title(xlab = "Lon", ylab = "Lat", line = 2)
-  if(vms_DB$db != "")
-  {
+  if(vms_DB$db != ""){
     enabled(intrp_view_win) <- FALSE
     svalue(sel_vms_f) <- ifelse(.Platform$OS.type == "windows", strsplit(vms_DB$db, "\\\\")[[1]][length(strsplit(vms_DB$db, "\\\\")[[1]])],strsplit(vms_DB$db, "/")[[1]][length(strsplit(vms_DB$db, "/")[[1]])])
     incee <- sqldf("select distinct I_NCEE from intrp order by I_NCEE", dbname = vms_DB$db)
@@ -348,8 +345,7 @@ gui_vms_view_intrp <- function (vms_db_name = "", bathy_file_name = "")
     enabled(intrp_view_win) <- TRUE
     turn_wdgt_on(c(left_g1, selves, vestra, save_ves_jpeg, cus_dep_g, vms_db_f, expo_gr))
   }
-  if(bathy$path != "")
-  {
+  if(bathy$path != ""){
     svalue(cus_dep_lab) <- paste("File: ", ifelse(.Platform$OS.type == "windows", strsplit(bathy$path, "\\\\")[[1]][length(strsplit(bathy$path, "\\\\")[[1]])],strsplit(bathy$path, "/")[[1]][length(strsplit(bathy$path, "/")[[1]])]), sep = "")
     bathy$data <- readRDS(bathy$path)
   }

@@ -100,12 +100,14 @@ gui_vms_view_track <- function (vms_db_name = "", bathy_file_name = "")
       }else{
         enabled(vestra) <- FALSE
         enabled(selves) <- FALSE
-        track  <- fn$sqldf("select * from track where I_NCEE = `vnum` and T_NUM = `trackn` order by DATE", dbname = vms_DB$db)      
-        if(nrow(track) > 2)
-        {
-          xrange <- c(svalue(mi_lo), svalue(ma_lo))
-          yrange <- c(svalue(mi_la), svalue(ma_la))
+        track  <- fn$sqldf("select * from track where I_NCEE = `vnum` and T_NUM = `trackn` order by DATE", dbname = vms_DB$db)
+        xrange <- c(svalue(mi_lo), svalue(ma_lo))
+        yrange <- c(svalue(mi_la), svalue(ma_la))
+        if(nrow(track) > 3){
           trackview2(track, trackn, bathy, xrange, yrange)
+        }else{
+          pingview(vessel = track, bathy, xrange, yrange)
+          cat("\nNot enough data for track ", trackn, ", showing points only", sep = "")
         }
         enabled(vestra) <- TRUE
         enabled(selves) <- TRUE
@@ -153,8 +155,7 @@ gui_vms_view_track <- function (vms_db_name = "", bathy_file_name = "")
         enabled(vestra) <- FALSE
         enabled(selves) <- FALSE
         track  <- fn$sqldf("select * from track where I_NCEE = `vnum` and T_NUM = `trackn` order by DATE", dbname = vms_DB$db)      
-        if(nrow(track) > 2)
-        {
+        if(nrow(track) > 3){
           csv_fil_na <- gfile(text = "Saving single vessel track as CSV file", type = "save", initialfilename = "*.csv", 
                               filter = list("All files" = list(patterns = c("*")), "CSV files" =
                                               list(patterns = "*.csv")))
@@ -168,6 +169,8 @@ gui_vms_view_track <- function (vms_db_name = "", bathy_file_name = "")
                       dec = ".",
                       row.names = FALSE,
                       col.names = TRUE)
+        }else{
+          cat("\nSkipped! Not enough data!\n")
         }
         enabled(vestra) <- TRUE
         enabled(selves) <- TRUE
@@ -216,11 +219,13 @@ gui_vms_view_track <- function (vms_db_name = "", bathy_file_name = "")
       enabled(vestra) <- FALSE
       enabled(selves) <- FALSE
       track  <- fn$sqldf("select * from track where I_NCEE = `vnum` and T_NUM = `trackn` order by DATE", dbname = vms_DB$db)      
-      if(nrow(track) > 2)
-      {
-        xrange <- c(svalue(mi_lo), svalue(ma_lo))
-        yrange <- c(svalue(mi_la), svalue(ma_la))
+      xrange <- c(svalue(mi_lo), svalue(ma_lo))
+      yrange <- c(svalue(mi_la), svalue(ma_la))
+      if(nrow(track) > 3){
         trackview2(track, trackn, bathy, xrange, yrange)
+      }else{
+        pingview(vessel = track, bathy, xrange, yrange)
+        cat("\nNot enough data for track ", trackn, ", showing points only", sep = "")
       }
       enabled(vestra) <- TRUE
       enabled(selves) <- TRUE
@@ -255,7 +260,7 @@ gui_vms_view_track <- function (vms_db_name = "", bathy_file_name = "")
         pingview(vessel, bathy, xrange, yrange)
       }
     }else{
-      cat("\n\nSkipped! Not enough data!\n\n")
+      cat("\nSkipped! Not enough data!")
     }
     enabled(vestra) <- TRUE
     enabled(selves) <- TRUE
@@ -272,18 +277,18 @@ gui_vms_view_track <- function (vms_db_name = "", bathy_file_name = "")
     
     trackn <<- svalue(vestra)
     track  <- fn$sqldf("select * from track where I_NCEE = `vnum` and T_NUM = `trackn` order by DATE", dbname = vms_DB$db)      
-    if(nrow(track) > 2)
-    {
-      span <- 0.25
-      xrange <- extendrange(x = track["LON"], f = span)
-      yrange <- extendrange(x = track["LAT"], f = span)
-      svalue(ma_la) <- yrange[2]
-      svalue(mi_lo) <- xrange[1]
-      svalue(ma_lo) <- xrange[2]
-      svalue(mi_la) <- yrange[1]
+    span <- 0.25
+    xrange <- extendrange(x = track["LON"], f = span)
+    yrange <- extendrange(x = track["LAT"], f = span)
+    svalue(ma_la) <- yrange[2]
+    svalue(mi_lo) <- xrange[1]
+    svalue(ma_lo) <- xrange[2]
+    svalue(mi_la) <- yrange[1]
+    if(nrow(track) > 3){
       trackview2(track, trackn, bathy, xrange, yrange)
     }else{
-      cat("\n\nSkipped! Not enough data!\n\n")
+      pingview(vessel = track, bathy, xrange, yrange)
+      cat("\nNot enough data for track ", trackn, ", showing points only", sep = "")
     }
     enabled(vestra) <- TRUE
     enabled(selves) <- TRUE
