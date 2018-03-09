@@ -11,15 +11,16 @@
 #' @param vms_db_name The path of a VMS DataBase
 #' @param map_file_name The path of a shape file with land polygon data
 #' @param harb_file_name The path of a shape file with harbours point data
+#' @param inHarbBuff Numeric, buffer radius in kilometers to flag 'in harbour' pings. Default to 2 Km.
 #' 
 #' @return This function does not return a value. 
 #' 
-#' @usage gui_vms_db_clean(vms_db_name = "", map_file_name = "", harb_file_name = "")
+#' @usage gui_vms_db_clean(vms_db_name = "", map_file_name = "", harb_file_name = "", inHarbBuff = 2)
 #' 
 #' @export gui_vms_db_clean
 #'
 
-gui_vms_db_clean <- function(vms_db_name = "", map_file_name = "", harb_file_name = "")
+gui_vms_db_clean <- function(vms_db_name = "", map_file_name = "", harb_file_name = "", inHarbBuff = 2)
 {
   vms_DB <- vms_DB$new()
   vms_DB$db <- vms_db_name
@@ -39,6 +40,7 @@ gui_vms_db_clean <- function(vms_db_name = "", map_file_name = "", harb_file_nam
   chk_g3a <- ggroup(horizontal = TRUE, container = chk_g3)
   chk_g3b <- ggroup(horizontal = TRUE, container = chk_g3)
   chk_g3c <- ggroup(horizontal = TRUE, container = chk_g3)  
+  chk_g3d <- ggroup(horizontal = TRUE, container = chk_g3)  
   
   addSpring(chk_g2)
   gimage(system.file("ico/edit-clear-2.png", package = "vmsbase"), container = chk_g2)
@@ -121,6 +123,17 @@ gui_vms_db_clean <- function(vms_db_name = "", map_file_name = "", harb_file_nam
            svalue(cus_har_lab) <- "Select Land Shape File"
          })
   addSpring(chk_g3c)
+  
+  addSpring(chk_g3d)
+  cus_dist_g <- gframe(text = "In harbour Buffer", horizontal = TRUE, container = chk_g3d)
+  addSpring(cus_dist_g)
+  cus_har_lab <- glabel("Radius Size\n(kilometers)", container = cus_dist_g)
+  addSpring(cus_dist_g)
+  cusDistVal <- gspinbutton(from = 0, to = 100, by = 0.1, digits = 1, container = cus_dist_g)
+  addSpring(cus_dist_g)
+  addSpring(chk_g3d)
+  svalue(cusDistVal) <- inHarbBuff
+  
   addSpring(chk_g)
   infolab <- glabel("" , container = chk_g)
   addSpring(chk_g)
@@ -182,7 +195,7 @@ gui_vms_db_clean <- function(vms_db_name = "", map_file_name = "", harb_file_nam
           
           #Check pings in harbour
           hdist <- min(spDistsN1(cbind(XCOORD, YCOORD), as.matrix(c(vessel[j,"LON"],vessel[j,"LAT"])), longlat = TRUE))
-          ifelse(hdist < 2, ann_data[j,"W_HARB"] <- T, ann_data[j,"W_HARB"] <- F)
+          ifelse(hdist < svalue(cusDistVal), ann_data[j,"W_HARB"] <- T, ann_data[j,"W_HARB"] <- F)
           
           #Check pings coherence
           if(j == 1)
@@ -295,7 +308,7 @@ gui_vms_db_clean <- function(vms_db_name = "", map_file_name = "", harb_file_nam
         
         cat(" - Completed!\n", sep = "")
         
-        sqldf("insert into warn select * from `ann_data`", dbname = vms_DB$db)
+        sqldf("insert into warn select * from ann_data", dbname = vms_DB$db)
         
       }
     }
