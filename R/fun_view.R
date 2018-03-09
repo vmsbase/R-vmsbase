@@ -110,14 +110,8 @@ plot_box <- function(obj_list){
   boxplot(tmp_dat, outline=F, ylab = "Pings per day", main = "Distributions for each source")
   par(op)
 }
-########################################
-########################################
 
-
-########################################
-#            Ping Viewer
-########################################
-
+# Viewers ----
 pingview <- function(vessel, bathy, xrange, yrange)
 {
   pal_col <- add.alpha(c("#E41A1C", "#377EB8", "#4DAF4A", "#984EA3", "#FF7F00", "#FFFF33", "#A65628", "#F781BF"), 0.5)
@@ -172,14 +166,8 @@ pingview <- function(vessel, bathy, xrange, yrange)
     span <- 0.25
   }
 }
-########################################
-########################################
 
-
-
-########################################
-#            Track Viewer
-########################################
+# Track Viewers ####
 trackview <- function(vessel, bathy = "", xrange, yrange)
 {
   span <- 0.25
@@ -201,26 +189,15 @@ trackview <- function(vessel, bathy = "", xrange, yrange)
     title(main = paste("Vessel ", vessel[1,1]," with ", length(unique(vessel[,"T_NUM"]))," tracks" , sep = ""), line = 0.3)
     title(xlab = "Lon", ylab = "Lat", line = 2)
     colsca <- rainbow(max(vessel[, "T_NUM"]), alpha = 0.5)
-    textn <- 0
-    for (i in 1:(nrow(vessel)-1))
-    {
-      trackn <- vessel[i,"T_NUM"]
-      if(trackn != 0)
-      {
-        if(trackn == vessel[i+1,"T_NUM"])
-        {
-          lines(cbind(c(vessel[i,"LON"],vessel[i+1,"LON"]), c(vessel[i,"LAT"], vessel[i+1,"LAT"])), col = colsca[vessel[i,"T_NUM"]], lty = "dashed", cex = 1.5)
-          if((vessel[i,"W_HARB"] != 1) & (trackn != textn))
-          {
-            text(vessel[i,"LON"], vessel[i,"LAT"], col = colsca[vessel[i,"T_NUM"]], labels = vessel[i,"T_NUM"])
-            textn <- trackn
-          }
-        }
-      }
-    }
-    points(cbind(vessel[,"LON"], vessel[,"LAT"]), col = colsca[vessel[,"T_NUM"]], pch = 20, cex = 0.6)
-    points(cbind(vessel[c(1, nrow(vessel)),"LON"], vessel[c(1, nrow(vessel)),"LAT"]), col = "yellow", bg = "blue", pch = c(24, 25), cex = 0.8)
-  }else{
+    vecNoDup <- !duplicated(vessel$T_NUM)
+    segments(x0 = vessel$LON[-nrow(vessel)], y0 = vessel$LAT[-nrow(vessel)],
+             x1 = vessel$LON[-1], y1 = vessel$LAT[-1],
+             col = colsca[vessel$T_NUM[-nrow(vessel)]])
+    text(x = vessel$LON[vecNoDup],
+         y = vessel$LAT[vecNoDup],
+         labels = vessel$T_NUM[vecNoDup],
+         cex = 0.4, col = "grey23")
+    }else{
     map2plot <- try(maps::map("worldHires", ylim = yrange, xlim = xrange, mar = c(6, 6, 0, 0), plot = F), silent = T)
     while(class(map2plot) == "try-error")
     {
@@ -238,36 +215,18 @@ trackview <- function(vessel, bathy = "", xrange, yrange)
     title(main = paste("Vessel ", vessel[1,1]," with ", length(unique(vessel[,"T_NUM"]))," tracks" , sep = ""), line = 0.3)
     title(xlab = "Lon", ylab = "Lat", line = 2)
     colsca <- rainbow(length(unique(vessel[, "T_NUM"])), alpha = 0.5)
-    textn <- 0
-    for (i in 1:(nrow(vessel)-1))
-    {
-      trackn <- vessel[i,"T_NUM"]
-      if(trackn != 0)
-      {
-        if(trackn == vessel[i+1,"T_NUM"])
-        {
-          lines(cbind(c(vessel[i,"LON"],vessel[i+1,"LON"]), c(vessel[i,"LAT"], vessel[i+1,"LAT"])), col = colsca[vessel[i,"T_NUM"]], lty = "dashed", cex = 1.5)
-          if((vessel[i,"W_HARB"] != 1) & (trackn != textn))
-          {
-            text(vessel[i,"LON"], vessel[i,"LAT"], col = colsca[vessel[i,"T_NUM"]], labels = vessel[i,"T_NUM"])
-            textn <- trackn
-          }
-        }
-      }
-    }            
-    points(cbind(vessel[,"LON"], vessel[,"LAT"]), col = colsca[vessel[,"T_NUM"]], pch = 20, cex = 0.6)
-    points(cbind(vessel[c(1, nrow(vessel)),"LON"], vessel[c(1, nrow(vessel)),"LAT"]), col = "yellow", bg = "blue", pch = c(24, 25), cex = 0.8)
+    vecNoDup <- !duplicated(vessel$T_NUM)
+    segments(x0 = vessel$LON[-nrow(vessel)], y0 = vessel$LAT[-nrow(vessel)],
+             x1 = vessel$LON[-1], y1 = vessel$LAT[-1],
+             col = colsca[vessel$T_NUM[-nrow(vessel)]])
+    text(x = vessel$LON[vecNoDup],
+         y = vessel$LAT[vecNoDup],
+         labels = vessel$T_NUM[vecNoDup],
+         cex = 0.4, col = "grey23")
     span <- 0.25
   }
 }
-########################################
-########################################
 
-
-
-########################################
-#           Track Viewer 2
-########################################
 trackview2 <- function(track, trackn, bathy = "", xrange, yrange)
 {
   span <- 0.25
@@ -288,17 +247,13 @@ trackview2 <- function(track, trackn, bathy = "", xrange, yrange)
     maps::map.axes()
     title(main = paste("Vessel: ", track[1,1],"  -  Track: ",trackn, sep = ""), line = 0.3)
     title(xlab = "Lon", ylab = "Lat", line = 2)
-    textn <- 0
-    for (i in 1:(nrow(track)-1))
-    {
-      lines(cbind(c(track[i,"LON"], track[i+1,"LON"]), c(track[i,"LAT"], track[i+1,"LAT"])), lty = "dashed", cex = 1.5)
-      if((track[i,"W_HARB"] != 1) & (trackn != textn))
-      {
-        text(track[i,"LON"], track[i,"LAT"], labels = track[i,"T_NUM"])
-        textn <- trackn
-      }
-    }
-    points(cbind(track[,"LON"], track[,"LAT"]), pch = 20, cex = 0.6)
+    segments(x0 = track$LON[-nrow(track)], y0 = track$LAT[-nrow(track)],
+             x1 = track$LON[-1], y1 = track$LAT[-1],
+             col = "dodgerblue4")
+    text(x = track$LON[1],
+         y = track$LAT[1],
+         labels = trackn,
+         cex = 0.4, col = "grey23")
     points(cbind(track[c(1, nrow(track)),"LON"], track[c(1, nrow(track)),"LAT"]), col = "yellow", bg = "blue", pch = c(24, 25), cex = 0.8)
   }else{
     while(class(map2plot) == "try-error")
@@ -316,29 +271,19 @@ trackview2 <- function(track, trackn, bathy = "", xrange, yrange)
     maps::map.axes()
     title(main = paste("Vessel: ", track[1,1],"  -  Track: ",trackn, sep = ""), line = 0.3)
     title(xlab = "Lon", ylab = "Lat", line = 2)
-    textn <- 0
-    for (i in 1:(nrow(track)-1))
-    {
-      lines(cbind(c(track[i,"LON"], track[i+1,"LON"]), c(track[i,"LAT"], track[i+1,"LAT"])), lty = "dashed", cex = 1.5)
-      if((track[i,"W_HARB"] != 1) & (trackn != textn))
-      {
-        text(track[i,"LON"], track[i,"LAT"], labels = track[i,"T_NUM"])
-        textn <- trackn
-      }
-    }            
-    points(cbind(track[,"LON"], track[,"LAT"]), pch = 20, cex = 0.6)
+    segments(x0 = track$LON[-nrow(track)], y0 = track$LAT[-nrow(track)],
+             x1 = track$LON[-1], y1 = track$LAT[-1],
+             col = "dodgerblue4")
+    text(x = track$LON[1],
+         y = track$LAT[1],
+         labels = trackn,
+         cex = 0.4, col = "grey23")
     points(cbind(track[c(1, nrow(track)),"LON"], track[c(1, nrow(track)),"LAT"]), col = "yellow", bg = "blue", pch = c(24, 25), cex = 0.8)
     span <- 0.25
   }
 }
-########################################
-########################################
 
-
-
-########################################
-#       Interpolation Viewer 2
-########################################
+# Interpolation Viewers ####
 intrpview2 <- function(track, trackn, bathy = "", fishi = FALSE, xrange, yrange)
 {
   span <- 0.25
@@ -359,21 +304,13 @@ intrpview2 <- function(track, trackn, bathy = "", fishi = FALSE, xrange, yrange)
     maps::map.axes()
     title(main = paste("Vessel: ", track[1,1],"  -  Track: ",trackn, sep = ""), line = 0.3)
     title(xlab = "Lon", ylab = "Lat", line = 2)
-    textn <- 0
-    for (i in 1:(nrow(track)-1))
-    {
-      lines(cbind(c(track[i,"LON"], track[i+1,"LON"]), c(track[i,"LAT"], track[i+1,"LAT"])), lty = "dashed", cex = 1.5)
-      if((track[i,"W_HARB"] != 1) & (trackn != textn))
-      {
-        text(track[i,"LON"], track[i,"LAT"], labels = track[i,"T_NUM"])
-        textn <- trackn
-      }
-      if(track[i,"P_INT"] == 0)
-      {
-        text(track[i,"LON"], track[i,"LAT"], labels = i, pos = 2, cex = 0.8)
-      }
-    }
-    points(cbind(track[,"LON"], track[,"LAT"]), pch = 20, cex = 0.6)
+    segments(x0 = track$LON[-nrow(track)], y0 = track$LAT[-nrow(track)],
+             x1 = track$LON[-1], y1 = track$LAT[-1],
+             col = "royalblue4")
+    text(x = track$LON[1],
+         y = track$LAT[1],
+         labels = trackn,
+         cex = 0.4, col = "grey23")
     if(fishi == TRUE) {points(cbind(track[which(track["FISH"] == 1),"LON"], track[which(track["FISH"] == 1),"LAT"]), pch = 19, cex = 0.5, col = "goldenrod1")}
     points(cbind(track[c(1, nrow(track)),"LON"], track[c(1, nrow(track)),"LAT"]), col = "yellow", bg = "blue", pch = c(24, 25), cex = 0.8)
   }else{
@@ -393,30 +330,18 @@ intrpview2 <- function(track, trackn, bathy = "", fishi = FALSE, xrange, yrange)
     title(main = paste("Vessel: ", track[1,1],"  -  Track: ",trackn, sep = ""), line = 0.3)
     title(xlab = "Lon", ylab = "Lat", line = 2)
     textn <- 0
-    for (i in 1:(nrow(track)-1))
-    {
-      lines(cbind(c(track[i,"LON"], track[i+1,"LON"]), c(track[i,"LAT"], track[i+1,"LAT"])), lty = "dashed", cex = 2)
-      if((track[i,"W_HARB"] != 1) & (trackn != textn))
-      {
-        text(track[i,"LON"], track[i,"LAT"], labels = track[i,"T_NUM"])
-        textn <- trackn
-      }
-      if(track[i,"P_INT"] == 0)
-      {
-        text(track[i,"LON"], track[i,"LAT"], labels = i, pos = 2, cex = 0.8)
-      }
-    }
+    segments(x0 = track$LON[-nrow(track)], y0 = track$LAT[-nrow(track)],
+             x1 = track$LON[-1], y1 = track$LAT[-1],
+             col = "royalblue4")
+    text(x = track$LON[1],
+         y = track$LAT[1],
+         labels = trackn,
+         cex = 0.4, col = "grey23")
+    if(fishi == TRUE) {points(cbind(track[which(track["FISH"] == 1),"LON"], track[which(track["FISH"] == 1),"LAT"]), pch = 19, cex = 0.5, col = "goldenrod1")}
+    points(cbind(track[c(1, nrow(track)),"LON"], track[c(1, nrow(track)),"LAT"]), col = "yellow", bg = "blue", pch = c(24, 25), cex = 0.8)
+    span <- 0.25
   }
-  points(cbind(track[,"LON"], track[,"LAT"]), pch = 20, cex = 0.6)
-  if(fishi == TRUE) {points(cbind(track[which(track["FISH"] == 1),"LON"], track[which(track["FISH"] == 1),"LAT"]), pch = 19, cex = 0.5, col = "goldenrod1")}
-  points(cbind(track[c(1, nrow(track)),"LON"], track[c(1, nrow(track)),"LAT"]), col = "yellow", bg = "blue", pch = c(24, 25), cex = 0.8)
-  span <- 0.25
 }
-########################################
-########################################
-
-
-
 
 
 add.alpha <- function(col, alpha=1){
