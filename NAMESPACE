@@ -30,7 +30,7 @@ importFrom("grDevices", "col2rgb", "dev.off", "extendrange", "jpeg", "rainbow", 
 importFrom("graphics", "abline", "axis", "barplot", "boxplot",
      "contour", "hist", "image", "layout", "legend", "lines",
      "par", "plot", "plot.new", "points", "rect", "text",
-     "title")
+     "title", "segments")
 importFrom("stats", "median", "predict", "quantile", "xtabs")
 importFrom("utils", "browseURL", "packageVersion", "read.csv",
      "read.csv2", "read.table", "write.table")
