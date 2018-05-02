@@ -131,7 +131,7 @@ gui_join_lb_vms <- function(lb_db_name = "", vms_db_name = "")
           next
         }else{
         
-          num_track <- max(vms_data["T_NUM"])
+          num_track <- length(unique(vms_data["T_NUM"]))
           
           res_over <- data.frame(vessel = vess[i],
                                  track = unique(vms_data[,"T_NUM"]),
