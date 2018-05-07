@@ -123,7 +123,7 @@ gui_vms_db_intr <- function(vms_db_name = "")
               
               COO_LL <- as.data.frame(cbind(tracki[,"LON"],tracki[,"LAT"]))
               sign_chk <- FALSE
-              if(abs(sum(sign(COO_LL[,1]))) != nrow(COO_LL)){
+              if((abs(sum(sign(COO_LL[,1]))) != nrow(COO_LL)) & (max(abs(COO_LL[,1])) > 90)){
                 COO_LL[which(COO_LL[,1] < 0),1] <- COO_LL[which(COO_LL[,1] < 0),1] + 360
                 sign_chk <- TRUE
               }
