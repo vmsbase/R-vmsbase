@@ -124,17 +124,16 @@ gui_join_lb_vms <- function(lb_db_name = "", vms_db_name = "")
         vms_data <- fn$sqldf("select * from track where I_NCEE = `vess[i]` order by DATE", dbname = vms_DB$db)
         lb_data <- fn$sqldf("select elobo.ROWID, * from elobo, lb_cla where vessUE = `vess[i]` and log_num = elobo.rowid order by s_utc, e_utc", dbname = lb_DB$db)
         
-        #                                 if(is.null(nrow(vms_data["T_NUM"])) | nrow(lb_data) == 1)
         if(nrow(vms_data) == 0 | nrow(lb_data) == 0)
         {
           cat(" - Skipped, not enough data!\n")
           next
         }else{
-        
-          num_track <- length(unique(vms_data["T_NUM"]))
+          
+          num_track <- length(unique(vms_data$T_NUM))
           
           res_over <- data.frame(vessel = vess[i],
-                                 track = unique(vms_data[,"T_NUM"]),
+                                 track = unique(vms_data$T_NUM),
                                  logbook = numeric(num_track),
                                  log_id = numeric(num_track),
                                  met_fou = character(num_track))
@@ -144,7 +143,7 @@ gui_join_lb_vms <- function(lb_db_name = "", vms_db_name = "")
           cat(" - ", num_track, " tracks ", sep = "")
           for( k in 1:num_track)
           {
-            trakap <- which(vms_data["T_NUM"] == k)
+            trakap <- which(vms_data$T_NUM == k)
             if(length(trakap) == 0)
             {
               cat("-", sep = "")
