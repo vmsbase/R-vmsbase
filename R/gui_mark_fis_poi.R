@@ -400,6 +400,8 @@ gui_mark_fis_poi <- function(vms_db_name = "", harb_file_name = ""){
             }
             if(length(to_remo) > 0){
               sin_tra[tochk[-to_remo], "F_DIS"] <- 1
+            }else{
+              sin_tra[tochk, "F_DIS"] <- 1
             }
             rm(tochk)
             rm(to_remo)
