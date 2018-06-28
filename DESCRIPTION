@@ -1,5 +1,5 @@
 Package: vmsbase
-Version: 2.1.31
+Version: 2.1.32
 License: GPL (>= 2)
 Description: The tools you need to process, analyze, combine, integrate and
     plot your fishery data: the georeferenced dataset from the Vessel Monitoring
@@ -18,7 +18,7 @@ Description: The tools you need to process, analyze, combine, integrate and
 Title: GUI Tools to Process, Analyze and Plot Fisheries Data
 Author: Lorenzo D'Andrea, Tommaso Russo, Antonio Parisi, Stefano Cataudella
 Maintainer: Lorenzo D'Andrea <support@vmsbase.org>
-Date: 2018-03-09
+Date: 2018-06-28
 Depends: sqldf, ggmap, mapdata, maps
 Imports: marmap, intervals, methods, plotrix, sp, foreign, cluster,
         cairoDevice, ggplot2, DBI, RSQLite, fields, gsubfn, AMORE,
