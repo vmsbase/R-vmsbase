@@ -373,10 +373,15 @@ gui_mark_fis_poi <- function(vms_db_name = "", harb_file_name = ""){
           if(length(tochk)<= 10000){
             cat("...", sep = "")
             dismat <- spDists(as.matrix(sin_tra[tochk,c("LON","LAT")]), as.matrix(harbs@coords), longlat = TRUE)
-            tochk <- tochk[-which(dismat < sta_met[sta_met_num, "harb_dist_km"], arr.ind = TRUE)[,1]]
+            tmp_rem <- which(dismat < sta_met[sta_met_num, "harb_dist_km"], arr.ind = TRUE)[,1]
+            if(length(tmp_rem) > 0){
+              tochk <- tochk[-tmp_rem]
+            }
             rm(dismat)
             gc()
-            sin_tra[tochk, "F_DIS"] <- 1
+            if(length(tochk) > 0){
+              sin_tra[tochk, "F_DIS"] <- 1
+            }
           }else{
             nTock <- ceiling(length(tochk)/10000)
             to_remo <- vector()
@@ -386,12 +391,16 @@ gui_mark_fis_poi <- function(vms_db_name = "", harb_file_name = ""){
               r2 <- min(length(tochk),r1+10000-1)
               dismat <- spDists(as.matrix(sin_tra[tochk[r1:r2],c("LON","LAT")]), as.matrix(harbs@coords), longlat = TRUE)
               to_remo_par <- which(dismat < sta_met[sta_met_num, "harb_dist_km"], arr.ind = TRUE)[,1]
-              to_remo <- c(to_remo, to_remo_par + r1 - 1)
+              if(length(to_remo_par) > 0){
+                to_remo <- c(to_remo, to_remo_par + r1 - 1)
+              }
               rm(dismat)
               rm(to_remo_par)
               gc()
             }
-            sin_tra[tochk[-to_remo], "F_DIS"] <- 1
+            if(length(to_remo) > 0){
+              sin_tra[tochk[-to_remo], "F_DIS"] <- 1
+            }
             rm(tochk)
             rm(to_remo)
             gc()
@@ -401,6 +410,8 @@ gui_mark_fis_poi <- function(vms_db_name = "", harb_file_name = ""){
         if(length(fis_poi) != 0){
           cat("\n   -     ", length(fis_poi)," fishing point founded    -\n", sep = "")
           sin_tra[fis_poi, "FISH"] <- 1
+        }else{
+          cat("\n   -    No fishing point founded    -\n", sep = "")
         }
         rm(fis_poi)
         gc()
