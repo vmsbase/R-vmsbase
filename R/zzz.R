@@ -1,5 +1,4 @@
-.onAttach <- function(lib, pkg)
-{
+.onAttach <- function(lib, pkg) {
   packageStartupMessage("
 
     ------------------------------------------------------------------
@@ -21,12 +20,12 @@
 
 ")
 }
-# 
-# 
+#
+#
 # .onUnload <- function(libpath)
 # {
 #     library.dynam.unload("vmsbase", libpath)
 # }
-# 
+#
 # ## no S4 methodology here; speedup :
 # .noGenerics <- TRUE

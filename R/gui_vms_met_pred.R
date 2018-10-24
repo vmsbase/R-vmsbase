@@ -1,182 +1,194 @@
 
 #' Predict Metier GUI
-#'  
+#'
 #' The \code{gui_vms_met_pred} function implements the graphical user interface for the
 #'  Metier Prediction
-#' 
+#'
 #' This function,  with a VMS database and a shape file with harbours points, performs a neural network prediction over the whole
 #'  db assigning metier data to vms tracks based on a training with existing vms-lb match data
 #'   given by the database.
-#'   
-#' @param vms_db_name The path of a VMS DataBase
-#' 
-#' @return This function does not return a value. 
-#' 
-#' @usage gui_vms_met_pred(vms_db_name = "")
-#' 
-#' @export gui_vms_met_pred  
 #'
-#' @references 
+#' @param vms_db_name The path of a VMS DataBase
+#'
+#' @return This function does not return a value.
+#'
+#' @usage gui_vms_met_pred(vms_db_name = "")
+#'
+#' @export gui_vms_met_pred
+#'
+#' @references
 #' Russo, T., Parisi, A., Prorgi, M., Boccoli, F., Cignini, I., Tordoni, M. and Cataudella, S. (2011) When behaviour reveals activity: Assigning fishing effort to metiers based on VMS data using artificial neural networks. \emph{Fisheries Research}, \bold{111(1)}, 53--64.
 #' \url{http://www.sciencedirect.com/science/article/pii/S0165783611002281}
 
-gui_vms_met_pred <- function(vms_db_name = ""){
-  
+gui_vms_met_pred <- function(vms_db_name = "") {
   vms_DB <- vms_DB$new()
   vms_DB$db <- vms_db_name
   clas_file <- ""
-  
-  main_win <- gwindow(title = " Metier Prediction - Interactive Interface", visible = FALSE,
-                      width = 800, height= 500)
+
+  main_win <- gwindow(
+    title = " Metier Prediction - Interactive Interface", visible = FALSE,
+    width = 800, height = 500
+  )
   main_g <- ggroup(horizontal = TRUE, container = main_win)
   right_g <- gframe(horizontal = FALSE, use.scrollwindow = FALSE, container = main_g)
   addSpring(main_g)
   left_g <- ggroup(horizontal = FALSE, use.scrollwindow = FALSE, container = main_g)
-  
-  #addSpring(left_g)
+
+  # addSpring(left_g)
   one_g <- ggroup(horizontal = TRUE, container = right_g)
   addSpring(one_g)
-  ##VMS DataBase file
+  ## VMS DataBase file
   vms_db_f <- gframe(text = "VMS DB file", horizontal = TRUE, container = one_g)
   addSpring(vms_db_f)
   sel_vms_f <- glabel("Select VMS DB file", container = vms_db_f)
   addSpring(vms_db_f)
-  gimage(system.file("ico/folder-blue.png", package="vmsbase"), container = vms_db_f,
-         handler = function(h,...){
-           vms_DB$db <- gfile(text = "Select VMS DataBase file",
-                              type = "open",
-                              filter = list("VMS DB file" = list(patterns = c("*.vms.sqlite"))))
-           if(!is.na(vms_DB$db)){
-             svalue(sel_vms_f) <- ifelse(.Platform$OS.type == "windows", strsplit(vms_DB$db, "\\\\")[[1]][length(strsplit(vms_DB$db, "\\\\")[[1]])],strsplit(vms_DB$db, "/")[[1]][length(strsplit(vms_DB$db, "/")[[1]])])
-             n_ntr <- as.numeric(sqldf("select count(*) from intrp", dbname = vms_DB$db))
-             if(n_ntr > 0){
-               svalue(n_vess) <- paste("   N. of Vessels:  ", as.numeric(sqldf("select count(distinct I_NCEE) from intrp", dbname = vms_DB$db)), sep = "")
-               svalue(n_trck) <- paste("    N. of tracks:  ", as.numeric(sqldf("select count(*) from (select distinct I_NCEE, T_NUM from track)", dbname = vms_DB$db)), sep = "")
-               svalue(n_matc) <- paste(" N. VMS-LB match:  ", as.numeric(sqldf("select count(*) from vms_lb", dbname = vms_DB$db)), sep = "")
-               svalue(n_ping) <- paste("     N. of Pings:  ", n_ntr, sep = "")
-               
-               enabled(start_ba) <- TRUE
-               enabled(two_b_g) <- TRUE
-               
-               nn_tab <- as.numeric(sqldf("SELECT count(*) FROM sqlite_master WHERE type='table' AND name='pre_nn'", dbname = vms_DB$db))
-               if(nn_tab == 1){
-                 enabled(g_go) <- TRUE
-                 enabled(two_c_g) <- TRUE
-               }
-             }else{
-               cat("\n\n  VMS DB error - Interpolated Pings not found!\n\n", sep = "")
-             }
-           }
-         })
-  gimage(system.file("ico/application-exit-5.png", package="vmsbase"), container = vms_db_f,
-         handler = function(h,...){
-           vms_DB$db <- ""
-           svalue(sel_vms_f) <- "Select VMS DB file"
-           enabled(g_go) <- FALSE
-           enabled(start_ba) <- FALSE
-           enabled(two_b_g) <- FALSE
-           enabled(two_c_g) <- FALSE
-         })
+  gimage(system.file("ico/folder-blue.png", package = "vmsbase"),
+    container = vms_db_f,
+    handler = function(h, ...) {
+      vms_DB$db <- gfile(
+        text = "Select VMS DataBase file",
+        type = "open",
+        filter = list("VMS DB file" = list(patterns = c("*.vms.sqlite")))
+      )
+      if (!is.na(vms_DB$db)) {
+        svalue(sel_vms_f) <- ifelse(.Platform$OS.type == "windows", strsplit(vms_DB$db, "\\\\")[[1]][length(strsplit(vms_DB$db, "\\\\")[[1]])], strsplit(vms_DB$db, "/")[[1]][length(strsplit(vms_DB$db, "/")[[1]])])
+        n_ntr <- as.numeric(sqldf("select count(*) from intrp", dbname = vms_DB$db))
+        if (n_ntr > 0) {
+          svalue(n_vess) <- paste("   N. of Vessels:  ", as.numeric(sqldf("select count(distinct I_NCEE) from intrp", dbname = vms_DB$db)), sep = "")
+          svalue(n_trck) <- paste("    N. of tracks:  ", as.numeric(sqldf("select count(*) from (select distinct I_NCEE, T_NUM from track)", dbname = vms_DB$db)), sep = "")
+          svalue(n_matc) <- paste(" N. VMS-LB match:  ", as.numeric(sqldf("select count(*) from vms_lb", dbname = vms_DB$db)), sep = "")
+          svalue(n_ping) <- paste("     N. of Pings:  ", n_ntr, sep = "")
+
+          enabled(start_ba) <- TRUE
+          enabled(two_b_g) <- TRUE
+
+          nn_tab <- as.numeric(sqldf("SELECT count(*) FROM sqlite_master WHERE type='table' AND name='pre_nn'", dbname = vms_DB$db))
+          if (nn_tab == 1) {
+            enabled(g_go) <- TRUE
+            enabled(two_c_g) <- TRUE
+          }
+        } else {
+          cat("\n\n  VMS DB error - Interpolated Pings not found!\n\n", sep = "")
+        }
+      }
+    }
+  )
+  gimage(system.file("ico/application-exit-5.png", package = "vmsbase"),
+    container = vms_db_f,
+    handler = function(h, ...) {
+      vms_DB$db <- ""
+      svalue(sel_vms_f) <- "Select VMS DB file"
+      enabled(g_go) <- FALSE
+      enabled(start_ba) <- FALSE
+      enabled(two_b_g) <- FALSE
+      enabled(two_c_g) <- FALSE
+    }
+  )
   addSpring(one_g)
-  
+
   two_g <- gexpandgroup("Data", horizontal = FALSE, container = right_g)
   n_vess <- glabel("N. of Vessels:   ---", container = two_g)
   n_trck <- glabel(" N. of Tracks:   ---", container = two_g)
   n_matc <- glabel(" VMS-LB match:   ---", container = two_g)
   n_ping <- glabel("  N. of Pings:   ---", container = two_g)
-  
+
   par_bg00 <- ggroup(horizontal = TRUE, container = right_g)
   addSpring(par_bg00)
   glabel("Classify by", container = par_bg00)
   cla_trkvess <- gradio(c("Vessel", "Track"), container = par_bg00, horizontal = TRUE)
   addSpring(par_bg00)
-  
+
   two_b_g <- gexpandgroup("Classes", horizontal = FALSE, container = right_g)
   addSpring(two_b_g)
-  
+
   par_bg21 <- ggroup(horizontal = TRUE, container = two_b_g)
-  
+
   addSpring(par_bg21)
   bg21 <- glayout(container = par_bg21, spacing = 10)
-  bg21[1,1, anchor = 0] <- "Speed\nClasses"
-  bg21[1,2, anchor = 0] <- gspinbutton(from = 2, to = 30, by = 1, value = 9)
-  bg21[1,3, anchor = 0] <- "Max Speed"
-  bg21[1,4, anchor = 0] <- gspinbutton(from = 0, to = 60, by = 1, value = 30)
-  
-  bg21[2,1, anchor = 0] <- "Depth\nClasses"
-  bg21[2,2, anchor = 0] <- gspinbutton(from = 2, to = 30, by = 1, value = 9)
-  bg21[2,3, anchor = 0] <- "Max Depth"
-  bg21[2,4, anchor = 0] <- gspinbutton(from = 0, to = 11000, by = 1, value = 1000)
-  
-  bg21[3,1, anchor = 0] <- "Heading\nClasses"
-  bg21[3,2, anchor = 0] <- gspinbutton(from = 2, to = 30, by = 1, value = 4)
+  bg21[1, 1, anchor = 0] <- "Speed\nClasses"
+  bg21[1, 2, anchor = 0] <- gspinbutton(from = 2, to = 30, by = 1, value = 9)
+  bg21[1, 3, anchor = 0] <- "Max Speed"
+  bg21[1, 4, anchor = 0] <- gspinbutton(from = 0, to = 60, by = 1, value = 30)
+
+  bg21[2, 1, anchor = 0] <- "Depth\nClasses"
+  bg21[2, 2, anchor = 0] <- gspinbutton(from = 2, to = 30, by = 1, value = 9)
+  bg21[2, 3, anchor = 0] <- "Max Depth"
+  bg21[2, 4, anchor = 0] <- gspinbutton(from = 0, to = 11000, by = 1, value = 1000)
+
+  bg21[3, 1, anchor = 0] <- "Heading\nClasses"
+  bg21[3, 2, anchor = 0] <- gspinbutton(from = 2, to = 30, by = 1, value = 4)
   addSpring(par_bg21)
-  
+
   addSpring(two_b_g)
-  
+
   par_bg22 <- ggroup(horizontal = TRUE, container = two_b_g)
   addSpring(par_bg22)
-  
+
   glabel("Use Custom\nClasses?", container = par_bg22)
-  sta_cla_sel <- gradio(c("No", "Yes"), container = par_bg22, horizontal = FALSE,
-                        handler = function(h,...){
-                          enabled(par_bg21) <- !enabled(par_bg21)
-                          enabled(cust_clas) <- !enabled(cust_clas)
-                          enabled(start_ba) <- !enabled(start_ba)
-                          if(vms_DB$db == ""){
-                            enabled(start_ba) <- FALSE
-                          }
-                        })
-  
+  sta_cla_sel <- gradio(c("No", "Yes"),
+    container = par_bg22, horizontal = FALSE,
+    handler = function(h, ...) {
+      enabled(par_bg21) <- !enabled(par_bg21)
+      enabled(cust_clas) <- !enabled(cust_clas)
+      enabled(start_ba) <- !enabled(start_ba)
+      if (vms_DB$db == "") {
+        enabled(start_ba) <- FALSE
+      }
+    }
+  )
+
   cust_clas <- ggroup(horizontal = TRUE, container = par_bg22)
   cus_cla_lab <- glabel("Select Custom\nClass File", container = cust_clas)
-  gimage(system.file("ico/address-book-new-4.png", package="vmsbase"), container = cust_clas,
-         handler = function(h,...){
-           enabled(start_ba) <- FALSE
-           clas_file <<- gfile(text = "Select Custom Class file",
-                               type = "open")
-           svalue(cus_cla_lab) <- ifelse(.Platform$OS.type == "windows", strsplit(clas_file, "\\\\")[[1]][length(strsplit(clas_file, "\\\\")[[1]])],strsplit(clas_file, "/")[[1]][length(strsplit(clas_file, "/")[[1]])])
-           if(vms_DB$db != ""){
-             enabled(start_ba) <- TRUE
-           }
-         })
+  gimage(system.file("ico/address-book-new-4.png", package = "vmsbase"),
+    container = cust_clas,
+    handler = function(h, ...) {
+      enabled(start_ba) <- FALSE
+      clas_file <<- gfile(
+        text = "Select Custom Class file",
+        type = "open"
+      )
+      svalue(cus_cla_lab) <- ifelse(.Platform$OS.type == "windows", strsplit(clas_file, "\\\\")[[1]][length(strsplit(clas_file, "\\\\")[[1]])], strsplit(clas_file, "/")[[1]][length(strsplit(clas_file, "/")[[1]])])
+      if (vms_DB$db != "") {
+        enabled(start_ba) <- TRUE
+      }
+    }
+  )
   enabled(cust_clas) <- FALSE
-  
+
   addSpring(par_bg22)
-  
-  start_ba <- gbutton(text = "\nClassify Data\n", container = two_b_g, handler = function(h,...){
+
+  start_ba <- gbutton(text = "\nClassify Data\n", container = two_b_g, handler = function(h, ...) {
     enabled(g_go) <- FALSE
     enabled(start_ba) <- FALSE
     enabled(vms_db_f) <- FALSE
     enabled(two_b_g) <- FALSE
     enabled(two_c_g) <- FALSE
-    
+
     ## Data Classification ----
     cat("\n\n   ---   Start Data Classification   ---\n\n", sep = "")
     cat("\n   -     Configuration...     \n", sep = "")
     svalue(sup_rep) <- "Parameters\nConfiguration..."
-    
+
     ## Classes Definition ----
-    if(svalue(sta_cla_sel) == "No"){
-      max_spe <- svalue(bg21[1,4])
+    if (svalue(sta_cla_sel) == "No") {
+      max_spe <- svalue(bg21[1, 4])
       min_spe <- 0
       max_dep <- 0
-      min_dep <- -as.numeric(floor(svalue(bg21[2,4])))
-      cla_spe <- svalue(bg21[1,2])
-      cla_dep <- svalue(bg21[2,2])
-      cla_hea <- svalue(bg21[3,2])
-      
-      vect_spe <- seq(min_spe, max_spe, length = cla_spe+1)
-      cat("\n Speed Classes: ", round(vect_spe,2), sep = " ")
-      
-      vect_dep <- seq(min_dep, max_dep, length = cla_dep+1)
-      cat("\n Depth Classes: ", round(vect_dep,2), sep = " ")
-      
-      vect_hea <- seq(-360, 360, length = cla_hea+1)
-      cat("\n Heading Classes: ", round(vect_hea,2), "\n\n", sep = " ")
-      
-    }else{
-      if(clas_file != ""){
+      min_dep <- -as.numeric(floor(svalue(bg21[2, 4])))
+      cla_spe <- svalue(bg21[1, 2])
+      cla_dep <- svalue(bg21[2, 2])
+      cla_hea <- svalue(bg21[3, 2])
+
+      vect_spe <- seq(min_spe, max_spe, length = cla_spe + 1)
+      cat("\n Speed Classes: ", round(vect_spe, 2), sep = " ")
+
+      vect_dep <- seq(min_dep, max_dep, length = cla_dep + 1)
+      cat("\n Depth Classes: ", round(vect_dep, 2), sep = " ")
+
+      vect_hea <- seq(-360, 360, length = cla_hea + 1)
+      cat("\n Heading Classes: ", round(vect_hea, 2), "\n\n", sep = " ")
+    } else {
+      if (clas_file != "") {
         thr_lns <- readLines(clas_file, 3)
         vect_spe <- as.numeric(unlist(strsplit(unlist(strsplit(thr_lns[1], ":"))[2], "; ")))
         vect_dep <- as.numeric(unlist(strsplit(unlist(strsplit(thr_lns[2], ":"))[2], "; ")))
@@ -185,40 +197,41 @@ gui_vms_met_pred <- function(vms_db_name = ""){
         min_spe <- 0
         max_dep <- 0
         min_dep <- min(vect_dep)
-        cla_spe <- length(vect_spe)-1
-        cla_dep <- length(vect_dep)-1
-        cla_hea <- length(vect_hea)-1
-      }else{
+        cla_spe <- length(vect_spe) - 1
+        cla_dep <- length(vect_dep) - 1
+        cla_hea <- length(vect_hea) - 1
+      } else {
         enabled(start_ba) <- TRUE
         enabled(two_b_g) <- TRUE
         nn_tab <- as.numeric(sqldf("SELECT count(*) FROM sqlite_master WHERE type='table' AND name='pre_nn'", dbname = vms_DB$db))
-        if(nn_tab == 1){
+        if (nn_tab == 1) {
           enabled(g_go) <- TRUE
           enabled(two_c_g) <- TRUE
         }
         stop("Missing Custom Class File")
       }
     }
-    
+
     ## Classification by track ----
-    
-    if(svalue(cla_trkvess) == "Track"){
-      
+
+    if (svalue(cla_trkvess) == "Track") {
       svalue(sup_rep) <- "Loading\nFleet Data..."
       poi <- sqldf("select distinct I_NCEE, T_NUM from intrp", dbname = vms_DB$db)
       numpoi <- nrow(poi)
-      to_out <- data.frame("I_NCEE" = numeric(numpoi),
-                           "T_NUM" = numeric(numpoi))
-      to_out[,1:2] <- poi
-      for(s in 1:cla_spe){
+      to_out <- data.frame(
+        "I_NCEE" = numeric(numpoi),
+        "T_NUM" = numeric(numpoi)
+      )
+      to_out[, 1:2] <- poi
+      for (s in 1:cla_spe) {
         to_out <- cbind(to_out, 0)
         colnames(to_out)[ncol(to_out)] <- paste("SPE_", s, sep = "")
       }
-      for(d in 1:cla_dep){
+      for (d in 1:cla_dep) {
         to_out <- cbind(to_out, 0)
         colnames(to_out)[ncol(to_out)] <- paste("DEP_", d, sep = "")
       }
-      for(h in 1:cla_hea){
+      for (h in 1:cla_hea) {
         to_out <- cbind(to_out, 0)
         colnames(to_out)[ncol(to_out)] <- paste("HEA_", h, sep = "")
       }
@@ -228,86 +241,84 @@ gui_vms_met_pred <- function(vms_db_name = ""){
       colnames(to_out)[ncol(to_out)] <- "M_LON"
       to_out <- cbind(to_out, 0)
       colnames(to_out)[ncol(to_out)] <- "MET"
-      
+
       incee <- sqldf("select distinct(I_NCEE) from intrp", dbname = vms_DB$db)
       cat("   -     Analyzing     -\n", sep = "")
       svalue(sup_rep) <- "Analysis\nStarted..."
-      for(v in 1:nrow(incee)){
-        cat("\n   -     Vessel: ", incee[v,1]," - ", v, " of ", nrow(incee), sep = "")
+      for (v in 1:nrow(incee)) {
+        cat("\n   -     Vessel: ", incee[v, 1], " - ", v, " of ", nrow(incee), sep = "")
         vessel <- fn$sqldf("select * from intrp, p_depth where intrp.ROWID = i_id and I_NCEE = `incee[v,1]` order by DATE", dbname = vms_DB$db)
-        svalue(sup_rep) <- paste("Analyzing...\n   ", round((100/nrow(incee))*v,1), "%", sep = "")
-        if(nrow(vessel) > 0){
-          
-          trks <- unique(vessel[,"T_NUM"])
-          for(t in trks){
-            
-            spee_t <- vessel[which(vessel[,"T_NUM"] == t),"SPE"]
-            spee_t <- spee_t[which((spee_t >= min_spe)&(spee_t < max_spe))]
-            if(length(spee_t) == 0){
+        svalue(sup_rep) <- paste("Analyzing...\n   ", round((100 / nrow(incee)) * v, 1), "%", sep = "")
+        if (nrow(vessel) > 0) {
+          trks <- unique(vessel[, "T_NUM"])
+          for (t in trks) {
+            spee_t <- vessel[which(vessel[, "T_NUM"] == t), "SPE"]
+            spee_t <- spee_t[which((spee_t >= min_spe) & (spee_t < max_spe))]
+            if (length(spee_t) == 0) {
               cat(" - Skipped no speed data", sep = "")
               next
             }
             spee_t[which(spee_t >= max_spe)] <- max_spe
             spe_int <- hist(spee_t, breaks = vect_spe, plot = FALSE)$count
-            spe_out <- spe_int/length(spee_t)
-            
-            deep_t <- vessel[which(vessel[,"T_NUM"] == t),"DEPTH"]
-            deep_t <- deep_t[which((deep_t > min_dep)&(deep_t <= max_dep))]
-            if(length(deep_t) == 0){
+            spe_out <- spe_int / length(spee_t)
+
+            deep_t <- vessel[which(vessel[, "T_NUM"] == t), "DEPTH"]
+            deep_t <- deep_t[which((deep_t > min_dep) & (deep_t <= max_dep))]
+            if (length(deep_t) == 0) {
               cat(" - Skipped no depth data", sep = "")
               next
             }
             dee_int <- hist(deep_t, breaks = vect_dep, plot = FALSE)$count
-            dep_out <- dee_int/length(deep_t)
-            
-            head_t <- vessel[which(vessel[,"T_NUM"] == t),"HEA"]
+            dep_out <- dee_int / length(deep_t)
+
+            head_t <- vessel[which(vessel[, "T_NUM"] == t), "HEA"]
             head_t[which(head_t > 360)] <- head_t[which(head_t > 360)] - 360
-            head_t <- c(0,diff(head_t))
+            head_t <- c(0, diff(head_t))
             hea_int <- hist(head_t, breaks = vect_hea, plot = FALSE)$count
-            hea_out <- hea_int/length(head_t)
-            
-            to_tr <- which((to_out[,"I_NCEE"] == incee[v,1]) & (to_out[,"T_NUM"] == t))
-            to_out[to_tr, 3:(2+cla_spe)] <- spe_out
-            to_out[to_tr, (3+cla_spe):(2+cla_spe+cla_dep)] <- dep_out
-            to_out[to_tr, (3+cla_spe+cla_dep):(2+cla_spe+cla_dep+cla_hea)] <- hea_out
-            
+            hea_out <- hea_int / length(head_t)
+
+            to_tr <- which((to_out[, "I_NCEE"] == incee[v, 1]) & (to_out[, "T_NUM"] == t))
+            to_out[to_tr, 3:(2 + cla_spe)] <- spe_out
+            to_out[to_tr, (3 + cla_spe):(2 + cla_spe + cla_dep)] <- dep_out
+            to_out[to_tr, (3 + cla_spe + cla_dep):(2 + cla_spe + cla_dep + cla_hea)] <- hea_out
+
             cat(".", sep = "")
-            to_out[to_tr, "M_LON"] <- median(vessel[which(vessel[,"T_NUM"] == t),"LON"])
-            to_out[to_tr, "M_LAT"] <- median(vessel[which(vessel[,"T_NUM"] == t),"LAT"])
+            to_out[to_tr, "M_LON"] <- median(vessel[which(vessel[, "T_NUM"] == t), "LON"])
+            to_out[to_tr, "M_LAT"] <- median(vessel[which(vessel[, "T_NUM"] == t), "LAT"])
           }
           metier <- fn$sqldf("select * from vms_lb where vessel = `incee[v,1]`", dbname = vms_DB$db)
-          if(length(metier) > 0){
-            go_in <- which(to_out[,"I_NCEE"] == incee[v,1])
-            whi_1 <- which(to_out[go_in,"T_NUM"] %in% metier[,2])
-            if(length(whi_1) > 0 ){
-              whi_3 <- which(metier[,"track"] %in% to_out[go_in[whi_1], 2])
-              if(length(whi_3) > 0){
+          if (length(metier) > 0) {
+            go_in <- which(to_out[, "I_NCEE"] == incee[v, 1])
+            whi_1 <- which(to_out[go_in, "T_NUM"] %in% metier[, 2])
+            if (length(whi_1) > 0) {
+              whi_3 <- which(metier[, "track"] %in% to_out[go_in[whi_1], 2])
+              if (length(whi_3) > 0) {
                 to_out[go_in[whi_1], "MET"] <- as.character(metier[whi_3, "met_des"])
               }
             }
           }
-        }else{
+        } else {
           cat(" - No VMS-Depth Data - Skipping", sep = "")
           next
         }
       }
-    }else{
+    } else {
       ## Classification by Vessel ----
-      
+
       poi <- sqldf("select distinct I_NCEE from intrp", dbname = vms_DB$db)
       numpoi <- nrow(poi)
       to_out <- data.frame("I_NCEE" = numeric(numpoi))
-      to_out[,1] <- poi[,1]
-      
-      for(s in 1:cla_spe){
+      to_out[, 1] <- poi[, 1]
+
+      for (s in 1:cla_spe) {
         to_out <- cbind(to_out, 0)
         colnames(to_out)[ncol(to_out)] <- paste("SPE_", s, sep = "")
       }
-      for(d in 1:cla_dep){
+      for (d in 1:cla_dep) {
         to_out <- cbind(to_out, 0)
         colnames(to_out)[ncol(to_out)] <- paste("DEP_", d, sep = "")
       }
-      for(h in 1:cla_hea){
+      for (h in 1:cla_hea) {
         to_out <- cbind(to_out, 0)
         colnames(to_out)[ncol(to_out)] <- paste("HEA_", h, sep = "")
       }
@@ -317,54 +328,53 @@ gui_vms_met_pred <- function(vms_db_name = ""){
       colnames(to_out)[ncol(to_out)] <- "M_LON"
       to_out <- cbind(to_out, 0)
       colnames(to_out)[ncol(to_out)] <- "MET"
-      
+
       incee <- sqldf("select distinct(I_NCEE) from intrp", dbname = vms_DB$db)
       cat("   -     Analyzing     -\n", sep = "")
       svalue(sup_rep) <- "Analysis\nStarted..."
-      
-      for(v in 1:nrow(incee)){
-        cat("\n   -     Vessel: ", incee[v,1]," - ", v, " of ", nrow(incee), sep = "")
+
+      for (v in 1:nrow(incee)) {
+        cat("\n   -     Vessel: ", incee[v, 1], " - ", v, " of ", nrow(incee), sep = "")
         vessel <- fn$sqldf("select * from intrp, p_depth where intrp.ROWID = i_id and I_NCEE = `incee[v,1]` order by DATE", dbname = vms_DB$db)
-        svalue(sup_rep) <- paste("Analyzing...\n   ", round((100/nrow(incee))*v,1), "%", sep = "")
-        if(nrow(vessel) > 0){
-          
+        svalue(sup_rep) <- paste("Analyzing...\n   ", round((100 / nrow(incee)) * v, 1), "%", sep = "")
+        if (nrow(vessel) > 0) {
           spee_t <- vessel$SPE
-          spee_t <- spee_t[which((spee_t >= min_spe)&(spee_t < max_spe))]
-          if(length(spee_t) == 0){
+          spee_t <- spee_t[which((spee_t >= min_spe) & (spee_t < max_spe))]
+          if (length(spee_t) == 0) {
             cat(" - Skipped no speed data", sep = "")
             next
           }
           spe_int <- hist(spee_t, breaks = vect_spe, plot = FALSE)$count
-          spe_out <- spe_int/length(spee_t)
-          
+          spe_out <- spe_int / length(spee_t)
+
           deep_t <- vessel$DEPTH
-          deep_t <- deep_t[which((deep_t > min_dep)&(deep_t <= max_dep))]
-          if(length(deep_t) == 0){
+          deep_t <- deep_t[which((deep_t > min_dep) & (deep_t <= max_dep))]
+          if (length(deep_t) == 0) {
             cat(" - Skipped no depth data", sep = "")
             next
           }
           dee_int <- hist(deep_t, breaks = vect_dep, plot = FALSE)$count
-          dep_out <- dee_int/length(deep_t)
-          
+          dep_out <- dee_int / length(deep_t)
+
           head_t <- vessel$HEA
           head_t[which(head_t > 360)] <- head_t[which(head_t > 360)] - 360
-          head_t <- c(0,diff(head_t))
+          head_t <- c(0, diff(head_t))
           hea_int <- hist(head_t, breaks = vect_hea, plot = FALSE)$count
-          hea_out <- hea_int/length(head_t)
-          
-          to_tr <- which(to_out[,"I_NCEE"] == incee[v,1])
-          to_out[to_tr, 3:(2+cla_spe)] <- spe_out
-          to_out[to_tr, (3+cla_spe):(2+cla_spe+cla_dep)] <- dep_out
-          to_out[to_tr, (3+cla_spe+cla_dep):(2+cla_spe+cla_dep+cla_hea)] <- hea_out
-          
+          hea_out <- hea_int / length(head_t)
+
+          to_tr <- which(to_out[, "I_NCEE"] == incee[v, 1])
+          to_out[to_tr, 3:(2 + cla_spe)] <- spe_out
+          to_out[to_tr, (3 + cla_spe):(2 + cla_spe + cla_dep)] <- dep_out
+          to_out[to_tr, (3 + cla_spe + cla_dep):(2 + cla_spe + cla_dep + cla_hea)] <- hea_out
+
           to_out[to_tr, "M_LON"] <- median(vessel$LON)
           to_out[to_tr, "M_LAT"] <- median(vessel$LAT)
-          
-          metier <- fn$sqldf("select met_des from vms_lb where vessel = `incee[v,1]`", dbname = vms_DB$db)[,1]
-          if(length(metier) > 0){
+
+          metier <- fn$sqldf("select met_des from vms_lb where vessel = `incee[v,1]`", dbname = vms_DB$db)[, 1]
+          if (length(metier) > 0) {
             to_out[to_tr, "MET"] <- names(which.max(table(metier)))
           }
-        }else{
+        } else {
           cat(" - No VMS-Depth Data - Skipping", sep = "")
           next
         }
@@ -374,19 +384,19 @@ gui_vms_met_pred <- function(vms_db_name = ""){
     sqldf("drop table if exists pre_nn", dbname = vms_DB$db)
     sqldf("CREATE TABLE pre_nn AS SELECT * FROM `to_out`", dbname = vms_DB$db)
     svalue(sup_rep) <- ""
-    
+
     cat("\n\n   ---   Vessel Data Classification Complete!   ---\n\n", sep = "")
-    
+
     enabled(g_go) <- TRUE
     enabled(start_ba) <- TRUE
     enabled(vms_db_f) <- TRUE
     enabled(two_b_g) <- TRUE
     enabled(two_c_g) <- TRUE
   })
-  #addSpring(right_g)
-  
+  # addSpring(right_g)
+
   ## NN Metier Predict ----
-  
+
   two_c_g <- gexpandgroup("NN parameters", horizontal = FALSE, container = right_g)
   bgc1 <- ggroup(horizontal = TRUE, container = two_c_g)
   addSpring(bgc1)
@@ -423,46 +433,48 @@ gui_vms_met_pred <- function(vms_db_name = ""){
   n_mfac_h <- glabel("Min Fac", container = bgc7)
   addSpring(bgc7)
   mfac_sel <- gspinbutton(from = 1, to = 100, by = 1, value = 50, container = bgc7)
-  
+
   sup_rep <- glabel("\n", container = right_g)
-  
+
   g_go <- ggroup(horizontal = TRUE, container = right_g)
   addSpring(g_go)
-  pred_f_net <- gbutton(text = "\nPredict from Saved\n", container = g_go, handler = function(h,...){
+  pred_f_net <- gbutton(text = "\nPredict from Saved\n", container = g_go, handler = function(h, ...) {
     enabled(g_go) <- FALSE
     enabled(start_ba) <- FALSE
     enabled(vms_db_f) <- FALSE
     enabled(two_b_g) <- FALSE
     enabled(two_c_g) <- FALSE
-    
-    net <- readRDS(gfile(text = "Select Saved Neural Net file",
-                         type = "open",
-                         filter = list("R file" = list(patterns = c("*.rData")))))
-    
+
+    net <- readRDS(gfile(
+      text = "Select Saved Neural Net file",
+      type = "open",
+      filter = list("R file" = list(patterns = c("*.rData")))
+    ))
+
     LBdata <- sqldf("select * from pre_nn", dbname = vms_DB$db)
-    
-    if(svalue(cla_trkvess) == "Track"){
-      hea_lb <- LBdata[,c(1:2)]
-      tai_lb <- LBdata[,ncol(LBdata)]
-      LBdata <- LBdata[,3:(ncol(LBdata)-1)] 
-    }else{
-      hea_lb <- LBdata[,1]
-      tai_lb <- LBdata[,ncol(LBdata)]
-      LBdata <- LBdata[,2:(ncol(LBdata)-1)] 
+
+    if (svalue(cla_trkvess) == "Track") {
+      hea_lb <- LBdata[, c(1:2)]
+      tai_lb <- LBdata[, ncol(LBdata)]
+      LBdata <- LBdata[, 3:(ncol(LBdata) - 1)]
+    } else {
+      hea_lb <- LBdata[, 1]
+      tai_lb <- LBdata[, ncol(LBdata)]
+      LBdata <- LBdata[, 2:(ncol(LBdata) - 1)]
     }
-    
+
     cat("\n\n   ---   Metier Prediction Started!   ---", sep = "")
     cat("\n   -     Configuring Neural Network     -", sep = "")
-    
+
     # Previsione
-    Te_PRED <- net$selmet[apply(sim(net$net,LBdata),1,which.max)]
-    
+    Te_PRED <- net$selmet[apply(sim(net$net, LBdata), 1, which.max)]
+
     nomet <- which(tai_lb == 0)
     Out_BP <- as.data.frame(cbind(hea_lb, tai_lb))
-    
-    if(svalue(cla_trkvess) == "Track"){
+
+    if (svalue(cla_trkvess) == "Track") {
       Out_BP[nomet, 3] <- Te_PRED[nomet]
-    }else{
+    } else {
       Out_BP[nomet, 2] <- Te_PRED[nomet]
     }
 
@@ -470,218 +482,230 @@ gui_vms_met_pred <- function(vms_db_name = ""){
     svalue(sup_rep) <- "Updating\nDataBase..."
     sqldf("drop table if exists nn_clas", dbname = vms_DB$db)
     sqldf("CREATE TABLE nn_clas(I_NCEE INT, T_NUM INT, met_des CHAR)", dbname = vms_DB$db)
-    if(svalue(cla_trkvess) == "Vessel"){
+    if (svalue(cla_trkvess) == "Vessel") {
       poi <- sqldf("select distinct I_NCEE, T_NUM from intrp", dbname = vms_DB$db)
       Out_BP <- merge(poi, Out_BP, by.x = "I_NCEE", by.y = "hea_lb")
     }
     sqldf("INSERT INTO nn_clas SELECT * FROM `Out_BP`", dbname = vms_DB$db)
     svalue(sup_rep) <- ""
-    
+
     cat("\n\n   ---   Metier Prediction Complete!   ---\n\n", sep = "")
-    
-    gconfirm("\nNeural Network Prediction complete!\n", title="Save NN", icon = "info",
-             parent = main_win)
-    
+
+    gconfirm("\nNeural Network Prediction complete!\n",
+      title = "Save NN", icon = "info",
+      parent = main_win
+    )
+
     enabled(vms_db_f) <- TRUE
     enabled(two_b_g) <- TRUE
     enabled(two_c_g) <- TRUE
     enabled(g_go) <- TRUE
     enabled(start_ba) <- TRUE
-    
   })
   addSpring(g_go)
-  start_bb <- gbutton(text = "\nTrain & Predict\n", container = g_go, handler = function(h,...){
+  start_bb <- gbutton(text = "\nTrain & Predict\n", container = g_go, handler = function(h, ...) {
     enabled(g_go) <- FALSE
     enabled(start_ba) <- FALSE
     enabled(vms_db_f) <- FALSE
     enabled(two_b_g) <- FALSE
     enabled(two_c_g) <- FALSE
-    
+
     cat("\n\n   ---   Metier Prediction Started!   ---", sep = "")
-    
+
     cat("\n   -     Configuring Neural Network     -", sep = "")
     svalue(sup_rep) <- "Neural Network\nConfiguration..."
-    
-    #Set parametri
+
+    # Set parametri
     thr <- svalue(thr_sel)
     nHf <- svalue(nHf_sel)
     nTr <- svalue(trs_sel)
     nVa <- svalue(va_sel)
     ##########
-    nTe <- 100-(svalue(trs_sel) + svalue(va_sel))
+    nTe <- 100 - (svalue(trs_sel) + svalue(va_sel))
     nStep <- svalue(step_sel)
     nShow <- svalue(show_sel)
     minfac <- svalue(mfac_sel)
-    
+
     LBdata <- sqldf("select * from pre_nn", dbname = vms_DB$db)
-    
-    if(nrow(LBdata) > 0){
-      #Seleziono dati per training
-      if(svalue(cla_trkvess) == "Track"){
-        tdata <- LBdata[which(LBdata[,ncol(LBdata)]!=0),3:ncol(LBdata)]
-      }else{
-        tdata <- LBdata[which(LBdata[,ncol(LBdata)]!=0),2:ncol(LBdata)]
+
+    if (nrow(LBdata) > 0) {
+      # Seleziono dati per training
+      if (svalue(cla_trkvess) == "Track") {
+        tdata <- LBdata[which(LBdata[, ncol(LBdata)] != 0), 3:ncol(LBdata)]
+      } else {
+        tdata <- LBdata[which(LBdata[, ncol(LBdata)] != 0), 2:ncol(LBdata)]
       }
-      if(nrow(tdata) == 0){
+      if (nrow(tdata) == 0) {
         cat("\n\n   ---   Error not enough data!   ---", sep = "")
-      }else{
-        #Quanti met, quali met
-        lmet <- unique(tdata[,ncol(tdata)])
+      } else {
+        # Quanti met, quali met
+        lmet <- unique(tdata[, ncol(tdata)])
         nmet <- length(lmet)
-        mets <- tdata[,ncol(tdata)]
+        mets <- tdata[, ncol(tdata)]
         nvms <- nrow(tdata)
-        
-        #Bilancia i mestieri
-        selmet <- names(table(mets))[which(table(mets)>(thr*length(mets)))]
-        minrec <- minfac*min(table(mets[which(mets %in% selmet)]))
-        tdatab <- tdata[0,]
-        for(i in 1:length(selmet)){
-          metIdx <- which(mets==selmet[i])
-          if(length(metIdx) == 1){
-            tdatab <- rbind(tdatab,tdata[rep(metIdx, minrec),])
-          }else{
-            tdatab <- rbind(tdatab,tdata[sample(metIdx, minrec, replace = T),])
+
+        # Bilancia i mestieri
+        selmet <- names(table(mets))[which(table(mets) > (thr * length(mets)))]
+        minrec <- minfac * min(table(mets[which(mets %in% selmet)]))
+        tdatab <- tdata[0, ]
+        for (i in 1:length(selmet)) {
+          metIdx <- which(mets == selmet[i])
+          if (length(metIdx) == 1) {
+            tdatab <- rbind(tdatab, tdata[rep(metIdx, minrec), ])
+          } else {
+            tdatab <- rbind(tdatab, tdata[sample(metIdx, minrec, replace = T), ])
           }
         }
-        
-        mets <- tdatab[,ncol(tdatab)]
+
+        mets <- tdatab[, ncol(tdatab)]
         nvms <- nrow(tdatab)
         lmet <- unique(mets)
         nmet <- length(lmet)
-        
-        #Pulizia
-        #Elimina colonne nulle
-        c0 <- which(apply(tdatab[,1:(ncol(tdatab)-1)], 2, sum)==0)
-        if(length(c0)>0) tdatab <- tdatab[,-c0]
-        #Standardizzo
-        tdatab[,1:(ncol(tdatab)-1)] <- StandardizeByCol(tdatab[,1:(ncol(tdatab)-1)])
-        
-        #Genero Training, Validation, Test dataset
+
+        # Pulizia
+        # Elimina colonne nulle
+        c0 <- which(apply(tdatab[, 1:(ncol(tdatab) - 1)], 2, sum) == 0)
+        if (length(c0) > 0) tdatab <- tdatab[, -c0]
+        # Standardizzo
+        tdatab[, 1:(ncol(tdatab) - 1)] <- StandardizeByCol(tdatab[, 1:(ncol(tdatab) - 1)])
+
+        # Genero Training, Validation, Test dataset
         Tr <- Va <- Te <- numeric(0)
-        for(ij in 1:nmet){
-          ijr <- which(tdatab[,ncol(tdatab)]==selmet[ij])
-          Tr <- c(Tr,sample(ijr,floor(length(ijr)*nTr/100), replace = F))
-          Va <- c(Va,sample(setdiff(ijr,Tr),floor(length(ijr)*nVa/100), replace = F))
-          Te <- c(Te,setdiff(ijr,c(Tr,Va)))
+        for (ij in 1:nmet) {
+          ijr <- which(tdatab[, ncol(tdatab)] == selmet[ij])
+          Tr <- c(Tr, sample(ijr, floor(length(ijr) * nTr / 100), replace = F))
+          Va <- c(Va, sample(setdiff(ijr, Tr), floor(length(ijr) * nVa / 100), replace = F))
+          Te <- c(Te, setdiff(ijr, c(Tr, Va)))
         }
-        
-        #Genero matrici x BP
-        metmat <- matrix(0,nvms,nmet)
+
+        # Genero matrici x BP
+        metmat <- matrix(0, nvms, nmet)
         colnames(metmat) <- selmet
-        for(ij in 1:nvms) metmat[ij,which(colnames(metmat)==mets[ij])]=1
-        
-        nInput <- ncol(tdatab)-1
+        for (ij in 1:nvms) metmat[ij, which(colnames(metmat) == mets[ij])] <- 1
+
+        nInput <- ncol(tdatab) - 1
         nOUT <- nmet
-        nH <- floor(nInput*nHf)
-        
+        nH <- floor(nInput * nHf)
+
         svalue(sup_rep) <- "TR - VA - TE\nConfiguration..."
-        #Individua le matrici di Training
-        Tr_DATA=as.matrix(tdatab[Tr,1:nInput])
-        Tr_OUT=as.matrix(metmat[Tr,])
-        #Individua le matrici di Validazione
-        Va_DATA=as.matrix(tdatab[Va,1:nInput])
-        Va_OUT=as.matrix(metmat[Va,])
-        #Individua le matrici di Test
-        Te_DATA=as.matrix(tdatab[Te,1:nInput])
-        Te_OUT=as.matrix(metmat[Te,])
-        
-        net.start = newff(n.neurons=c(nInput,nH,nOUT),learning.rate.global=1e-2, 
-                          momentum.global=0.5, error.criterium="LMS",
-                          hidden.layer="sigmoid", output.layer="sigmoid", 
-                          method="ADAPTgd")
+        # Individua le matrici di Training
+        Tr_DATA <- as.matrix(tdatab[Tr, 1:nInput])
+        Tr_OUT <- as.matrix(metmat[Tr, ])
+        # Individua le matrici di Validazione
+        Va_DATA <- as.matrix(tdatab[Va, 1:nInput])
+        Va_OUT <- as.matrix(metmat[Va, ])
+        # Individua le matrici di Test
+        Te_DATA <- as.matrix(tdatab[Te, 1:nInput])
+        Te_OUT <- as.matrix(metmat[Te, ])
+
+        net.start <- newff(
+          n.neurons = c(nInput, nH, nOUT), learning.rate.global = 1e-2,
+          momentum.global = 0.5, error.criterium = "LMS",
+          hidden.layer = "sigmoid", output.layer = "sigmoid",
+          method = "ADAPTgd"
+        )
         cat("\n   -     Neural Network Calibration     -\n", sep = "")
         svalue(sup_rep) <- "Neural Network\nTraining..."
-        net = train(net.start, P=Tr_DATA, 
-                    T=Tr_OUT, 
-                    Pval=Va_DATA, 
-                    Tval=Va_OUT, 
-                    error.criterium="LMS", 
-                    report=FALSE, show.step=nStep, n.shows=nShow)
+        net <- train(net.start,
+          P = Tr_DATA,
+          T = Tr_OUT,
+          Pval = Va_DATA,
+          Tval = Va_OUT,
+          error.criterium = "LMS",
+          report = FALSE, show.step = nStep, n.shows = nShow
+        )
         cat("\n   -     Neural Network Prediction     -", sep = "")
-        
+
         svalue(sup_rep) <- "Neural Network\nPredicting..."
         # Previsione
-        Te_PRED <- sim(net$net,Te_DATA)
-        Te_PRED <- selmet[apply(Te_PRED,1,which.max)]
+        Te_PRED <- sim(net$net, Te_DATA)
+        Te_PRED <- selmet[apply(Te_PRED, 1, which.max)]
         Te_OUT <- mets[Te]
-        ConfMat <- xtabs(~.,cbind(Te_PRED,Te_OUT))
+        ConfMat <- xtabs(~., cbind(Te_PRED, Te_OUT))
         rownames(ConfMat) <- colnames(ConfMat) <- selmet
-        Dg <- sum(diag(ConfMat))/sum(ConfMat)
-        
-        #Assegnazione finale
-        if(svalue(cla_trkvess) == "Track"){
-          pdata <- LBdata[which(LBdata[,ncol(LBdata)]==0),c(3:(ncol(LBdata)-1))]
-        }else{
-          pdata <- LBdata[which(LBdata[,ncol(LBdata)]==0),c(2:(ncol(LBdata)-1))]
+        Dg <- sum(diag(ConfMat)) / sum(ConfMat)
+
+        # Assegnazione finale
+        if (svalue(cla_trkvess) == "Track") {
+          pdata <- LBdata[which(LBdata[, ncol(LBdata)] == 0), c(3:(ncol(LBdata) - 1))]
+        } else {
+          pdata <- LBdata[which(LBdata[, ncol(LBdata)] == 0), c(2:(ncol(LBdata) - 1))]
         }
-        if(length(c0)>0) pdata <- pdata[,-c0]
-        #Standardizzo
-        pdata[,1:(ncol(pdata)-1)] <- StandardizeByCol(pdata[,1:(ncol(pdata)-1)])
-        
-        Met_PRED <- sim(net$net,pdata)
-        Met_PRED <- selmet[apply(Met_PRED,1,which.max)]
+        if (length(c0) > 0) pdata <- pdata[, -c0]
+        # Standardizzo
+        pdata[, 1:(ncol(pdata) - 1)] <- StandardizeByCol(pdata[, 1:(ncol(pdata) - 1)])
+
+        Met_PRED <- sim(net$net, pdata)
+        Met_PRED <- selmet[apply(Met_PRED, 1, which.max)]
         Out_Pred <- numeric(nrow(LBdata))
-        Out_Pred[which(LBdata[,ncol(LBdata)]!=0)] <- LBdata[which(LBdata[,ncol(LBdata)]!=0),ncol(LBdata)]
-        Out_Pred[which(Out_Pred==0)] <- Met_PRED
-        
-        if(svalue(cla_trkvess) == "Track"){
-          Out_BP <- as.data.frame(cbind(LBdata[,c(1:2)],Out_Pred))
-        }else{
-          Out_BP <- data.frame(I_NCEE = LBdata[,1], met_des = Out_Pred)
+        Out_Pred[which(LBdata[, ncol(LBdata)] != 0)] <- LBdata[which(LBdata[, ncol(LBdata)] != 0), ncol(LBdata)]
+        Out_Pred[which(Out_Pred == 0)] <- Met_PRED
+
+        if (svalue(cla_trkvess) == "Track") {
+          Out_BP <- as.data.frame(cbind(LBdata[, c(1:2)], Out_Pred))
+        } else {
+          Out_BP <- data.frame(I_NCEE = LBdata[, 1], met_des = Out_Pred)
           poi <- sqldf("select distinct I_NCEE, T_NUM from intrp", dbname = vms_DB$db)
           Out_BP <- merge(poi, Out_BP, by = "I_NCEE")
         }
-        
-        plotNet(net,Dg,ConfMat)
-        
+
+        plotNet(net, Dg, ConfMat)
+
         cat("\n   -     DataBase Update     -", sep = "")
         svalue(sup_rep) <- "Updating\nDataBase..."
         sqldf("drop table if exists nn_clas", dbname = vms_DB$db)
         sqldf("CREATE TABLE nn_clas(I_NCEE INT, T_NUM INT, met_des CHAR)", dbname = vms_DB$db)
         sqldf("INSERT INTO nn_clas SELECT * FROM `Out_BP`", dbname = vms_DB$db)
-        cat("\n   -     Perfect Prediction in ", round(Dg*100,2), "% of test set     -", sep = "")
+        cat("\n   -     Perfect Prediction in ", round(Dg * 100, 2), "% of test set     -", sep = "")
         cat("\n\n   ---   Metier Prediction Complete!   ---\n\n", sep = "")
-        svalue(sup_rep) <- paste("Perfect Prediction\nin ", round(Dg*100,2), "% of test set\nwith ", minrec, " observation * metier", sep = "")
-        
-        
-        gconfirm("\nNeural Network Training and Prediction complete!\n\nSave current network?\n\n", title="Save NN", icon = "info",
-                 parent = main_win,
-                 handler = function(...){
-                   nn_file <- gfile(text = "Save Neural Network", type = "save", initialfilename = "*.rData", 
-                                    filter = list("All files" = list(patterns = c("*")), "R files" =
-                                                    list(patterns = "*.rData")))
-                   if(length(unlist(strsplit(nn_file, "[.]"))) == 1){nn_file <- paste(nn_file, ".rData", sep = "")}
-                   net$selmet <- selmet
-                   saveRDS(net, nn_file)
-                 })
+        svalue(sup_rep) <- paste("Perfect Prediction\nin ", round(Dg * 100, 2), "% of test set\nwith ", minrec, " observation * metier", sep = "")
+
+
+        gconfirm("\nNeural Network Training and Prediction complete!\n\nSave current network?\n\n",
+          title = "Save NN", icon = "info",
+          parent = main_win,
+          handler = function(...) {
+            nn_file <- gfile(
+              text = "Save Neural Network", type = "save", initialfilename = "*.rData",
+              filter = list(
+                "All files" = list(patterns = c("*")), "R files" =
+                  list(patterns = "*.rData")
+              )
+            )
+            if (length(unlist(strsplit(nn_file, "[.]"))) == 1) {
+              nn_file <- paste(nn_file, ".rData", sep = "")
+            }
+            net$selmet <- selmet
+            saveRDS(net, nn_file)
+          }
+        )
       }
-    }else{
+    } else {
       cat("\n\n   ---   Error no Pre_NN data!   ---", sep = "")
     }
-    
+
     enabled(vms_db_f) <- TRUE
     enabled(two_b_g) <- TRUE
     enabled(two_c_g) <- TRUE
     enabled(g_go) <- TRUE
     enabled(start_ba) <- TRUE
-    
   })
   addSpring(g_go)
-  
+
   enabled(g_go) <- FALSE
   enabled(two_b_g) <- FALSE
   enabled(two_c_g) <- FALSE
-  
+
   addSpring(left_g)
   theplot <- ggraphics(width = 600, height = 400, container = left_g)
   addSpring(left_g)
-  
-  
-  if(vms_DB$db != ""){
-    svalue(sel_vms_f) <- ifelse(.Platform$OS.type == "windows", strsplit(vms_DB$db, "\\\\")[[1]][length(strsplit(vms_DB$db, "\\\\")[[1]])],strsplit(vms_DB$db, "/")[[1]][length(strsplit(vms_DB$db, "/")[[1]])])
-    
+
+
+  if (vms_DB$db != "") {
+    svalue(sel_vms_f) <- ifelse(.Platform$OS.type == "windows", strsplit(vms_DB$db, "\\\\")[[1]][length(strsplit(vms_DB$db, "\\\\")[[1]])], strsplit(vms_DB$db, "/")[[1]][length(strsplit(vms_DB$db, "/")[[1]])])
+
     n_ntr <- as.numeric(sqldf("select count(*) from intrp", dbname = vms_DB$db))
-    if(n_ntr > 0){
+    if (n_ntr > 0) {
       svalue(n_vess) <- paste("   N. of Vessels:  ", as.numeric(sqldf("select count(distinct I_NCEE) from intrp", dbname = vms_DB$db)), sep = "")
       svalue(n_trck) <- paste("    N. of tracks:  ", as.numeric(sqldf("select count(*) from (select distinct I_NCEE, T_NUM from track)", dbname = vms_DB$db)), sep = "")
       svalue(n_matc) <- paste(" N. VMS-LB match:  ", as.numeric(sqldf("select count(*) from vms_lb", dbname = vms_DB$db)), sep = "")
@@ -689,11 +713,11 @@ gui_vms_met_pred <- function(vms_db_name = ""){
       enabled(start_ba) <- TRUE
       enabled(two_b_g) <- TRUE
       nn_tab <- as.numeric(sqldf("SELECT count(*) FROM sqlite_master WHERE type='table' AND name='pre_nn'", dbname = vms_DB$db))
-      if(nn_tab == 1){
+      if (nn_tab == 1) {
         enabled(g_go) <- TRUE
         enabled(two_c_g) <- TRUE
       }
-    }else{
+    } else {
       cat("\n\n  VMS DB error - Interpolated Pings not found!\n\n", sep = "")
     }
   }
