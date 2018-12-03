@@ -8,7 +8,7 @@
 #'
 #' @usage kno2kmh(speed)
 #' @example 
-#' vmsbase:::kno2kmh(speed = c(3, 4.5, 5))
+#' kno2kmh(speed = c(3, 4.5, 5))
 #'
 
 # KNOTS2KMH

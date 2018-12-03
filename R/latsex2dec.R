@@ -12,7 +12,7 @@
 #' @usage latsex2dec(degree, minute, second, direction)
 #'
 #' @example 
-#' vmsbase:::latsex2dec(degree = 10, minute = 10, second = 10, direction = "N")
+#' latsex2dec(degree = 10, minute = 10, second = 10, direction = "N")
 #' 
 
 # LAT_SEX2DEC

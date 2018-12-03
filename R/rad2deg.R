@@ -10,7 +10,7 @@
 #' @usage rad2deg(heading)
 #'
 #' @example 
-#' vmsbase:::rad2deg(heading = 1.4)
+#' rad2deg(heading = 1.4)
 #' 
 
 # Heading edit
