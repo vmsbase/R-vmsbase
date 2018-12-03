@@ -2,12 +2,12 @@
 % Please edit documentation in R/gui_vms_db_clean.R
 \name{gui_vms_db_clean}
 \alias{gui_vms_db_clean}
-\title{VMS DB Clean GUI
- 
-The \code{gui_vms_db_clean} function implements the graphical user interface for the
- VMS DataBase Cleaning routine.}
+\title{VMS DB Clean GUI}
 \usage{
-gui_vms_db_clean(vms_db_name = "", map_file_name = "", harb_file_name = "", inHarbBuff = 2)
+gui_vms_db_clean(vms_db_name = "",
+                        map_file_name = "",
+                        harb_file_name = "",
+                        inHarbBuff = 2)
 }
 \arguments{
 \item{vms_db_name}{The path of a VMS DataBase}
@@ -22,6 +22,10 @@ gui_vms_db_clean(vms_db_name = "", map_file_name = "", harb_file_name = "", inHa
 This function does not return a value.
 }
 \description{
+The \code{gui_vms_db_clean} function implements the graphical user interface for the
+ VMS DataBase Cleaning routine.
+}
+\details{
 This function, with a VMS database and two shape files with land polygon and harbours points,
  performs a filtered search over the whole db assigning warning status to the vms raw data.
 }

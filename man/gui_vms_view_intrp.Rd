@@ -2,10 +2,7 @@
 % Please edit documentation in R/gui_vms_view_intrp.R
 \name{gui_vms_view_intrp}
 \alias{gui_vms_view_intrp}
-\title{VMS DB View Interpolated Data GUI
- 
-The \code{gui_vms_view_intrp} function implements the graphical user interface for the
- VMS DB routine to view interpolated data.}
+\title{VMS DB View Interpolated Data GUI}
 \usage{
 gui_vms_view_intrp(vms_db_name = "", bathy_file_name = "")
 }
@@ -18,6 +15,10 @@ gui_vms_view_intrp(vms_db_name = "", bathy_file_name = "")
 This function does not return a value.
 }
 \description{
+The \code{gui_vms_view_intrp} function implements the graphical user interface for the
+ VMS DB routine to view interpolated data.
+}
+\details{
 This function, with a VMS database,
  plots vessel and track data.
 }

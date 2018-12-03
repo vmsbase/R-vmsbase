@@ -7,7 +7,7 @@
 gui_lb_met_edi()
 }
 \value{
-This function does not return a value. 
+This function does not return a value.
 After the execution, the edited names will be added to the LogBook Metier file.
 }
 \description{

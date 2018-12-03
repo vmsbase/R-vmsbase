@@ -15,7 +15,7 @@ The \code{gui_vms_editraw} function implements the graphical user interface for 
 editing of a raw vms dataset
 }
 \details{
-This function, with a raw vms dataset, produces an edited version of it. 
-The user must select, for each mandatory field, the column name where the data is 
+This function, with a raw vms dataset, produces an edited version of it.
+The user must select, for each mandatory field, the column name where the data is
 stored.
 }

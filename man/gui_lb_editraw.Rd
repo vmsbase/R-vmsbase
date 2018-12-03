@@ -15,7 +15,7 @@ The \code{gui_lb_editraw} function implements the graphical user interface for t
 editing of a raw logbook dataset
 }
 \details{
-This function, with a raw logbook dataset, produces an edited version of it. 
-The user must select, for each mandatory field, the column name where the data is 
+This function, with a raw logbook dataset, produces an edited version of it.
+The user must select, for each mandatory field, the column name where the data is
 stored.
 }

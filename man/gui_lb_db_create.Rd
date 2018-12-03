@@ -7,7 +7,7 @@
 gui_lb_db_create()
 }
 \value{
-This function does not return a value. 
+This function does not return a value.
 After the execution a logbook database will be deployed.
 }
 \description{

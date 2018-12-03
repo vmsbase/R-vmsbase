@@ -2,10 +2,7 @@
 % Please edit documentation in R/gui_vms_met_pred.R
 \name{gui_vms_met_pred}
 \alias{gui_vms_met_pred}
-\title{Predict Metier GUI
- 
-The \code{gui_vms_met_pred} function implements the graphical user interface for the
- Metier Prediction}
+\title{Predict Metier GUI}
 \usage{
 gui_vms_met_pred(vms_db_name = "")
 }
@@ -16,6 +13,10 @@ gui_vms_met_pred(vms_db_name = "")
 This function does not return a value.
 }
 \description{
+The \code{gui_vms_met_pred} function implements the graphical user interface for the
+ Metier Prediction
+}
+\details{
 This function,  with a VMS database and a shape file with harbours points, performs a neural network prediction over the whole
  db assigning metier data to vms tracks based on a training with existing vms-lb match data
   given by the database.

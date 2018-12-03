@@ -15,7 +15,10 @@
 #'
 #' @return This function does not return a value.
 #'
-#' @usage gui_vms_db_clean(vms_db_name = "", map_file_name = "", harb_file_name = "", inHarbBuff = 2)
+#' @usage gui_vms_db_clean(vms_db_name = "",
+#'                         map_file_name = "",
+#'                         harb_file_name = "",
+#'                         inHarbBuff = 2)
 #'
 #' @export gui_vms_db_clean
 #'

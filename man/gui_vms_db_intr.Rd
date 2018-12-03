@@ -2,10 +2,7 @@
 % Please edit documentation in R/gui_vms_db_intr.R
 \name{gui_vms_db_intr}
 \alias{gui_vms_db_intr}
-\title{VMS DB Interpolation GUI
- 
-The \code{gui_vms_db_intr} function implements the graphical user interface for the
- VMS Track Interpolation routine.}
+\title{VMS DB Interpolation GUI}
 \usage{
 gui_vms_db_intr(vms_db_name = "")
 }
@@ -16,6 +13,10 @@ gui_vms_db_intr(vms_db_name = "")
 This function does not return a value.
 }
 \description{
+The \code{gui_vms_db_intr} function implements the graphical user interface for the
+ VMS Track Interpolation routine.
+}
+\details{
 This function, with a VMS cleaned and cutted database (see \code{\link{gui_vms_db_cut}} and \code{\link{gui_vms_db_clean}}),
  interpolates track data of each vessel in the VMS DB.
 }
