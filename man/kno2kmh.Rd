@@ -15,3 +15,7 @@ The function returns the speed value converted in km/h
 \description{
 \code{kno2kmh} converts speed in knots to km/h values.
 }
+\examples{
+kno2kmh(speed = c(3, 4.5, 5))
+
+}

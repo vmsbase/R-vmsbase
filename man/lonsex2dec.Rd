@@ -21,3 +21,7 @@ The function returns the longitude value converted in the decimal numeral system
 \description{
 \code{lonsex2dec} converts sexagesimal longitude data to decimal longitude values.
 }
+\examples{
+lonsex2dec(degree = 10, minute = 10, second = 10, direction = "W")
+
+}
