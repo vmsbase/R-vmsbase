@@ -24,6 +24,7 @@ Imports: marmap, intervals, methods, plotrix, sp, foreign, cluster,
         cairoDevice, ggplot2, DBI, RSQLite, fields, gsubfn, AMORE,
         ecodist, gWidgets, gWidgetsRGtk2, chron, maptools, outliers,
         PBSmapping, R6, grid, VennDiagram, gmt
-URL: http://www.vmsbase.org/
+URL: https://github.com/vmsbase/R-vmsbase
 NeedsCompilation: no
-RoxygenNote: 6.0.1
+RoxygenNote: 6.1.0
+Encoding: UTF-8
