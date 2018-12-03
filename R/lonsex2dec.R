@@ -11,7 +11,7 @@
 #'
 #' @usage lonsex2dec(degree, minute, second, direction)
 #'
-#' @example 
+#' @examples
 #' lonsex2dec(degree = 10, minute = 10, second = 10, direction = "W")
 #' 
 

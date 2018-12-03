@@ -8,8 +8,8 @@
 #' @return The function returns the heading value converted in degrees
 #'
 #' @usage rad2deg(heading)
-#'
-#' @example 
+#' 
+#' @examples
 #' rad2deg(heading = 1.4)
 #' 
 

@@ -11,7 +11,7 @@
 #'
 #' @usage latsex2dec(degree, minute, second, direction)
 #'
-#' @example 
+#' @examples
 #' latsex2dec(degree = 10, minute = 10, second = 10, direction = "N")
 #' 
 

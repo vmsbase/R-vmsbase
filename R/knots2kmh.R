@@ -7,7 +7,7 @@
 #' @return The function returns the speed value converted in km/h
 #'
 #' @usage kno2kmh(speed)
-#' @example 
+#' @examples
 #' kno2kmh(speed = c(3, 4.5, 5))
 #'
 
