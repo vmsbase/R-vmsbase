@@ -16,7 +16,6 @@
 #' 
 #' @usage gui_lb_met_dis(lb_db_name = "")
 #' 
-#' @export gui_lb_met_dis  
 #'
 
 gui_lb_met_dis <- function(lb_db_name = "")

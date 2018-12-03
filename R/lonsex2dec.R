@@ -11,8 +11,9 @@
 #'
 #' @usage lonsex2dec(degree, minute, second, direction)
 #'
-#' @export lonsex2dec
-#'
+#' @example 
+#' vmsbase:::lonsex2dec(degree = 10, minute = 10, second = 10, direction = "W")
+#' 
 
 # LON_SEX2DEC
 # Converts longitude from sexagesimal to decimal numeral system.

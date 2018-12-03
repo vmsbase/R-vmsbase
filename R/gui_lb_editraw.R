@@ -13,7 +13,6 @@
 #'
 #' @usage gui_lb_editraw()
 #'
-#' @export gui_lb_editraw
 #'
 
 gui_lb_editraw <- function() {

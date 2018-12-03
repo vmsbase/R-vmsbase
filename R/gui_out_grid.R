@@ -17,7 +17,6 @@
 #'
 #' @usage gui_out_grid(vms_db_name = "")
 #'
-#' @export gui_out_grid
 #'
 #' @seealso \code{\link{gui_dcf_ind}}
 

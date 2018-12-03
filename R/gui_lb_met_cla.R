@@ -16,7 +16,6 @@
 #'
 #' @usage gui_lb_met_cla(lb_db_name = "")
 #'
-#' @export gui_lb_met_cla
 #'
 #' @seealso \code{\link{gui_lb_met_dis}}
 

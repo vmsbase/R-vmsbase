@@ -14,7 +14,6 @@
 #'
 #' @usage gui_vms_db_dep(vms_db_name = "")
 #'
-#' @export gui_vms_db_dep
 #'
 
 gui_vms_db_dep <- function(vms_db_name = "") {

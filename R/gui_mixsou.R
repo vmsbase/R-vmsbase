@@ -12,7 +12,6 @@
 #'
 #' @usage gui_vmsdb_mixsou()
 #'
-#' @export gui_vmsdb_mixsou
 #'
 #' @seealso \code{\link{gui_vms_editraw}}
 #'

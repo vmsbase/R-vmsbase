@@ -13,7 +13,6 @@
 #'
 #' @usage gui_vms_editraw()
 #'
-#' @export gui_vms_editraw
 #'
 
 gui_vms_editraw <- function() {

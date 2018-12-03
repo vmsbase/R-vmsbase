@@ -13,7 +13,6 @@
 #'
 #' @usage gui_vms_db_sel(vms_db_name = "")
 #'
-#' @export gui_vms_db_sel
 #'
 #' @seealso \code{\link{gui_vms_db_stat}}
 

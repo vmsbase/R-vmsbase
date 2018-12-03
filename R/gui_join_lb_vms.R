@@ -16,7 +16,6 @@
 #'
 #' @usage gui_join_lb_vms(lb_db_name = "", vms_db_name = "")
 #'
-#' @export gui_join_lb_vms
 #'
 #'
 #' @references free text reference Pointers to the literature related to this object.

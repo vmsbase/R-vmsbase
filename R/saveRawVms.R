@@ -11,7 +11,6 @@
 #'
 #' @usage saveRawVms(rawfile, widget)
 #'
-#' @export saveRawVms
 #' @seealso \code{\link{gui_vms_editraw}}
 
 saveRawVms <- function(rawfile, widget) {

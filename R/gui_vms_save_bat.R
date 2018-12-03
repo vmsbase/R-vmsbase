@@ -13,7 +13,6 @@
 #'
 #' @usage gui_vms_save_bat(vms_db_name = "")
 #'
-#' @export gui_vms_save_bat
 #'
 #' @seealso \code{\link{gui_vms_view_ping}} \code{\link{gui_vms_view_track}} \code{\link{gui_vms_view_intrp}}
 

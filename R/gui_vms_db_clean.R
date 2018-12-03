@@ -20,7 +20,6 @@
 #'                         harb_file_name = "",
 #'                         inHarbBuff = 2)
 #'
-#' @export gui_vms_db_clean
 #'
 
 gui_vms_db_clean <- function(vms_db_name = "", map_file_name = "", harb_file_name = "", inHarbBuff = 2) {

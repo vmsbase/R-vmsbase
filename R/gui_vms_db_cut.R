@@ -13,7 +13,6 @@
 #'
 #' @usage gui_vms_db_cut(vms_db_name = "")
 #'
-#' @export gui_vms_db_cut
 #'
 #' @seealso \code{\link{gui_vms_db_clean}}
 

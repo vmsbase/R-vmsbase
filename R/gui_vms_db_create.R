@@ -13,7 +13,6 @@
 #'
 #' @usage gui_vms_db_create()
 #'
-#' @export gui_vms_db_create
 #'
 #' @seealso \code{\link{gui_vms_editraw}}
 

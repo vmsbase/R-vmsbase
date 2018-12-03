@@ -14,7 +14,6 @@
 #'
 #' @usage gui_vms_met_pred(vms_db_name = "")
 #'
-#' @export gui_vms_met_pred
 #'
 #' @references
 #' Russo, T., Parisi, A., Prorgi, M., Boccoli, F., Cignini, I., Tordoni, M. and Cataudella, S. (2011) When behaviour reveals activity: Assigning fishing effort to metiers based on VMS data using artificial neural networks. \emph{Fisheries Research}, \bold{111(1)}, 53--64.

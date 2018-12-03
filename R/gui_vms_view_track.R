@@ -14,7 +14,6 @@
 #'
 #' @usage gui_vms_view_track(vms_db_name = "", bathy_file_name = "")
 #'
-#' @export gui_vms_view_track
 #'
 #' @seealso \code{\link{gui_vms_view_ping}} \code{\link{gui_vms_save_bat}} \code{\link{gui_vms_view_intrp}}
 

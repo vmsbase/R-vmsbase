@@ -12,7 +12,6 @@
 #'
 #' @usage gui_lb_met_edi()
 #'
-#' @export gui_lb_met_edi
 #'
 
 gui_lb_met_edi <- function() {

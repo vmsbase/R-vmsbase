@@ -11,7 +11,6 @@
 #'
 #' @usage saveRawLogBook(rawfile, widget)
 #'
-#' @export saveRawLogBook
 #' @seealso \code{\link{gui_lb_editraw}}
 
 saveRawLogBook <- function(rawfile,

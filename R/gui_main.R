@@ -9,7 +9,6 @@
 #'
 #' @usage gui_main()
 #'
-#' @export gui_main
 
 gui_main <- function() {
   vms_db_file <- ""

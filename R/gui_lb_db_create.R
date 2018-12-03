@@ -11,7 +11,6 @@
 #'
 #' @usage gui_lb_db_create()
 #'
-#' @export gui_lb_db_create
 #'
 #' @seealso \code{\link{gui_lb_editraw}}
 

@@ -13,7 +13,6 @@
 #'
 #' @usage gui_lb_db_edit(lb_db_name = "")
 #'
-#' @export gui_lb_db_edit
 #'
 
 gui_lb_db_edit <- function(lb_db_name = "") {

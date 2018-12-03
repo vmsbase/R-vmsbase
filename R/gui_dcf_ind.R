@@ -11,7 +11,6 @@
 #'
 #' @usage gui_dcf_ind()
 #'
-#' @export gui_dcf_ind
 #'
 #' @seealso \code{\link{gui_out_grid}}
 #'

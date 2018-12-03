@@ -9,14 +9,14 @@
 #'
 #' @usage rad2deg(heading)
 #'
-#' @export rad2deg
-#'
+#' @example 
+#' vmsbase:::rad2deg(heading = 1.4)
+#' 
 
 # Heading edit
 # Edits the heading data
 
 rad2deg <- function(heading) {
-  heading <- heading * pi * (2 / 360)
-
+  heading <- heading * (180/pi)
   return(heading)
 }

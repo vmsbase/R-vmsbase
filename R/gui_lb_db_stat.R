@@ -14,7 +14,6 @@
 #'
 #' @usage gui_lb_db_stat(lb_db_name = "")
 #'
-#' @export gui_lb_db_stat
 #'
 
 gui_lb_db_stat <- function(lb_db_name = "") {

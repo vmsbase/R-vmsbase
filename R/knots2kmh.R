@@ -7,8 +7,8 @@
 #' @return The function returns the speed value converted in km/h
 #'
 #' @usage kno2kmh(speed)
-#'
-#' @export kno2kmh
+#' @example 
+#' vmsbase:::kno2kmh(speed = c(3, 4.5, 5))
 #'
 
 # KNOTS2KMH

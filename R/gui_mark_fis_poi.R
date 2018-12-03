@@ -15,7 +15,6 @@
 #'
 #' @usage gui_mark_fis_poi(vms_db_name = "", harb_file_name = "")
 #'
-#' @export gui_mark_fis_poi
 #'
 
 gui_mark_fis_poi <- function(vms_db_name = "", harb_file_name = "") {

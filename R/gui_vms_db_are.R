@@ -13,7 +13,6 @@
 #'
 #' @usage gui_vms_db_are(vms_db_name = "")
 #'
-#' @export gui_vms_db_are
 #'
 
 gui_vms_db_are <- function(vms_db_name = "") {
