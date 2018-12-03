@@ -21,7 +21,7 @@
 #'
 #' @references
 #'
-#' \url{http://www.vmsbase.org/}
+#' \url{https://github.com/vmsbase/R-vmsbase}
 #'
 #'
 #' Russo, T., D'Andrea, L., Parisi, A. and Cataudella, S. (2014) VMSbase: An R-Package for VMS and Logbook Data Management and Analysis in Fisheries Ecology. \emph{PloS one}, \bold{9(6)}, e100195.
