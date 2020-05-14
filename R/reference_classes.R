@@ -339,7 +339,7 @@ mix_sou <- R6Class("mixsou",
           up_g <- ggroup(horizontal = FALSE, container = temp_dia)
 
           glabel("\nThis is a sample of the vessel IDs found in your dataset:", container = up_g)
-          addSpace(up_g, 15, horizontal = FALSE)
+          addSpace(up_g, 15)
           tab_g <- ggroup(horizontal = TRUE, container = up_g)
           size(tab_g) <- c(450, 150)
 
@@ -359,7 +359,7 @@ mix_sou <- R6Class("mixsou",
           svalue(id_ty_2) <- "CFR"
           addSpring(tab_g)
 
-          addSpace(up_g, 15, horizontal = FALSE)
+          addSpace(up_g, 15)
           dia_g <- ggroup(horizontal = TRUE, container = up_g)
           addSpring(dia_g)
           bu1_g <- ggroup(horizontal = FALSE, container = dia_g)

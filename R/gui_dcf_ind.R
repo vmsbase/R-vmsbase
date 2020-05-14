@@ -57,7 +57,7 @@ gui_dcf_ind <- function() {
     }
   )
   addSpring(g_input)
-  addSpace(big_g, 10, horizontal = FALSE)
+  addSpace(big_g, 10)
   g_inputb <- ggroup(horizontal = TRUE, container = big_g)
   addSpring(g_inputb)
   glabel("Cell Area", container = g_inputb)

@@ -66,23 +66,23 @@ gui_vms_db_cut <- function(vms_db_name = "") {
 
   addSpring(cut_opt)
   opt_f <- gframe(text = "Split Options", horizontal = FALSE, container = cut_opt, expand = TRUE)
-  addSpace(opt_f, 20, horizontal = TRUE)
+  addSpace(opt_f, 20)
   opt_out_g <- ggroup(horizontal = TRUE, container = opt_f)
   addSpring(opt_out_g)
   opt_out_c <- gcheckbox("Use Outliers", checked = TRUE, container = opt_out_g)
   addSpring(opt_out_g)
-  addSpace(opt_f, 20, horizontal = TRUE)
+  addSpace(opt_f, 20)
   opt_med_g <- ggroup(horizontal = TRUE, container = opt_f)
   addSpring(opt_med_g)
   opt_med_c <- gcheckbox("Lag > Median", checked = TRUE, container = opt_med_g)
   addSpring(opt_med_g)
-  addSpace(opt_f, 20, horizontal = FALSE)
+  addSpace(opt_f, 20)
   glabel(text = "Lag > Minutes", container = opt_f)
   opt_hou_s <- gslider(
     from = 30, to = 360, by = 5,
     value = 120, horizontal = TRUE, container = opt_f
   )
-  addSpace(opt_f, 20, horizontal = TRUE)
+  addSpace(opt_f, 20)
   addSpring(cut_opt)
 
   ################
